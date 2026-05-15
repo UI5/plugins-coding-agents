@@ -12,6 +12,7 @@ permissions:
 jobs:
   pull-request:
     runs-on: ubuntu-24.04
+    environment: release
     steps:
     - uses: googleapis/release-please-action@v5
       id: release
