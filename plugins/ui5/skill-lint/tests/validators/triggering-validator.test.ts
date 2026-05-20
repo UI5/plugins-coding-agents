@@ -1,7 +1,7 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
+import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { TriggeringValidator } from '../../src/validators/triggering-validator.js';
 import type { Skill, LintConfig } from '../../src/types/index.js';
-import { writeFileSync, mkdirSync } from 'fs';
+import { writeFileSync, mkdirSync, existsSync, rmSync } from 'fs';
 import { join } from 'path';
 import { tmpdir } from 'os';
 
@@ -47,6 +47,13 @@ describe('TriggeringValidator', () => {
       formatters: { default: 'text' as const, options: { colors: true, verbose: false } },
       output: { directory: '.lint-reports', formats: ['text'] }
     };
+  });
+
+  afterEach(() => {
+    // Clean up temp directory to prevent disk space issues
+    if (existsSync(tempDir)) {
+      rmSync(tempDir, { recursive: true, force: true });
+    }
   });
 
   describe('Basic Properties', () => {

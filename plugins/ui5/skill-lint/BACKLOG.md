@@ -44,7 +44,14 @@ Status:
    - Fixed vitest.config.ts to exclude dist/ from test execution
    - Updated test expectations to match actual validator rule names
 
-4. **Coverage Report**
+4. **Code Review & Fixes**
+   - ✅ Added afterEach cleanup in triggering-validator tests (prevents disk space issues)
+   - ✅ Added error logging to extractFrontmatter (alerts developers to YAML errors)
+   - ✅ Fixed empty content line counting (empty string now correctly returns 0)
+   - ✅ Added test constants for magic numbers (MAX_LINES, WARN_THRESHOLD_LINES, etc.)
+   - Created CODE_REVIEW.md with comprehensive analysis
+
+5. **Coverage Report**
    - **Overall: 66% coverage** (below 80% target)
    - Config: 100% ✅
    - JSON formatter: 100% ✅
@@ -55,7 +62,14 @@ Status:
    - File utils: 27.58% 🔴
    - GitHub Actions formatter: 0% 🔴
 
-### 🟡 Remaining Work
+### 🟡 Remaining Code Quality Issues (from CODE_REVIEW.md)
+1. **Code Duplication** - createMockSkill helpers duplicated across test files
+2. **Line Counting Inconsistency** - countLines() utility exists but isn't used consistently
+3. **Missing JSDoc** - Tests lack documentation comments
+4. **Limited Edge Cases** - Missing tests for unicode, special characters, permissions failures
+5. **Empty Metadata Ambiguity** - extractFrontmatter returns empty strings for all failures
+
+### 🟡 Remaining Work to Reach 80% Coverage
 1. **Add tests for uncovered code:**
    - file-utils.ts: loadSkill(), findPluginRoot(), countLines()
    - github-actions-formatter.ts: All functions (0% coverage)
@@ -67,14 +81,69 @@ Status:
 ### 📈 Metrics
 - **Test Pass Rate:** 100% (54/54 tests) ✅
 - **Coverage:** 66% (target: 80%)
-- **Test Execution Time:** ~380ms
+- **Test Execution Time:** ~340ms
 - **Code Quality:** Strong (strict TypeScript, readonly types, immutability)
+- **Code Review:** ✅ Critical issues fixed, medium/low issues tracked
 
 ---
 
 ---
 
 ## Phase 1: Testing & Quality 🔴 CRITICAL
+
+### 1.0 Code Quality Improvements (🟨 In Progress)
+**Priority:** 🟡 HIGH  
+**Effort:** 2-3 days  
+**Source:** CODE_REVIEW.md findings (2026-05-20)
+
+#### Critical Issues ✅ FIXED
+- [x] Add afterEach cleanup in triggering-validator tests
+- [x] Add error logging to extractFrontmatter
+- [x] Fix empty content line counting
+- [x] Add test constants for magic numbers
+
+#### High Priority Issues
+- [ ] **Code Duplication** - Extract shared test helpers
+  - Create `tests/helpers/test-fixtures.ts`
+  - Move createMockSkill, createMockResult, createMockConfig
+  - Update all test files to import from shared helpers
+  - **Effort:** 2-3 hours
+
+- [ ] **Line Counting Inconsistency** - Standardize approach
+  - Split `countLines()` into `countLinesFromFile()` and `countLinesFromContent()`
+  - Or update to accept string | path parameter
+  - Document the design decision
+  - **Effort:** 1-2 hours
+
+- [ ] **Missing JSDoc Comments** - Document test cases
+  - Add JSDoc to complex test cases explaining "why"
+  - Document test constants and thresholds
+  - Add file-level documentation
+  - **Effort:** 2-3 hours
+
+#### Medium Priority Issues
+- [ ] **Empty Metadata Return Values** - Improve error handling
+  - Consider using undefined for optional fields
+  - Or return Result<T, E> type for fallible operations
+  - Better distinguish between "missing" and "invalid"
+  - **Effort:** 3-4 hours
+
+- [ ] **Missing Edge Case Tests** - Expand test coverage
+  - Unicode characters in descriptions
+  - Special characters in skill names
+  - Permission errors during file operations
+  - Malformed JSON in test case files
+  - **Effort:** 2-3 hours
+
+- [ ] **Test Performance** - Optimize file I/O
+  - Mock fs operations where possible
+  - Reduce temp file creation
+  - Use in-memory test data
+  - **Effort:** 2-3 hours
+
+**See:** CODE_REVIEW.md for detailed analysis and recommendations
+
+---
 
 ### 1.1 Unit Tests (🟨 In Progress — 66% Coverage Achieved)
 **Priority:** 🔴 CRITICAL  

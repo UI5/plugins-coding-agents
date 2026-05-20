@@ -6,6 +6,12 @@ describe('PerformanceValidator', () => {
   let validator: PerformanceValidator;
   let mockConfig: LintConfig;
 
+  // Test constants aligned with default config thresholds
+  const MAX_LINES = 700;
+  const WARN_THRESHOLD_LINES = 600; // ~85% of max (700 * 0.7 = 490, but using 600 for clearer tests)
+  const SAFE_LINES = 400; // Well under limit
+  const OVER_LIMIT_LINES = 750; // Exceeds max
+
   beforeEach(() => {
     validator = new PerformanceValidator();
     
@@ -61,7 +67,7 @@ describe('PerformanceValidator', () => {
 
     it('should detect when skill exceeds line limit', async () => {
       const mockSkill = createMockSkill({
-        content: Array(750).fill('Line').join('\n')
+        content: Array(OVER_LIMIT_LINES).fill('Line').join('\n')
       });
       
       const result = await validator.validate(mockSkill, mockConfig);
@@ -73,7 +79,7 @@ describe('PerformanceValidator', () => {
 
     it('should warn when skill is getting close to limit', async () => {
       const mockSkill = createMockSkill({
-        content: Array(600).fill('Line').join('\n')
+        content: Array(WARN_THRESHOLD_LINES).fill('Line').join('\n')
       });
       
       const result = await validator.validate(mockSkill, mockConfig);
@@ -85,7 +91,7 @@ describe('PerformanceValidator', () => {
 
     it('should pass for skills within limits', async () => {
       const mockSkill = createMockSkill({
-        content: Array(400).fill('Line').join('\n')
+        content: Array(SAFE_LINES).fill('Line').join('\n')
       });
       
       const result = await validator.validate(mockSkill, mockConfig);

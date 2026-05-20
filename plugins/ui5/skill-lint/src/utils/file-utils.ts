@@ -49,7 +49,8 @@ export function extractFrontmatter(content: string): SkillMetadata {
         : [],
     };
   } catch (error) {
-    // YAML parsing error - return empty metadata
+    // YAML parsing error - log and return empty metadata
+    console.warn('[extractFrontmatter] Failed to parse YAML frontmatter:', error instanceof Error ? error.message : String(error));
     return { name: '', description: '', compatibility: [] };
   }
 }
