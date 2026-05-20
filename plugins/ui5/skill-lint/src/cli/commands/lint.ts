@@ -12,6 +12,7 @@ import { JsonFormatter } from '../../formatters/json-formatter.js';
 import { GithubActionsFormatter } from '../../formatters/github-actions-formatter.js';
 import { BaseFormatter } from '../../formatters/base-formatter.js';
 import { Logger } from '../../utils/logger.js';
+import { sanitizePath } from '../../utils/path-security.js';
 import type { LintConfig } from '../../types/index.js';
 
 export interface LintOptions {
@@ -77,9 +78,20 @@ export async function lintCommand(
  * Prevents path traversal attacks and ensures path points to valid SKILL.md
  */
 async function validateSkillPath(skillPath: string): Promise<string> {
+  // SECURITY: Sanitize path to prevent:
+  // - Null byte injection (CVE-2008-2958)
+  // - Unicode homoglyph attacks (CVE-2019-9636)
+  // - Path normalization vulnerabilities
+  let sanitized: string;
+  try {
+    sanitized = sanitizePath(skillPath);
+  } catch (error) {
+    throw new Error(`Invalid skill path: ${error instanceof Error ? error.message : String(error)}`);
+  }
+
   // Use git root as workspace root if available, otherwise cwd
   const workspaceRoot = await findGitRoot() || process.cwd();
-  const resolved = resolve(workspaceRoot, skillPath);
+  const resolved = resolve(workspaceRoot, sanitized);
   
   // Check if path exists
   if (!existsSync(resolved)) {

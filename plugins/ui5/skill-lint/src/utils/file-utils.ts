@@ -7,6 +7,7 @@ import { existsSync } from 'fs';
 import { join, dirname } from 'path';
 import * as yaml from 'js-yaml';
 import { TOKEN_ESTIMATION } from './constants.js';
+import { sanitizePath } from './path-security.js';
 import type { Skill, SkillMetadata } from '../types/index.js';
 
 /**
@@ -21,9 +22,20 @@ export async function loadSkill(skillPath: string): Promise<Skill> {
     throw new Error('Invalid skill path: cannot be empty or whitespace');
   }
 
-  const resolvedPath = existsSync(join(skillPath, 'SKILL.md'))
-    ? join(skillPath, 'SKILL.md')
-    : skillPath;
+  // SECURITY: Sanitize path to prevent:
+  // - Null byte injection (CVE-2008-2958)
+  // - Unicode homoglyph attacks (CVE-2019-9636)
+  // - Path normalization vulnerabilities
+  let sanitized: string;
+  try {
+    sanitized = sanitizePath(skillPath);
+  } catch (error) {
+    throw new Error(`Invalid skill path: ${error instanceof Error ? error.message : String(error)}`);
+  }
+
+  const resolvedPath = existsSync(join(sanitized, 'SKILL.md'))
+    ? join(sanitized, 'SKILL.md')
+    : sanitized;
 
   try {
     await access(resolvedPath, constants.R_OK);
