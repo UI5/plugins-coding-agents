@@ -78,7 +78,7 @@ describe('TriggeringValidator', () => {
       testCases: {
         triggering: join(tempDir, 'test/fixtures/trigger-cases.json')
       },
-      execution: { timeout: 60000, maxRetries: 2, parallel: false },
+      execution: { timeout: 60000, maxRetries: 2, parallel: false, maxConcurrency: 1 },
       formatters: { default: 'text' as const, options: { colors: true, verbose: false } },
       output: { directory: '.lint-reports', formats: ['text'] }
     };

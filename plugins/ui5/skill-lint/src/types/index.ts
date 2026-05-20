@@ -152,6 +152,7 @@ export interface LintConfig {
     readonly timeout: number;
     readonly maxRetries: number;
     readonly parallel: boolean;
+    readonly maxConcurrency?: number;
   };
   readonly formatters: {
     readonly default: string;

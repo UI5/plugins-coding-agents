@@ -34,6 +34,7 @@ export const lintConfigSchema = z.object({
     timeout: z.number().positive().default(60_000),
     maxRetries: z.number().nonnegative().default(2),
     parallel: z.boolean().default(false),
+    maxConcurrency: z.number().positive().default(Infinity),
   }).default({}),
 
   formatters: z.object({

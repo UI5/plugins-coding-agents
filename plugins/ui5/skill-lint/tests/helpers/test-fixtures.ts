@@ -128,7 +128,7 @@ export function createMockConfig(overrides: Partial<LintConfig> = {}): LintConfi
       triggering: { minAccuracy: 90 }
     },
     testCases: {},
-    execution: { timeout: 60000, maxRetries: 2, parallel: false },
+    execution: { timeout: 60000, maxRetries: 2, parallel: false, maxConcurrency: 1 },
     formatters: { 
       default: 'text' as const, 
       options: { colors: true, verbose: false } 

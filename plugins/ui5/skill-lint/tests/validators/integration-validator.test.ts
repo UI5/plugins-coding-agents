@@ -57,7 +57,7 @@ describe('IntegrationValidator', () => {
       testCases: {
         integration: join(tempDir, 'test/integration/fixtures/test-cases.json')
       },
-      execution: { timeout: 60000, maxRetries: 2, parallel: false },
+      execution: { timeout: 60000, maxRetries: 2, parallel: false, maxConcurrency: 1 },
       formatters: { default: 'text' as const, options: { colors: true, verbose: false } },
       output: { directory: '.lint-reports', formats: ['text'] }
     };

@@ -160,6 +160,24 @@ export const INTEGRATION = {
 } as const;
 
 /**
+ * Security limits for file operations
+ */
+export const SECURITY_LIMITS = {
+  /**
+   * Maximum file size before reading (bytes)
+   * Rationale: Prevent OOM attacks with malicious 100GB+ files
+   * Default: 50 MB (configurable via MAX_FILE_SIZE_MB env var)
+   */
+  MAX_FILE_SIZE_BYTES: Number(process.env.MAX_FILE_SIZE_MB || 50) * 1024 * 1024,
+
+  /**
+   * Streaming threshold for large files (bytes)
+   * Rationale: Files >10MB should use streaming to prevent memory issues
+   */
+  STREAMING_THRESHOLD_BYTES: 10 * 1024 * 1024,
+} as const;
+
+/**
  * Export all constants as a single namespace
  */
 export const CONSTANTS = {
@@ -169,4 +187,5 @@ export const CONSTANTS = {
   FRONTMATTER,
   DUPLICATE_DETECTION,
   INTEGRATION,
+  SECURITY_LIMITS,
 } as const;

@@ -8,7 +8,7 @@ import { existsSync } from 'fs';
 import { join, dirname } from 'path';
 import { createInterface } from 'readline';
 import * as yaml from 'js-yaml';
-import { TOKEN_ESTIMATION } from './constants.js';
+import { TOKEN_ESTIMATION, SECURITY_LIMITS } from './constants.js';
 import { sanitizePath } from './path-security.js';
 import { retryOperation } from './retry.js';
 import type { Skill, SkillMetadata } from '../types/index.js';
@@ -45,6 +45,17 @@ export async function loadSkill(skillPath: string): Promise<Skill> {
     await retryOperation(() => access(resolvedPath, constants.R_OK));
   } catch (error) {
     throw new Error(`Skill file not found: ${resolvedPath}`);
+  }
+
+  // SECURITY: Check file size before reading to prevent OOM attacks
+  const fileSize = await getFileSize(resolvedPath);
+  if (fileSize > SECURITY_LIMITS.MAX_FILE_SIZE_BYTES) {
+    const maxMB = SECURITY_LIMITS.MAX_FILE_SIZE_BYTES / (1024 * 1024);
+    const actualMB = (fileSize / (1024 * 1024)).toFixed(2);
+    throw new Error(
+      `File too large: ${actualMB}MB exceeds maximum allowed size of ${maxMB}MB. ` +
+      `Set MAX_FILE_SIZE_MB environment variable to increase limit.`
+    );
   }
 
   // Read file with retry logic
@@ -113,11 +124,7 @@ export async function findPluginRoot(startDir: string): Promise<string> {
   return startDir;
 }
 
-/**
- * File size threshold for switching to streaming (10 MB)
- * Files larger than this will be processed with streams to prevent OOM
- */
-const STREAMING_THRESHOLD_BYTES = 10 * 1024 * 1024; // 10 MB
+
 
 /**
  * Count lines in a file using streaming.
@@ -182,7 +189,7 @@ export async function countLines(filePath: string): Promise<number> {
   // Check file size to decide approach
   const size = await getFileSize(filePath);
   
-  if (size > STREAMING_THRESHOLD_BYTES) {
+  if (size > SECURITY_LIMITS.STREAMING_THRESHOLD_BYTES) {
     // Large file: use streaming to prevent OOM
     return retryOperation(() => countLinesStreaming(filePath));
   }

@@ -9,6 +9,7 @@ import { IntegrationValidator } from '../validators/integration-validator.js';
 import { BaseValidator } from '../validators/base-validator.js';
 import { collectResults } from './result-collector.js';
 import { loadSkill } from '../utils/file-utils.js';
+import { promiseAllBatched } from '../utils/concurrency.js';
 import type { LintConfig, LintResult, Skill, ValidationResult } from '../types/index.js';
 
 export class SkillLinter {
@@ -114,13 +115,13 @@ export class SkillLinter {
   }
 
   /**
-   * Run validators in parallel with error boundaries
+   * Run validators in parallel with error boundaries and concurrency control
    */
   private async runValidatorsParallel(
     skill: Skill,
     config: LintConfig,
   ): Promise<ValidationResult[]> {
-    const promises = this.validators.map(async (validator): Promise<ValidationResult> => {
+    const tasks = this.validators.map(validator => async (): Promise<ValidationResult> => {
       try {
         return await validator.validate(skill, config);
       } catch (error) {
@@ -142,6 +143,8 @@ export class SkillLinter {
       }
     });
 
-    return Promise.all(promises);
+    // Use batched execution if maxConcurrency is set
+    const maxConcurrency = config.execution.maxConcurrency ?? Infinity;
+    return promiseAllBatched(tasks, maxConcurrency);
   }
 }
