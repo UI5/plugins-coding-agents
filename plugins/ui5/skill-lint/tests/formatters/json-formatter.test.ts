@@ -1,3 +1,34 @@
+/**
+ * JSON Formatter Test Suite
+ * 
+ * Tests the JsonFormatter which converts LintResult objects into JSON output.
+ * Used for:
+ * - CI/CD integration (machine-readable results)
+ * - Automated reporting and analytics
+ * - Custom tooling and dashboards
+ * - Archiving test results
+ * 
+ * Test Coverage:
+ * - Successful validations (all validators pass)
+ * - Failed validations (with violation details)
+ * - Multiple violations of different severity levels
+ * - Violation metadata (file paths, suggestions, rules)
+ * - Summary statistics (total/passed/failed validators)
+ * - Timestamp and duration tracking
+ * 
+ * JSON Schema Guarantees:
+ * - All required fields present
+ * - Valid severity levels (error, warning, info)
+ * - Properly nested violation structure
+ * - Parsable by standard JSON tools
+ * 
+ * Why JSON Format?
+ * - Language-agnostic (works with any tooling)
+ * - Structured data for programmatic analysis
+ * - Easy to parse and filter
+ * - Standard format for CI/CD pipelines
+ */
+
 import { describe, it, expect, beforeEach } from 'vitest';
 import { JsonFormatter } from '../../src/formatters/json-formatter.js';
 import type { LintResult, ValidationResult } from '../../src/types/index.js';

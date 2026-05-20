@@ -1,3 +1,30 @@
+/**
+ * Performance Validator Test Suite
+ * 
+ * Tests the PerformanceValidator which checks SKILL.md resource usage:
+ * - Line count limits (max 700 lines, warning at 70% = ~600 lines)
+ * - Token budget estimation (max 4000 tokens, ~4 chars per token)
+ * - Context efficiency (total context under 10k tokens including metadata)
+ * - Empty content edge cases
+ * 
+ * Test Constants (from PERFORMANCE_THRESHOLDS):
+ * - MAX_LINES: 700 (hard limit, triggers error)
+ * - WARN_THRESHOLD_LINES: 600 (warning threshold at ~85% of max)
+ * - SAFE_LINES: 400 (well under limit, no violations)
+ * - OVER_LIMIT_LINES: 750 (exceeds max, triggers error)
+ * 
+ * Test Strategy:
+ * - Use shared constants from test-fixtures to ensure consistency
+ * - Test boundary conditions (exactly at limit, just over, just under)
+ * - Verify warning thresholds trigger before errors
+ * - Validate empty content edge case (0 lines, not 1)
+ * 
+ * Why These Thresholds?
+ * - 700 lines: Balances comprehensive guidance with context window efficiency
+ * - 600 warning: Gives developers early signal to refactor before hitting limit
+ * - 4000 tokens: Leaves room for user prompts and conversation history
+ */
+
 import { describe, it, expect, beforeEach } from 'vitest';
 import { PerformanceValidator } from '../../src/validators/performance-validator.js';
 import type { Skill, LintConfig } from '../../src/types/index.js';

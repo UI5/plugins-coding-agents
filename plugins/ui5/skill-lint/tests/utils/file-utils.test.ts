@@ -1,3 +1,43 @@
+/**
+ * File Utilities Test Suite
+ * 
+ * Tests core file system utilities used across validators:
+ * - extractFrontmatter: YAML parsing from SKILL.md headers
+ * - countLinesFromContent: Line counting with edge case handling
+ * - loadSkill: Skill file loading (TODO: needs tests)
+ * - findPluginRoot: Plugin root discovery (TODO: needs tests)
+ * 
+ * extractFrontmatter Test Coverage:
+ * - Valid YAML frontmatter extraction
+ * - Missing frontmatter (graceful fallback)
+ * - Empty frontmatter (returns empty metadata)
+ * - Malformed YAML (logs error, returns empty metadata)
+ * - Unclosed frontmatter delimiters (returns empty metadata)
+ * 
+ * Why Graceful Fallback?
+ * - Skills may not have frontmatter during development
+ * - Invalid YAML shouldn't crash the linter
+ * - Empty metadata allows validators to report specific violations
+ * - Error logging helps skill authors debug without breaking the tool
+ * 
+ * countLinesFromContent Test Coverage:
+ * - Empty string edge case (returns 0, not 1)
+ * - Single line without newline
+ * - Multiple lines with newlines
+ * - Trailing newlines (doesn't count as extra line)
+ * - Windows CRLF line endings
+ * - Empty lines in the middle
+ * - Large content (performance validation)
+ * 
+ * Line Counting Design Decision:
+ * - Empty string returns 0 (no lines present)
+ * - Content ending with \n doesn't add extra line
+ * - Consistent with editor line number displays
+ * - Prevents off-by-one errors in performance checks
+ * 
+ * Current Coverage: 41.66% (TODO: Add tests for loadSkill, findPluginRoot, countLines)
+ */
+
 import { describe, it, expect, beforeEach } from 'vitest';
 import { extractFrontmatter, countLinesFromContent } from '../../src/utils/file-utils.js';
 

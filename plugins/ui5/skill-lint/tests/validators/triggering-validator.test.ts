@@ -1,3 +1,38 @@
+/**
+ * Triggering Validator Test Suite
+ * 
+ * Tests the TriggeringValidator which verifies skill activation patterns:
+ * - Trigger case files (test/fixtures/trigger-cases.json)
+ * - Keyword matching accuracy (min 90% required)
+ * - Pattern specificity and relevance
+ * - Skill-agnostic pattern matching (not limited to ui5-best-practices)
+ * 
+ * Test Case File Structure:
+ * ```json
+ * {
+ *   "shouldTrigger": ["query that should activate skill", ...],
+ *   "shouldNotTrigger": ["query that should not activate", ...]
+ * }
+ * ```
+ * 
+ * Testing Strategy:
+ * - Creates temporary directories for each test (isolated file system)
+ * - Writes JSON test case files dynamically
+ * - Tests both valid and invalid scenarios
+ * - Verifies proper cleanup with afterEach (prevents temp directory accumulation)
+ * 
+ * Why Test Cleanup Matters:
+ * - CI/CD environments have limited temp space
+ * - Accumulating temp directories can cause disk space issues
+ * - Each test creates unique directory (Date.now()) to avoid collisions
+ * - afterEach ensures cleanup even if test fails
+ * 
+ * Accuracy Threshold:
+ * - 90% minimum: Balances strict validation with real-world flexibility
+ * - Skills don't need 100% accuracy (some queries are ambiguous)
+ * - Higher thresholds encourage better keyword selection
+ */
+
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import { TriggeringValidator } from '../../src/validators/triggering-validator.js';
 import type { Skill, LintConfig } from '../../src/types/index.js';

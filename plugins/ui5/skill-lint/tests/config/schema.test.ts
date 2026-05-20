@@ -1,3 +1,39 @@
+/**
+ * Configuration Schema Test Suite
+ * 
+ * Tests the Zod-based configuration schema for skill-lint:
+ * - Default configuration values
+ * - Schema validation and parsing
+ * - Partial config merging with defaults
+ * - Type safety and validation errors
+ * 
+ * Configuration Structure:
+ * - scenarios: Which validators to run (structure, triggering, performance, integration)
+ * - adapter: Test execution adapter (claude-code, mock, etc.)
+ * - thresholds: Validation limits (max lines/tokens, min accuracy)
+ * - execution: Timeout, retries, parallel execution
+ * - formatters: Output format and options
+ * - output: Report directory and formats
+ * 
+ * Default Values (aligned with project guidelines):
+ * - maxLines: 700 (context efficiency)
+ * - maxTokens: 4000 (leaves room for conversation)
+ * - minAccuracy: 90% (high quality without being too strict)
+ * - integration: false (requires live adapter, expensive)
+ * 
+ * Why Zod?
+ * - Runtime validation (catches config errors early)
+ * - TypeScript inference (type-safe configs)
+ * - Clear error messages for invalid configs
+ * - Composable schemas (easy to extend)
+ * 
+ * Test Strategy:
+ * - Verify defaults are sensible and documented
+ * - Test partial config merging (user overrides)
+ * - Validate error handling for invalid configs
+ * - Ensure schema matches TypeScript types
+ */
+
 import { describe, it, expect } from 'vitest';
 import { parseConfig, DEFAULT_CONFIG, lintConfigSchema } from '../../src/config/schema.js';
 

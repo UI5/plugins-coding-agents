@@ -1,3 +1,23 @@
+/**
+ * Structure Validator Test Suite
+ * 
+ * Tests the StructureValidator which verifies SKILL.md file structure including:
+ * - Frontmatter presence and completeness (name, description, compatibility)
+ * - Required sections and content (description >50 chars)
+ * - File references and external links
+ * - Project scaffolding detection (plugin.json, README.md)
+ * 
+ * Note: Many tests expect violations for missing files (plugin.json, README.md)
+ * since the validator performs file-system checks on actual paths. This is
+ * expected behavior and validates the validator's ability to detect incomplete
+ * plugin structures.
+ * 
+ * Test Strategy:
+ * - Mock skills use temporary paths that don't exist on disk
+ * - File-system violations are expected and verified
+ * - Frontmatter and content validations test the actual parsing logic
+ */
+
 import { describe, it, expect, beforeEach } from 'vitest';
 import { StructureValidator } from '../../src/validators/structure-validator.js';
 import type { Skill, LintConfig } from '../../src/types/index.js';
