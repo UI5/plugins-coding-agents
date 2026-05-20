@@ -10,6 +10,7 @@ import { join } from 'path';
 import { BaseValidator } from './base-validator.js';
 import { estimateTokens, countLines, countLinesFromContent } from '../utils/file-utils.js';
 import { PERFORMANCE_THRESHOLDS, TOKEN_ESTIMATION } from '../utils/constants.js';
+import { retryOperation } from '../utils/retry.js';
 import type { ValidationResult, Violation, Skill, LintConfig } from '../types/index.js';
 
 export class PerformanceValidator extends BaseValidator {
@@ -59,7 +60,7 @@ export class PerformanceValidator extends BaseValidator {
     // ── Reference files ──
     const skillDir = join(skill.path, '..');
     try {
-      const files = await readdir(skillDir);
+      const files = await retryOperation(() => readdir(skillDir));
       const refs = files.filter(f => f !== 'SKILL.md' && f.endsWith('.md'));
       if (refs.length > 0) {
         violations.push(this.createViolation('info', 'reference-files',
@@ -72,7 +73,7 @@ export class PerformanceValidator extends BaseValidator {
     // ── README conciseness ──
     const readmePath = join(root, 'README.md');
     try {
-      await access(readmePath, constants.R_OK);
+      await retryOperation(() => access(readmePath, constants.R_OK));
       const readmeLines = await countLines(readmePath);
       if (readmeLines > PERFORMANCE_THRESHOLDS.MAX_README_LINES) {
         violations.push(this.createViolation('warning', 'readme-too-long',
@@ -89,7 +90,7 @@ export class PerformanceValidator extends BaseValidator {
     // ── Fixture size ──
     const fixturesPath = join(root, 'test/fixtures/trigger-cases.json');
     try {
-      const stats = await stat(fixturesPath);
+      const stats = await retryOperation(() => stat(fixturesPath));
       const size = stats.size;
       if (size > PERFORMANCE_THRESHOLDS.MAX_FIXTURE_SIZE_BYTES) {
         violations.push(this.createViolation('warning', 'fixture-too-large',
@@ -112,13 +113,13 @@ export class PerformanceValidator extends BaseValidator {
     const readmePath = join(root, 'README.md');
 
     try {
-      await access(readmePath, constants.R_OK);
+      await retryOperation(() => access(readmePath, constants.R_OK));
     } catch (error) {
       // Expected: README may not exist
       return violations;
     }
 
-    const readmeContent = (await readFile(readmePath, 'utf-8')).toLowerCase();
+    const readmeContent = (await retryOperation(() => readFile(readmePath, 'utf-8'))).toLowerCase();
     const skillContent = skill.content.toLowerCase();
 
     const readmeBlocks = [...readmeContent.matchAll(/```[\s\S]*?```/g)].map(m => m[0].trim());

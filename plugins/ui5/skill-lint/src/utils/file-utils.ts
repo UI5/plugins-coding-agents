@@ -8,6 +8,7 @@ import { join, dirname } from 'path';
 import * as yaml from 'js-yaml';
 import { TOKEN_ESTIMATION } from './constants.js';
 import { sanitizePath } from './path-security.js';
+import { retryOperation } from './retry.js';
 import type { Skill, SkillMetadata } from '../types/index.js';
 
 /**
@@ -37,13 +38,15 @@ export async function loadSkill(skillPath: string): Promise<Skill> {
     ? join(sanitized, 'SKILL.md')
     : sanitized;
 
+  // Check file accessibility with retry logic (handles EMFILE, EBUSY, etc.)
   try {
-    await access(resolvedPath, constants.R_OK);
+    await retryOperation(() => access(resolvedPath, constants.R_OK));
   } catch (error) {
     throw new Error(`Skill file not found: ${resolvedPath}`);
   }
 
-  const content = await readFile(resolvedPath, 'utf-8');
+  // Read file with retry logic
+  const content = await retryOperation(() => readFile(resolvedPath, 'utf-8'));
   const metadata = extractFrontmatter(content);
 
   // Walk up to find plugin root (directory containing package.json or .claude-plugin)
@@ -89,14 +92,14 @@ export async function findPluginRoot(startDir: string): Promise<string> {
 
   while (dir !== root) {
     try {
-      await access(join(dir, '.claude-plugin'), constants.R_OK);
+      await retryOperation(() => access(join(dir, '.claude-plugin'), constants.R_OK));
       return dir;
     } catch (error) {
       // Expected: .claude-plugin may not exist in this directory
     }
 
     try {
-      await access(join(dir, 'package.json'), constants.R_OK);
+      await retryOperation(() => access(join(dir, 'package.json'), constants.R_OK));
       return dir;
     } catch (error) {
       // Expected: package.json may not exist in this directory
@@ -122,7 +125,7 @@ export async function findPluginRoot(startDir: string): Promise<string> {
  * ```
  */
 export async function countLines(filePath: string): Promise<number> {
-  const content = await readFile(filePath, 'utf-8');
+  const content = await retryOperation(() => readFile(filePath, 'utf-8'));
   return countLinesFromContent(content);
 }
 
@@ -171,7 +174,7 @@ export function countLinesFromContent(content: string): number {
  * Get file size in bytes
  */
 export async function getFileSize(filePath: string): Promise<number> {
-  const stats = await stat(filePath);
+  const stats = await retryOperation(() => stat(filePath));
   return stats.size;
 }
 
@@ -180,13 +183,13 @@ export async function getFileSize(filePath: string): Promise<number> {
  */
 export async function listFiles(dir: string, extension?: string): Promise<string[]> {
   try {
-    await access(dir, constants.R_OK);
+    await retryOperation(() => access(dir, constants.R_OK));
   } catch (error) {
     // Expected: directory may not exist
     return [];
   }
   
-  const files = await readdir(dir);
+  const files = await retryOperation(() => readdir(dir));
   return extension
     ? files.filter(f => f.endsWith(extension))
     : files;
