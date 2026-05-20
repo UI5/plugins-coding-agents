@@ -30,29 +30,28 @@ export function loadSkill(skillPath: string): Skill {
 
 /**
  * Extract YAML frontmatter from SKILL.md content
+ * Returns empty metadata if frontmatter is missing or invalid (graceful fallback)
  */
 export function extractFrontmatter(content: string): SkillMetadata {
   const match = content.match(/^---\n([\s\S]*?)\n---/);
   if (!match) {
-    throw new Error('SKILL.md is missing YAML frontmatter (---...---)');
+    return { name: '', description: '', compatibility: [] };
   }
 
-  const raw = yaml.load(match[1]) as Record<string, unknown>;
+  try {
+    const raw = yaml.load(match[1]) as Record<string, unknown>;
 
-  if (typeof raw.name !== 'string') {
-    throw new Error('Frontmatter missing required field: name');
+    return {
+      name: typeof raw.name === 'string' ? raw.name : '',
+      description: typeof raw.description === 'string' ? raw.description : '',
+      compatibility: Array.isArray(raw.compatibility)
+        ? (raw.compatibility as string[])
+        : [],
+    };
+  } catch (error) {
+    // YAML parsing error - return empty metadata
+    return { name: '', description: '', compatibility: [] };
   }
-  if (typeof raw.description !== 'string') {
-    throw new Error('Frontmatter missing required field: description');
-  }
-
-  return {
-    name: raw.name,
-    description: raw.description,
-    compatibility: Array.isArray(raw.compatibility)
-      ? (raw.compatibility as string[])
-      : undefined,
-  };
 }
 
 /**

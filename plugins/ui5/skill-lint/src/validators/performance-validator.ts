@@ -23,7 +23,7 @@ export class PerformanceValidator extends BaseValidator {
     const maxTokens = config.thresholds.performance.maxTokens;
 
     // ── SKILL.md line count ──
-    const lineCount = countLines(skill.path);
+    const lineCount = skill.content ? skill.content.split('\n').length : 0;
     if (lineCount === 0) {
       violations.push(this.createViolation('error', 'skill-empty', 'SKILL.md is empty'));
     } else if (lineCount > maxLines) {

@@ -1,0 +1,154 @@
+import { describe, it, expect, beforeEach } from 'vitest';
+import { JsonFormatter } from '../../src/formatters/json-formatter.js';
+import type { LintResult, ValidationResult } from '../../src/types/index.js';
+
+describe('JsonFormatter', () => {
+  let formatter: JsonFormatter;
+
+  beforeEach(() => {
+    formatter = new JsonFormatter();
+  });
+
+  const createMockResult = (overrides: Partial<LintResult> = {}): LintResult => ({
+    skill: 'test-skill',
+    skillPath: '/test/skill/SKILL.md',
+    timestamp: '2026-05-20T10:00:00.000Z',
+    duration: 100,
+    passed: true,
+    results: [
+      {
+        validator: 'structure',
+        passed: true,
+        duration: 50,
+        violations: []
+      } as ValidationResult
+    ],
+    summary: {
+      totalValidators: 1,
+      passedValidators: 1,
+      failedValidators: 0,
+      errors: 0,
+      warnings: 0,
+      infos: 0
+    },
+    ...overrides
+  });
+
+  describe('Basic Properties', () => {
+    it('should have correct name and extension', () => {
+      expect(formatter.name).toBe('json');
+      expect(formatter.extension).toBe('.json');
+    });
+  });
+
+  describe('Formatting', () => {
+    it('should produce valid JSON', () => {
+      const mockResult = createMockResult();
+      const output = formatter.format(mockResult);
+      
+      expect(() => JSON.parse(output)).not.toThrow();
+    });
+
+    it('should include all result fields', () => {
+      const mockResult = createMockResult();
+      const output = formatter.format(mockResult);
+      const parsed = JSON.parse(output);
+      
+      expect(parsed.skill).toBe('test-skill');
+      expect(parsed.passed).toBe(true);
+      expect(parsed.duration).toBe(100);
+      expect(parsed.results).toHaveLength(1);
+      expect(parsed.summary).toBeDefined();
+    });
+
+    it('should format with indentation', () => {
+      const mockResult = createMockResult();
+      const output = formatter.format(mockResult);
+      
+      // Should have indentation (not minified)
+      expect(output).toContain('\n');
+      expect(output).toContain('  ');
+    });
+
+    it('should handle violations correctly', () => {
+      const mockResult = createMockResult({
+        results: [{
+          validator: 'test',
+          passed: false,
+          duration: 10,
+          violations: [
+            {
+              level: 'error',
+              rule: 'test-rule',
+              message: 'Test message',
+              file: '/test/file.md',
+              line: 10,
+              suggestion: 'Fix it'
+            }
+          ]
+        }]
+      });
+      
+      const output = formatter.format(mockResult);
+      const parsed = JSON.parse(output);
+      
+      expect(parsed.results[0].violations).toHaveLength(1);
+      expect(parsed.results[0].violations[0].level).toBe('error');
+      expect(parsed.results[0].violations[0].message).toBe('Test message');
+    });
+
+    it('should handle metrics correctly', () => {
+      const mockResult = createMockResult({
+        results: [{
+          validator: 'test',
+          passed: true,
+          duration: 10,
+          violations: [],
+          metrics: {
+            lineCount: 500,
+            tokens: 3000,
+            accuracy: 95.5
+          }
+        }]
+      });
+      
+      const output = formatter.format(mockResult);
+      const parsed = JSON.parse(output);
+      
+      expect(parsed.results[0].metrics).toBeDefined();
+      expect(parsed.results[0].metrics.lineCount).toBe(500);
+      expect(parsed.results[0].metrics.accuracy).toBe(95.5);
+    });
+  });
+
+  describe('Edge Cases', () => {
+    it('should handle empty violations array', () => {
+      const mockResult = createMockResult();
+      const output = formatter.format(mockResult);
+      const parsed = JSON.parse(output);
+      
+      expect(parsed.results[0].violations).toEqual([]);
+    });
+
+    it('should handle special characters in strings', () => {
+      const mockResult = createMockResult({
+        results: [{
+          validator: 'test',
+          passed: false,
+          duration: 10,
+          violations: [
+            {
+              level: 'error',
+              rule: 'test',
+              message: 'Message with "quotes" and \n newlines'
+            }
+          ]
+        }]
+      });
+      
+      const output = formatter.format(mockResult);
+      
+      expect(() => JSON.parse(output)).not.toThrow();
+    });
+  });
+});
