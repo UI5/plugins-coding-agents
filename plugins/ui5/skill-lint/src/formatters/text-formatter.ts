@@ -36,8 +36,8 @@ export class TextFormatter extends BaseFormatter {
     const lines: string[] = [];
 
     lines.push('');
-    lines.push(this.styled(`${BOLD}skill-lint${RESET}  ${result.skill}`, BOLD));
-    lines.push(this.styled(`${result.skillPath}`, DIM));
+    lines.push(this.styled(`skill-lint  ${result.skill}`, BOLD));
+    lines.push(this.styled(result.skillPath, DIM));
     lines.push('');
 
     for (const vr of result.results) {

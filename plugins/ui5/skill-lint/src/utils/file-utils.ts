@@ -2,7 +2,8 @@
  * File system helpers for reading and parsing skill files
  */
 
-import { readFileSync, existsSync, readdirSync, statSync } from 'fs';
+import { readFile, access, constants, readdir, stat } from 'fs/promises';
+import { existsSync } from 'fs';
 import { join, dirname } from 'path';
 import * as yaml from 'js-yaml';
 import type { Skill, SkillMetadata } from '../types/index.js';
@@ -10,20 +11,22 @@ import type { Skill, SkillMetadata } from '../types/index.js';
 /**
  * Load a skill from a SKILL.md file path or directory containing SKILL.md
  */
-export function loadSkill(skillPath: string): Skill {
+export async function loadSkill(skillPath: string): Promise<Skill> {
   const resolvedPath = existsSync(join(skillPath, 'SKILL.md'))
     ? join(skillPath, 'SKILL.md')
     : skillPath;
 
-  if (!existsSync(resolvedPath)) {
+  try {
+    await access(resolvedPath, constants.R_OK);
+  } catch {
     throw new Error(`Skill file not found: ${resolvedPath}`);
   }
 
-  const content = readFileSync(resolvedPath, 'utf-8');
+  const content = await readFile(resolvedPath, 'utf-8');
   const metadata = extractFrontmatter(content);
 
   // Walk up to find plugin root (directory containing package.json or .claude-plugin)
-  const pluginRoot = findPluginRoot(dirname(resolvedPath));
+  const pluginRoot = await findPluginRoot(dirname(resolvedPath));
 
   return { path: resolvedPath, content, metadata, pluginRoot };
 }
@@ -59,17 +62,25 @@ export function extractFrontmatter(content: string): SkillMetadata {
  * Walk up directory tree to find the plugin root
  * (contains package.json or .claude-plugin directory)
  */
-export function findPluginRoot(startDir: string): string {
+export async function findPluginRoot(startDir: string): Promise<string> {
   let dir = startDir;
   const root = dirname(dir) === dir ? dir : '/';
 
   while (dir !== root) {
-    if (
-      existsSync(join(dir, '.claude-plugin')) ||
-      existsSync(join(dir, 'package.json'))
-    ) {
+    try {
+      await access(join(dir, '.claude-plugin'), constants.R_OK);
       return dir;
+    } catch {
+      // Not found, continue
     }
+
+    try {
+      await access(join(dir, 'package.json'), constants.R_OK);
+      return dir;
+    } catch {
+      // Not found, continue
+    }
+
     dir = dirname(dir);
   }
 
@@ -85,12 +96,12 @@ export function findPluginRoot(startDir: string): string {
  * 
  * @example
  * ```typescript
- * const lines = countLines('/path/to/SKILL.md');
+ * const lines = await countLines('/path/to/SKILL.md');
  * console.log(`File has ${lines} lines`);
  * ```
  */
-export function countLines(filePath: string): number {
-  const content = readFileSync(filePath, 'utf-8');
+export async function countLines(filePath: string): Promise<number> {
+  const content = await readFile(filePath, 'utf-8');
   return countLinesFromContent(content);
 }
 
@@ -138,16 +149,22 @@ export function countLinesFromContent(content: string): number {
 /**
  * Get file size in bytes
  */
-export function getFileSize(filePath: string): number {
-  return statSync(filePath).size;
+export async function getFileSize(filePath: string): Promise<number> {
+  const stats = await stat(filePath);
+  return stats.size;
 }
 
 /**
  * List files in a directory, filtering by extension
  */
-export function listFiles(dir: string, extension?: string): string[] {
-  if (!existsSync(dir)) return [];
-  const files = readdirSync(dir);
+export async function listFiles(dir: string, extension?: string): Promise<string[]> {
+  try {
+    await access(dir, constants.R_OK);
+  } catch {
+    return [];
+  }
+  
+  const files = await readdir(dir);
   return extension
     ? files.filter(f => f.endsWith(extension))
     : files;

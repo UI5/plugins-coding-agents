@@ -4,7 +4,8 @@
  * Migrated from performance.test.ts — all AVA dependencies removed.
  */
 
-import { existsSync, readFileSync, readdirSync, statSync } from 'fs';
+import { access, readdir, readFile, stat, constants } from 'fs/promises';
+import { existsSync } from 'fs';
 import { join } from 'path';
 import { BaseValidator } from './base-validator.js';
 import { estimateTokens, countLines, countLinesFromContent } from '../utils/file-utils.js';
@@ -56,38 +57,46 @@ export class PerformanceValidator extends BaseValidator {
 
     // ── Reference files ──
     const skillDir = join(skill.path, '..');
-    if (existsSync(skillDir)) {
-      const files = readdirSync(skillDir);
+    try {
+      const files = await readdir(skillDir);
       const refs = files.filter(f => f !== 'SKILL.md' && f.endsWith('.md'));
       if (refs.length > 0) {
         violations.push(this.createViolation('info', 'reference-files',
           `Found ${refs.length} reference file(s): ${refs.join(', ')}`));
       }
+    } catch {
+      // Directory not accessible, skip
     }
 
     // ── README conciseness ──
     const readmePath = join(root, 'README.md');
-    if (existsSync(readmePath)) {
-      const readmeLines = countLines(readmePath);
+    try {
+      await access(readmePath, constants.R_OK);
+      const readmeLines = await countLines(readmePath);
       if (readmeLines > 150) {
         violations.push(this.createViolation('warning', 'readme-too-long',
           `README.md is ${readmeLines} lines — recommend ≤ 150`,
           { file: readmePath }));
       }
+    } catch {
+      // README not found, skip
     }
 
     // ── Duplicate content between README & SKILL ──
-    violations.push(...this.checkDuplicateContent(root, skill));
+    violations.push(...await this.checkDuplicateContent(root, skill));
 
     // ── Fixture size ──
     const fixturesPath = join(root, 'test/fixtures/trigger-cases.json');
-    if (existsSync(fixturesPath)) {
-      const size = statSync(fixturesPath).size;
+    try {
+      const stats = await stat(fixturesPath);
+      const size = stats.size;
       if (size > 50_000) {
         violations.push(this.createViolation('warning', 'fixture-too-large',
           `trigger-cases.json is ${(size / 1024).toFixed(1)} KB — recommend < 50 KB`,
           { file: fixturesPath }));
       }
+    } catch {
+      // Fixture file not found, skip
     }
 
     return this.buildResult(violations, start, {
@@ -97,13 +106,17 @@ export class PerformanceValidator extends BaseValidator {
     });
   }
 
-  private checkDuplicateContent(root: string, skill: Skill): Violation[] {
+  private async checkDuplicateContent(root: string, skill: Skill): Promise<Violation[]> {
     const violations: Violation[] = [];
     const readmePath = join(root, 'README.md');
 
-    if (!existsSync(readmePath)) return violations;
+    try {
+      await access(readmePath, constants.R_OK);
+    } catch {
+      return violations; // README doesn't exist
+    }
 
-    const readmeContent = readFileSync(readmePath, 'utf-8').toLowerCase();
+    const readmeContent = (await readFile(readmePath, 'utf-8')).toLowerCase();
     const skillContent = skill.content.toLowerCase();
 
     const readmeBlocks = [...readmeContent.matchAll(/```[\s\S]*?```/g)].map(m => m[0].trim());

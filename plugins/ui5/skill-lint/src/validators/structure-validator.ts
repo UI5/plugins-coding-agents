@@ -4,7 +4,8 @@
  * Migrated from structure.test.ts — all AVA dependencies removed.
  */
 
-import { existsSync, readFileSync } from 'fs';
+import { readFile, access, constants } from 'fs/promises';
+import { existsSync } from 'fs';
 import { join, dirname } from 'path';
 import { BaseValidator } from './base-validator.js';
 import type { ValidationResult, Violation, Skill, LintConfig } from '../types/index.js';
@@ -19,10 +20,12 @@ export class StructureValidator extends BaseValidator {
     const root = skill.pluginRoot;
 
     // ── plugin.json ──
-    violations.push(...this.checkPluginJson(root));
+    violations.push(...await this.checkPluginJson(root));
 
     // ── SKILL.md existence ──
-    if (!existsSync(skill.path)) {
+    try {
+      await access(skill.path, constants.R_OK);
+    } catch {
       violations.push(this.createViolation('error', 'skill-exists', `SKILL.md not found at ${skill.path}`));
     }
 
@@ -33,27 +36,29 @@ export class StructureValidator extends BaseValidator {
     violations.push(...this.checkSections(skill));
 
     // ── Broken links ──
-    violations.push(...this.checkLinks(skill));
+    violations.push(...await this.checkLinks(skill));
 
     // ── README.md ──
-    violations.push(...this.checkReadme(root, skill));
+    violations.push(...await this.checkReadme(root, skill));
 
     // ── Test fixtures ──
-    violations.push(...this.checkTestFixtures(root));
+    violations.push(...await this.checkTestFixtures(root));
 
     // ── package.json / tsconfig.json ──
-    violations.push(...this.checkProjectFiles(root));
+    violations.push(...await this.checkProjectFiles(root));
 
     return this.buildResult(violations, start);
   }
 
   // ── Private helpers ──
 
-  private checkPluginJson(root: string): Violation[] {
+  private async checkPluginJson(root: string): Promise<Violation[]> {
     const violations: Violation[] = [];
     const pluginPath = join(root, '.claude-plugin/plugin.json');
 
-    if (!existsSync(pluginPath)) {
+    try {
+      await access(pluginPath, constants.R_OK);
+    } catch {
       violations.push(this.createViolation('error', 'plugin-json-exists',
         'Missing .claude-plugin/plugin.json',
         { suggestion: 'Create a plugin.json with name, version, and skills array' }));
@@ -61,7 +66,8 @@ export class StructureValidator extends BaseValidator {
     }
 
     try {
-      const plugin = JSON.parse(readFileSync(pluginPath, 'utf-8'));
+      const content = await readFile(pluginPath, 'utf-8');
+      const plugin = JSON.parse(content);
 
       if (typeof plugin.name !== 'string') {
         violations.push(this.createViolation('error', 'plugin-json-name',
@@ -124,7 +130,7 @@ export class StructureValidator extends BaseValidator {
     return violations;
   }
 
-  private checkLinks(skill: Skill): Violation[] {
+  private async checkLinks(skill: Skill): Promise<Violation[]> {
     const violations: Violation[] = [];
     const linkPattern = /\[([^\]]+)\]\(([^)]+)\)/g;
     const links = [...skill.content.matchAll(linkPattern)];
@@ -137,7 +143,9 @@ export class StructureValidator extends BaseValidator {
       }
 
       const linkPath = join(dirname(skill.path), url);
-      if (!existsSync(linkPath)) {
+      try {
+        await access(linkPath, constants.R_OK);
+      } catch {
         violations.push(this.createViolation('error', 'broken-link',
           `Broken relative link: ${url}`, { file: skill.path }));
       }
@@ -151,18 +159,20 @@ export class StructureValidator extends BaseValidator {
     return violations;
   }
 
-  private checkReadme(root: string, skill: Skill): Violation[] {
+  private async checkReadme(root: string, skill: Skill): Promise<Violation[]> {
     const violations: Violation[] = [];
     const readmePath = join(root, 'README.md');
 
-    if (!existsSync(readmePath)) {
+    try {
+      await access(readmePath, constants.R_OK);
+    } catch {
       violations.push(this.createViolation('warning', 'readme-exists',
         'No README.md found at plugin root',
         { suggestion: 'Add a README.md with usage instructions' }));
       return violations;
     }
 
-    const readme = readFileSync(readmePath, 'utf-8');
+    const readme = await readFile(readmePath, 'utf-8');
     if (!readme.includes(skill.metadata.name)) {
       violations.push(this.createViolation('warning', 'readme-references-skill',
         `README.md does not mention skill "${skill.metadata.name}"`,
@@ -172,11 +182,13 @@ export class StructureValidator extends BaseValidator {
     return violations;
   }
 
-  private checkTestFixtures(root: string): Violation[] {
+  private async checkTestFixtures(root: string): Promise<Violation[]> {
     const violations: Violation[] = [];
     const triggerCasesPath = join(root, 'test/fixtures/trigger-cases.json');
 
-    if (!existsSync(triggerCasesPath)) {
+    try {
+      await access(triggerCasesPath, constants.R_OK);
+    } catch {
       violations.push(this.createViolation('info', 'trigger-fixtures-exist',
         'No trigger-cases.json found at test/fixtures/ — triggering validation will be limited',
         { suggestion: 'Create test/fixtures/trigger-cases.json with prompt test cases' }));
@@ -184,7 +196,8 @@ export class StructureValidator extends BaseValidator {
     }
 
     try {
-      const fixtures = JSON.parse(readFileSync(triggerCasesPath, 'utf-8'));
+      const content = await readFile(triggerCasesPath, 'utf-8');
+      const fixtures = JSON.parse(content);
       if (!Array.isArray(fixtures.tests)) {
         violations.push(this.createViolation('error', 'trigger-fixtures-format',
           'trigger-cases.json must have a "tests" array', { file: triggerCasesPath }));
@@ -201,18 +214,21 @@ export class StructureValidator extends BaseValidator {
     return violations;
   }
 
-  private checkProjectFiles(root: string): Violation[] {
+  private async checkProjectFiles(root: string): Promise<Violation[]> {
     const violations: Violation[] = [];
     const pkgPath = join(root, 'package.json');
 
-    if (!existsSync(pkgPath)) {
+    try {
+      await access(pkgPath, constants.R_OK);
+    } catch {
       violations.push(this.createViolation('warning', 'package-json-exists',
         'No package.json at plugin root'));
       return violations;
     }
 
     try {
-      const pkg = JSON.parse(readFileSync(pkgPath, 'utf-8'));
+      const content = await readFile(pkgPath, 'utf-8');
+      const pkg = JSON.parse(content);
       if (typeof pkg.scripts !== 'object' || !pkg.scripts.test) {
         violations.push(this.createViolation('warning', 'package-json-test-script',
           'package.json has no "test" script', { file: pkgPath }));

@@ -4,9 +4,11 @@
 
 import { BaseAdapter } from './base-adapter.js';
 import { ClaudeCodeAdapter } from './claude-code-adapter.js';
+import { MockAdapter } from './mock-adapter.js';
 
-const BUILTIN_ADAPTERS: ReadonlyMap<string, () => BaseAdapter> = new Map([
+const BUILTIN_ADAPTERS: ReadonlyMap<string, () => BaseAdapter> = new Map<string, () => BaseAdapter>([
   ['claude-code', () => new ClaudeCodeAdapter()],
+  ['mock', () => new MockAdapter()],
 ]);
 
 export function getAdapter(name: string): BaseAdapter {

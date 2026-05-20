@@ -30,7 +30,7 @@ export async function checkCommand(
 
   // Parse skill metadata
   try {
-    const skill = loadSkill(resolvedPath);
+    const skill = await loadSkill(resolvedPath);
     Logger.success(`Skill "${skill.metadata.name}" loaded successfully`);
     Logger.info(`Description: ${skill.metadata.description.substring(0, 100)}...`);
     Logger.info(`Plugin root: ${skill.pluginRoot}`);
