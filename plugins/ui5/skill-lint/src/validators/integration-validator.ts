@@ -9,6 +9,7 @@ import { join } from 'path';
 import { BaseValidator } from './base-validator.js';
 import { getAdapter } from '../adapters/adapter-registry.js';
 import { Logger } from '../utils/logger.js';
+import { TEST_THRESHOLDS } from '../utils/constants.js';
 import type {
   ValidationResult,
   Violation,
@@ -116,12 +117,12 @@ export class IntegrationValidator extends BaseValidator {
     const accuracy = total > 0 ? (passed / total) * 100 : 0;
     const avgLatency = total > 0 ? totalLatency / total : 0;
 
-    if (accuracy < 70) {
+    if (accuracy < TEST_THRESHOLDS.INTEGRATION_ACCURACY.CRITICAL_THRESHOLD) {
       violations.push(this.createViolation('error', 'integration-accuracy-low',
-        `Integration accuracy ${accuracy.toFixed(1)}% is below 70% threshold`));
-    } else if (accuracy < 90) {
+        `Integration accuracy ${accuracy.toFixed(1)}% is below ${TEST_THRESHOLDS.INTEGRATION_ACCURACY.CRITICAL_THRESHOLD}% threshold`));
+    } else if (accuracy < TEST_THRESHOLDS.INTEGRATION_ACCURACY.WARNING_THRESHOLD) {
       violations.push(this.createViolation('warning', 'integration-accuracy-moderate',
-        `Integration accuracy ${accuracy.toFixed(1)}% is below 90% — consider investigating failed cases`));
+        `Integration accuracy ${accuracy.toFixed(1)}% is below ${TEST_THRESHOLDS.INTEGRATION_ACCURACY.WARNING_THRESHOLD}% — consider investigating failed cases`));
     }
 
     Logger.metrics(`Integration: ${passed}/${total} passed (${accuracy.toFixed(1)}%), ` +
@@ -129,8 +130,9 @@ export class IntegrationValidator extends BaseValidator {
 
     try {
       await adapter.cleanup();
-    } catch {
-      // ignore cleanup errors
+    } catch (error) {
+      // Expected: cleanup may fail, but we should not propagate the error
+      // This is intentional - cleanup errors are non-critical
     }
 
     return this.buildResult(violations, start, {
@@ -178,8 +180,9 @@ export class IntegrationValidator extends BaseValidator {
               expectedContent: (tc as any).expectedContent,
             }));
           }
-        } catch {
-          // skip bad file
+        } catch (error) {
+          // Expected: test case file may be malformed JSON or have invalid structure
+          // Skip this file and continue searching
         }
       }
     }

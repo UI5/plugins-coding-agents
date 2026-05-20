@@ -6,19 +6,28 @@ import { readFile, access, constants, readdir, stat } from 'fs/promises';
 import { existsSync } from 'fs';
 import { join, dirname } from 'path';
 import * as yaml from 'js-yaml';
+import { TOKEN_ESTIMATION } from './constants.js';
 import type { Skill, SkillMetadata } from '../types/index.js';
 
 /**
  * Load a skill from a SKILL.md file path or directory containing SKILL.md
  */
 export async function loadSkill(skillPath: string): Promise<Skill> {
+  // Input validation
+  if (!skillPath || typeof skillPath !== 'string') {
+    throw new Error('Invalid skill path: must be a non-empty string');
+  }
+  if (skillPath.trim().length === 0) {
+    throw new Error('Invalid skill path: cannot be empty or whitespace');
+  }
+
   const resolvedPath = existsSync(join(skillPath, 'SKILL.md'))
     ? join(skillPath, 'SKILL.md')
     : skillPath;
 
   try {
     await access(resolvedPath, constants.R_OK);
-  } catch {
+  } catch (error) {
     throw new Error(`Skill file not found: ${resolvedPath}`);
   }
 
@@ -70,15 +79,15 @@ export async function findPluginRoot(startDir: string): Promise<string> {
     try {
       await access(join(dir, '.claude-plugin'), constants.R_OK);
       return dir;
-    } catch {
-      // Not found, continue
+    } catch (error) {
+      // Expected: .claude-plugin may not exist in this directory
     }
 
     try {
       await access(join(dir, 'package.json'), constants.R_OK);
       return dir;
-    } catch {
-      // Not found, continue
+    } catch (error) {
+      // Expected: package.json may not exist in this directory
     }
 
     dir = dirname(dir);
@@ -160,7 +169,8 @@ export async function getFileSize(filePath: string): Promise<number> {
 export async function listFiles(dir: string, extension?: string): Promise<string[]> {
   try {
     await access(dir, constants.R_OK);
-  } catch {
+  } catch (error) {
+    // Expected: directory may not exist
     return [];
   }
   
@@ -174,5 +184,5 @@ export async function listFiles(dir: string, extension?: string): Promise<string
  * Approximate token count (1 token ≈ 4 characters)
  */
 export function estimateTokens(text: string): number {
-  return Math.ceil(text.length / 4);
+  return Math.ceil(text.length / TOKEN_ESTIMATION.CHARS_PER_TOKEN);
 }

@@ -142,8 +142,9 @@ export class TriggeringValidator extends BaseValidator {
             this.skillConfig = data.skill;
           }
           if (Array.isArray(data.tests)) return data.tests;
-        } catch {
-          // skip bad file
+        } catch (error) {
+          // Expected: test case file may be malformed JSON or have invalid structure
+          // Skip this file and continue searching
         }
       }
     }

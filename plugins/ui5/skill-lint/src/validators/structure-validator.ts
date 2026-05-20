@@ -8,6 +8,7 @@ import { readFile, access, constants } from 'fs/promises';
 import { existsSync } from 'fs';
 import { join, dirname } from 'path';
 import { BaseValidator } from './base-validator.js';
+import { FRONTMATTER, TEST_THRESHOLDS } from '../utils/constants.js';
 import type { ValidationResult, Violation, Skill, LintConfig } from '../types/index.js';
 
 export class StructureValidator extends BaseValidator {
@@ -25,7 +26,8 @@ export class StructureValidator extends BaseValidator {
     // ── SKILL.md existence ──
     try {
       await access(skill.path, constants.R_OK);
-    } catch {
+    } catch (error) {
+      // Expected: SKILL.md may not exist, validation handles this
       violations.push(this.createViolation('error', 'skill-exists', `SKILL.md not found at ${skill.path}`));
     }
 
@@ -58,7 +60,8 @@ export class StructureValidator extends BaseValidator {
 
     try {
       await access(pluginPath, constants.R_OK);
-    } catch {
+    } catch (error) {
+      // Expected: plugin.json may not exist in new projects
       violations.push(this.createViolation('error', 'plugin-json-exists',
         'Missing .claude-plugin/plugin.json',
         { suggestion: 'Create a plugin.json with name, version, and skills array' }));
@@ -81,7 +84,8 @@ export class StructureValidator extends BaseValidator {
         violations.push(this.createViolation('error', 'plugin-json-skills',
           'plugin.json must have a non-empty "skills" array', { file: pluginPath }));
       }
-    } catch {
+    } catch (error) {
+      // JSON parsing or field validation failed
       violations.push(this.createViolation('error', 'plugin-json-parse',
         'plugin.json is not valid JSON', { file: pluginPath }));
     }
@@ -101,9 +105,9 @@ export class StructureValidator extends BaseValidator {
       violations.push(this.createViolation('error', 'frontmatter-description',
         'Frontmatter is missing "description"', { file: filePath }));
     }
-    if (metadata.description && metadata.description.length <= 50) {
+    if (metadata.description && metadata.description.length <= FRONTMATTER.MIN_DESCRIPTION_LENGTH) {
       violations.push(this.createViolation('warning', 'frontmatter-description-length',
-        `Description is only ${metadata.description.length} chars — should be > 50 for effective triggering`,
+        `Description is only ${metadata.description.length} chars — should be > ${FRONTMATTER.MIN_DESCRIPTION_LENGTH} for effective triggering`,
         { file: filePath, suggestion: 'Add more keywords and context to the description' }));
     }
 
@@ -145,7 +149,8 @@ export class StructureValidator extends BaseValidator {
       const linkPath = join(dirname(skill.path), url);
       try {
         await access(linkPath, constants.R_OK);
-      } catch {
+      } catch (error) {
+        // Expected: linked file may not exist
         violations.push(this.createViolation('error', 'broken-link',
           `Broken relative link: ${url}`, { file: skill.path }));
       }
@@ -165,7 +170,8 @@ export class StructureValidator extends BaseValidator {
 
     try {
       await access(readmePath, constants.R_OK);
-    } catch {
+    } catch (error) {
+      // Expected: README.md is optional but recommended
       violations.push(this.createViolation('warning', 'readme-exists',
         'No README.md found at plugin root',
         { suggestion: 'Add a README.md with usage instructions' }));
@@ -188,7 +194,8 @@ export class StructureValidator extends BaseValidator {
 
     try {
       await access(triggerCasesPath, constants.R_OK);
-    } catch {
+    } catch (error) {
+      // Expected: test fixtures may not exist yet
       violations.push(this.createViolation('info', 'trigger-fixtures-exist',
         'No trigger-cases.json found at test/fixtures/ — triggering validation will be limited',
         { suggestion: 'Create test/fixtures/trigger-cases.json with prompt test cases' }));
@@ -201,12 +208,13 @@ export class StructureValidator extends BaseValidator {
       if (!Array.isArray(fixtures.tests)) {
         violations.push(this.createViolation('error', 'trigger-fixtures-format',
           'trigger-cases.json must have a "tests" array', { file: triggerCasesPath }));
-      } else if (fixtures.tests.length < 20) {
+      } else if (fixtures.tests.length < TEST_THRESHOLDS.MIN_TRIGGER_TEST_CASES) {
         violations.push(this.createViolation('warning', 'trigger-fixtures-count',
-          `Only ${fixtures.tests.length} test cases — recommend at least 20`,
+          `Only ${fixtures.tests.length} test cases — recommend at least ${TEST_THRESHOLDS.MIN_TRIGGER_TEST_CASES}`,
           { file: triggerCasesPath }));
       }
-    } catch {
+    } catch (error) {
+      // JSON parsing or structure validation failed
       violations.push(this.createViolation('error', 'trigger-fixtures-parse',
         'trigger-cases.json is not valid JSON', { file: triggerCasesPath }));
     }
@@ -220,7 +228,8 @@ export class StructureValidator extends BaseValidator {
 
     try {
       await access(pkgPath, constants.R_OK);
-    } catch {
+    } catch (error) {
+      // Expected: package.json is optional for simple plugins
       violations.push(this.createViolation('warning', 'package-json-exists',
         'No package.json at plugin root'));
       return violations;
@@ -233,7 +242,8 @@ export class StructureValidator extends BaseValidator {
         violations.push(this.createViolation('warning', 'package-json-test-script',
           'package.json has no "test" script', { file: pkgPath }));
       }
-    } catch {
+    } catch (error) {
+      // JSON parsing failed
       violations.push(this.createViolation('error', 'package-json-parse',
         'package.json is not valid JSON', { file: pkgPath }));
     }

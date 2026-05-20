@@ -26,6 +26,17 @@ export class SkillLinter {
   }
 
   async lint(skillPath: string, config: LintConfig): Promise<LintResult> {
+    // Input validation
+    if (!skillPath || typeof skillPath !== 'string') {
+      throw new Error('Invalid skill path: must be a non-empty string');
+    }
+    if (!config || typeof config !== 'object') {
+      throw new Error('Invalid configuration: must be a valid config object');
+    }
+    if (!config.scenarios || typeof config.scenarios !== 'object') {
+      throw new Error('Invalid configuration: missing scenarios object');
+    }
+
     const startTime = Date.now();
     const skill = await loadSkill(skillPath);
     const results = await this.runValidators(skill, config);
@@ -33,6 +44,23 @@ export class SkillLinter {
   }
 
   async lintSkill(skill: Skill, config: LintConfig): Promise<LintResult> {
+    // Input validation
+    if (!skill || typeof skill !== 'object') {
+      throw new Error('Invalid skill: must be a valid Skill object');
+    }
+    if (!skill.path || typeof skill.path !== 'string') {
+      throw new Error('Invalid skill: missing or invalid path property');
+    }
+    if (!skill.content || typeof skill.content !== 'string') {
+      throw new Error('Invalid skill: missing or invalid content property');
+    }
+    if (!config || typeof config !== 'object') {
+      throw new Error('Invalid configuration: must be a valid config object');
+    }
+    if (!config.scenarios || typeof config.scenarios !== 'object') {
+      throw new Error('Invalid configuration: missing scenarios object');
+    }
+
     const startTime = Date.now();
     const results = await this.runValidators(skill, config);
     return collectResults(skill, results, startTime);

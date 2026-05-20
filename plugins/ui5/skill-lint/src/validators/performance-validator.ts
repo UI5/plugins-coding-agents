@@ -9,6 +9,7 @@ import { existsSync } from 'fs';
 import { join } from 'path';
 import { BaseValidator } from './base-validator.js';
 import { estimateTokens, countLines, countLinesFromContent } from '../utils/file-utils.js';
+import { PERFORMANCE_THRESHOLDS, TOKEN_ESTIMATION } from '../utils/constants.js';
 import type { ValidationResult, Violation, Skill, LintConfig } from '../types/index.js';
 
 export class PerformanceValidator extends BaseValidator {
@@ -31,7 +32,7 @@ export class PerformanceValidator extends BaseValidator {
       violations.push(this.createViolation('error', 'skill-too-large',
         `SKILL.md is ${lineCount} lines — max ${maxLines}`,
         { file: skill.path, suggestion: 'Move detailed content to reference files' }));
-    } else if (lineCount > maxLines * 0.7) {
+    } else if (lineCount > maxLines * PERFORMANCE_THRESHOLDS.LINE_WARNING_THRESHOLD) {
       violations.push(this.createViolation('warning', 'skill-getting-large',
         `SKILL.md is ${lineCount} lines (${Math.round(lineCount / maxLines * 100)}% of ${maxLines} limit)`,
         { file: skill.path, suggestion: 'Consider using reference files for detailed sections' }));
@@ -46,13 +47,13 @@ export class PerformanceValidator extends BaseValidator {
     }
 
     // ── Total context budget (skill + metadata) ──
-    const metadataOverhead = 100; // plugin.json metadata
+    const metadataOverhead = PERFORMANCE_THRESHOLDS.METADATA_OVERHEAD_TOKENS;
     const totalTokens = tokens + metadataOverhead;
-    const contextLimit = 10_000; // 5% of 200k context window
+    const contextLimit = PERFORMANCE_THRESHOLDS.MAX_CONTEXT_BUDGET;
     if (totalTokens > contextLimit) {
       violations.push(this.createViolation('warning', 'context-budget',
-        `Total context budget is ~${totalTokens} tokens (${(totalTokens / 200_000 * 100).toFixed(1)}% of context window)`,
-        { suggestion: 'Keep total plugin context under 10k tokens' }));
+        `Total context budget is ~${totalTokens} tokens (${(totalTokens / PERFORMANCE_THRESHOLDS.CONTEXT_WINDOW_SIZE * 100).toFixed(1)}% of context window)`,
+        { suggestion: `Keep total plugin context under ${PERFORMANCE_THRESHOLDS.MAX_CONTEXT_BUDGET / 1000}k tokens` }));
     }
 
     // ── Reference files ──
@@ -64,8 +65,8 @@ export class PerformanceValidator extends BaseValidator {
         violations.push(this.createViolation('info', 'reference-files',
           `Found ${refs.length} reference file(s): ${refs.join(', ')}`));
       }
-    } catch {
-      // Directory not accessible, skip
+    } catch (error) {
+      // Expected: skill directory may not be accessible or may not contain additional files
     }
 
     // ── README conciseness ──
@@ -73,13 +74,13 @@ export class PerformanceValidator extends BaseValidator {
     try {
       await access(readmePath, constants.R_OK);
       const readmeLines = await countLines(readmePath);
-      if (readmeLines > 150) {
+      if (readmeLines > PERFORMANCE_THRESHOLDS.MAX_README_LINES) {
         violations.push(this.createViolation('warning', 'readme-too-long',
-          `README.md is ${readmeLines} lines — recommend ≤ 150`,
+          `README.md is ${readmeLines} lines — recommend ≤ ${PERFORMANCE_THRESHOLDS.MAX_README_LINES}`,
           { file: readmePath }));
       }
-    } catch {
-      // README not found, skip
+    } catch (error) {
+      // Expected: README.md may not exist
     }
 
     // ── Duplicate content between README & SKILL ──
@@ -90,13 +91,13 @@ export class PerformanceValidator extends BaseValidator {
     try {
       const stats = await stat(fixturesPath);
       const size = stats.size;
-      if (size > 50_000) {
+      if (size > PERFORMANCE_THRESHOLDS.MAX_FIXTURE_SIZE_BYTES) {
         violations.push(this.createViolation('warning', 'fixture-too-large',
-          `trigger-cases.json is ${(size / 1024).toFixed(1)} KB — recommend < 50 KB`,
+          `trigger-cases.json is ${(size / 1024).toFixed(1)} KB — recommend < ${PERFORMANCE_THRESHOLDS.MAX_FIXTURE_SIZE_BYTES / 1024} KB`,
           { file: fixturesPath }));
       }
-    } catch {
-      // Fixture file not found, skip
+    } catch (error) {
+      // Expected: fixture file may not exist
     }
 
     return this.buildResult(violations, start, {
@@ -112,8 +113,9 @@ export class PerformanceValidator extends BaseValidator {
 
     try {
       await access(readmePath, constants.R_OK);
-    } catch {
-      return violations; // README doesn't exist
+    } catch (error) {
+      // Expected: README may not exist
+      return violations;
     }
 
     const readmeContent = (await readFile(readmePath, 'utf-8')).toLowerCase();

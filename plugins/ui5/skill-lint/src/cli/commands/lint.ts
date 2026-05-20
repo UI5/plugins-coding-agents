@@ -30,6 +30,17 @@ export async function lintCommand(
   options: LintOptions,
 ): Promise<number> {
   try {
+    // Input validation
+    if (!skillPath || typeof skillPath !== 'string') {
+      throw new Error('Invalid skill path: must be a non-empty string');
+    }
+    if (skillPath.trim().length === 0) {
+      throw new Error('Invalid skill path: cannot be empty or whitespace');
+    }
+    if (!options || typeof options !== 'object') {
+      throw new Error('Invalid options: must be a valid options object');
+    }
+
     // Validate skill path for security (prevents path traversal attacks)
     const resolvedPath = await validateSkillPath(skillPath);
     const config = await buildConfig(options);
@@ -127,7 +138,8 @@ async function findGitRoot(): Promise<string | null> {
     try {
       await access(gitDir, constants.R_OK);
       return currentDir;
-    } catch {
+    } catch (error) {
+      // Expected: .git directory may not exist in this directory
       currentDir = dirname(currentDir);
     }
   }
