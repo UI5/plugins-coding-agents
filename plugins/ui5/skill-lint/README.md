@@ -149,6 +149,54 @@ The linter reads skill-specific patterns from your test case files:
 
 **Unified format**: Both triggering and integration tests can use the same file structure. The integration validator automatically converts trigger test cases.
 
+## CI/CD Integration
+
+### GitHub Actions
+
+The skill-lint tool is integrated with GitHub Actions for automated testing and validation on every pull request.
+
+**Workflow**: `.github/workflows/skill-lint.yml`
+
+The workflow runs automatically when:
+- Pull requests are opened/updated targeting `main`
+- Code is pushed to `main`
+- Changes affect `plugins/ui5/skill-lint/**` or `plugins/ui5/skills/**`
+
+**Jobs:**
+
+1. **Test & Coverage** - Builds the project, runs all tests, and checks coverage
+2. **Lint Skills** - Validates all skill files using the linter
+3. **Type Check** - Ensures TypeScript type safety with `tsc --noEmit`
+
+**Artifacts**: Test coverage reports and lint results are uploaded as workflow artifacts (retained for 30 days).
+
+**Status Badge** (add to your README):
+```markdown
+[![Skill Lint](https://github.com/UI5/plugins-claude/actions/workflows/skill-lint.yml/badge.svg)](https://github.com/UI5/plugins-claude/actions/workflows/skill-lint.yml)
+```
+
+### Local Pre-commit Hook (Optional)
+
+For local validation before committing:
+
+```bash
+# Install husky (if not already installed)
+npm install -D husky
+
+# Set up git hooks
+npx husky init
+
+# Create pre-commit hook
+echo "cd plugins/ui5/skill-lint && npm run build && npm test" > .husky/pre-commit
+chmod +x .husky/pre-commit
+```
+
+### Coverage Requirements
+
+- **Target**: 80% coverage (lines, functions, branches, statements)
+- **Current**: 75% coverage
+- CI workflow tracks coverage and will enforce threshold once Sprint 1 is complete
+
 ## Architecture
 
 ```
