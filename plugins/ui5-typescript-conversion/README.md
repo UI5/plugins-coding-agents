@@ -1,10 +1,12 @@
-# UI5 TypeScript conversion plugin for Claude
+# UI5 TypeScript conversion plugin for Coding Agents
 
 ## Key Features
 
-- Converte JavaScript based UI5 project to TypeScript
+- Convert JavaScript based UI5 project to TypeScript
 
 ## Installation
+
+### Claude Code
 
 Via Claude CLI:
 ```bash

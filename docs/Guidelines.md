@@ -17,7 +17,7 @@ This project uses the [Conventional Commits specification](https://www.conventio
 ````
 feat(.mcp.json): Add UI5 MCP server
 
-Offers great UI5 expertise for Claude Code users.
+Offers great UI5 expertise for coding agents.
 ````
 
 #### Structure

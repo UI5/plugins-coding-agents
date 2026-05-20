@@ -1,5 +1,5 @@
 name: Bug Report
-description: Report an issue related to UI5 plugins for Claude
+description: Report an issue related to UI5 plugins for coding agents
 type: Bug
 body:
   - type: markdown
@@ -35,9 +35,9 @@ body:
     attributes:
       label: Confirmation
       description: |
-        To avoid duplicates and ensure efficient issue resolution, please double-check whether a similar issue has been reported or discussed already either in this UI5 plugins for Claude repository or at community sites like [Stack Overflow](https://stackoverflow.com/search?tab=active&q=%5bui5-renovate-preset-config%5d%20is%3aquestion&searchOn=3).
+        To avoid duplicates and ensure efficient issue resolution, please double-check whether a similar issue has been reported or discussed already either in this UI5 plugins for coding agents repository or at community sites like [Stack Overflow](https://stackoverflow.com/search?tab=active&q=%5bui5-renovate-preset-config%5d%20is%3aquestion&searchOn=3).
       options:
-        - label: I have searched the existing issues and reviewed the relevant documentation as well as the UI5 plugins for Claude documentation.
+        - label: I have searched the existing issues and reviewed the relevant documentation as well as the UI5 plugins for coding agents documentation.
           required: true
         - label: I am not disclosing any internal or sensitive information.
           required: true
