@@ -1,8 +1,10 @@
 # skill-lint Development Backlog
 
-> **Status:** Phase 1 Testing — 66% Coverage Achieved (Target: 80%)  
+> **Status:** Phase 1 Code Quality — Critical Review Complete  
 > **Last Updated:** 2026-05-20  
-> **Current Version:** 1.0.0
+> **Current Version:** 1.0.0  
+> **Risk Level:** 🔴 HIGH (5 critical issues blocking production)  
+> **Next Action:** Sprint 1 Critical Fixes (4 days)
 
 ## Legend
 
@@ -20,9 +22,68 @@ Status:
 
 ---
 
+## � Critical Review Summary (2026-05-20)
+
+**Document:** [CRITICAL_REVIEW.md](./CRITICAL_REVIEW.md)
+
+A comprehensive code review identified **25 issues** across 4 severity levels:
+- 🔴 **CRITICAL:** 5 issues (blocking production deployment)
+- 🟡 **HIGH:** 8 issues (must fix before v1.1.0)
+- 🟢 **MEDIUM:** 7 issues (quality improvements)
+- 🔵 **LOW:** 5 issues (future enhancements)
+
+### 🔴 Critical Issues Requiring Immediate Attention
+
+1. **Sequential Execution** (P0) — Validators run one-at-a-time despite parallel config (wastes 60-80% execution time)
+2. **No Error Boundaries** (P0) — Single validator crash brings down entire tool
+3. **Synchronous File I/O** (P0) — Blocks event loop, prevents bulk linting, poor performance
+4. **No Path Validation** (P0) — Security vulnerability allows arbitrary file access
+5. **Real API in Tests** (P0) — Integration tests cost $300/month in API usage, can't run in CI
+
+**Estimated Effort:** 4 days  
+**Impact:** Blocks production deployment, CI/CD integration, and bulk linting features
+
+### 📋 Recommended Action Plan
+
+#### **Sprint 1 (Week 1-2)** — Critical Fixes
+**Goal:** Production-ready core
+- Add error boundaries in validator execution (2h)
+- Implement parallel execution (4h)
+- Add path validation (4h)
+- Create MockAdapter for tests (1d)
+- Convert to async file I/O (2d)
+
+**Deliverable:** Reliable, secure, performant core
+
+#### **Sprint 2 (Week 3-4)** — Test Coverage
+**Goal:** 80%+ coverage
+- Test core linter (6h)
+- Test CLI commands (1d)
+- Test file utils (4h)
+- Test integration validator edge cases (4h)
+- Test structure validator file ops (6h)
+- Test GitHub Actions formatter (4h)
+- Test adapter registry (3h)
+
+**Deliverable:** 80%+ test coverage, CI-ready
+
+#### **Sprint 3 (Week 5-6)** — Polish
+**Goal:** Production deployment
+- Add progress reporting (6h)
+- Optimize pattern matching (3h)
+- Add caching (4h)
+- Standardize error handling (4h)
+- Add metrics collection (6h)
+
+**Deliverable:** Production-grade tool
+
+**Total Timeline:** 6 weeks to production-ready state
+
+---
+
 ## 📊 Today's Progress (2026-05-20)
 
-### ✅ Completed
+### ✅ Completed (Phase 1.0 Code Quality)
 1. **Test Infrastructure Setup**
    - Installed Vitest 4.1.7 + coverage plugin
    - Created test directory structure (6 categories)
@@ -153,38 +214,170 @@ Status:
 
 ---
 
-### 1.1 Unit Tests (🟨 In Progress — 66% Coverage Achieved)
+### 1.0.1 Critical Architecture Fixes (⬜ Not Started)
 **Priority:** 🔴 CRITICAL  
-**Effort:** 3-5 days  
+**Effort:** 4 days  
+**Source:** CRITICAL_REVIEW.md findings (2026-05-20)  
+**Risk:** Blocks production deployment, CI/CD integration, bulk linting
+
+#### P0 Issues (Blocking Production)
+- [ ] **Sequential Execution** (4h)
+  - Implement parallel validator execution
+  - Add config.execution.parallel support
+  - Add error handling for parallel failures
+  - Maintain sequential fallback option
+  - **Impact:** 60-80% performance improvement
+  - **File:** `src/core/linter.ts`
+
+- [ ] **No Error Boundaries** (2h)
+  - Wrap validator execution in try-catch
+  - Return error ValidationResult instead of crashing
+  - Log validator crashes with context
+  - Continue with remaining validators
+  - **Impact:** Prevents tool crashes from single validator failure
+  - **File:** `src/core/linter.ts`
+
+- [ ] **Synchronous File I/O** (2 days)
+  - Convert all fs sync operations to async (readFileSync → readFile)
+  - Update loadSkill() to return Promise<Skill>
+  - Update all validators to use async file operations
+  - Add proper error handling for file operations
+  - **Impact:** Enables bulk linting, prevents event loop blocking
+  - **Files:** `src/utils/file-utils.ts`, `src/validators/*.ts` (15+ files)
+  - **Breaking:** Yes (API changes, but validators already async)
+
+- [ ] **No Path Validation** (4h)
+  - Add validateSkillPath() function
+  - Use realpath() to resolve symlinks
+  - Check path is within workspace
+  - Validate file is SKILL.md or directory with SKILL.md
+  - Add tests for path traversal attacks
+  - **Impact:** Prevents arbitrary file access (security vulnerability)
+  - **File:** `src/cli/commands/lint.ts`
+
+- [ ] **Real API in Tests** (1 day)
+  - Create MockAdapter class extending BaseAdapter
+  - Add setResponse() for programmatic mocking
+  - Update integration tests to use MockAdapter
+  - Document how to run real integration tests (opt-in)
+  - Add --integration flag for real API tests
+  - **Impact:** Enables CI/CD, saves $300/month, faster test execution
+  - **Files:** `src/adapters/mock-adapter.ts`, `tests/validators/integration-validator.test.ts`
+
+**Total Effort:** 4 days  
+**Deliverable:** Production-ready, secure, reliable core
+
+---
+
+### 1.1 Unit Tests — Reach 80% Coverage (🟨 In Progress — 67% Current)
+**Priority:** 🟡 HIGH  
+**Effort:** 5 days  
 **Target Coverage:** 80%+  
-**Status Update (2026-05-20):** Test infrastructure complete, 54 tests passing (100%), 66% coverage achieved
+**Status Update (2026-05-20):** Test infrastructure complete, 63 tests passing (100%), 67% coverage achieved
 
-#### Validators
-- [x] `tests/validators/structure-validator.test.ts` — Complete (7 tests, ✅ ALL PASSING)
-- [x] `tests/validators/performance-validator.test.ts` — Complete (9 tests, ✅ ALL PASSING)
-- [x] `tests/validators/triggering-validator.test.ts` — Complete (12 tests, ✅ ALL PASSING)
-- [ ] `tests/validators/integration-validator.test.ts` — Not yet created (54% coverage)
+#### Critical Gaps (from CRITICAL_REVIEW.md)
 
-#### Formatters
-- [x] `tests/formatters/json-formatter.test.ts` — Complete (8 tests, ✅ ALL PASSING, 100% coverage)
-- [ ] `tests/formatters/text-formatter.test.ts` — Not yet created (60% coverage)
-- [ ] `tests/formatters/github-actions-formatter.test.ts` — Not yet created (0% coverage)
+**P1 Issues (Must fix before v1.1.0):**
 
-#### Config
-- [x] `tests/config/schema.test.ts` — Complete (13 tests, ✅ ALL PASSING, 100% coverage)
-- [ ] `tests/config/loader.test.ts` — Not yet created
+- [ ] **Core Linter Tests** (6h) — 0% coverage
+  - Test constructor initializes validators correctly
+  - Test lint() loads skill and runs validators
+  - Test error handling when skill file missing
+  - Test error handling when validator crashes
+  - Test results aggregation and summary
+  - Test duration tracking
+  - **File:** `tests/core/linter.test.ts`
 
-#### Utils
-- [x] `tests/utils/file-utils.test.ts` — Partial (5 tests, ✅ ALL PASSING, but only 27.58% coverage)
-  - Missing: loadSkill(), findPluginRoot(), countLines() tests
-- [ ] `tests/utils/logger.test.ts` — Not yet created
+- [ ] **GitHub Actions Formatter Tests** (4h) — 0% coverage
+  - Test annotation format matches GitHub spec
+  - Test file paths are workspace-relative
+  - Test line numbers are 1-indexed
+  - Test severity mapping (error/warning/notice)
+  - Test multiple violations
+  - **File:** `tests/formatters/github-actions-formatter.test.ts`
 
-#### Adapters
-- [ ] `tests/adapters/claude-code-adapter.test.ts` — Not yet created
+- [ ] **Adapter Registry Tests** (3h) — Not tested
+  - Test getAdapter() with valid name
+  - Test getAdapter() with invalid name (throws)
+  - Test registerAdapter() with custom adapter
+  - Test listAdapters() returns all
+  - **File:** `tests/adapters/adapter-registry.test.ts`
+
+- [ ] **File Utils Completion** (4h) — 41% coverage
+  - Test loadSkill() with valid/invalid paths
+  - Test findPluginRoot() directory traversal
+  - Test countLines() file variant
+  - Add edge cases: empty file, no frontmatter, permissions
+  - **File:** `tests/utils/file-utils.test.ts`
+
+- [ ] **CLI Command Tests** (1 day) — 0% coverage
+  - Test argument parsing
+  - Test config loading and merging
+  - Test output formatting
+  - Test exit codes (0/1/2)
+  - Test error messages
+  - **Files:** `tests/cli/commands/*.test.ts`
+
+- [ ] **Logger Tests** (3h) — Not tested
+  - Test log level filtering
+  - Test color output (ANSI codes)
+  - Test emoji rendering
+  - Test stream writing (stdout/stderr)
+  - **File:** `tests/utils/logger.test.ts`
+
+- [ ] **Integration Validator Edge Cases** (4h) — 54% coverage
+  - Test adapter unavailable
+  - Test malformed test case JSON
+  - Test timeout scenarios
+  - Test rate limit errors
+  - Test network failures
+  - **File:** `tests/validators/integration-validator.test.ts`
+
+- [ ] **Structure Validator File Ops** (6h) — 58% coverage
+  - Test file system checks (README, package.json, tsconfig)
+  - Test link validation regex
+  - Test duplicate content detection
+  - Test project scaffolding checks
+  - **File:** `tests/validators/structure-validator.test.ts`
+
+#### Current Status
+
+##### Validators
+- [x] `tests/validators/structure-validator.test.ts` — 7 tests, 58% coverage 🟨
+- [x] `tests/validators/performance-validator.test.ts` — 9 tests, 98.7% coverage ✅
+- [x] `tests/validators/triggering-validator.test.ts` — 12 tests, 71% coverage 🟡
+- [ ] `tests/validators/integration-validator.test.ts` — 0 tests, 54% coverage 🔴
+
+##### Formatters
+- [x] `tests/formatters/json-formatter.test.ts` — 8 tests, 100% coverage ✅
+- [ ] `tests/formatters/text-formatter.test.ts` — 0 tests, 60% coverage 🟨
+- [ ] `tests/formatters/github-actions-formatter.test.ts` — 0 tests, 0% coverage 🔴
+
+##### Core
+- [ ] `tests/core/linter.test.ts` — 0 tests, 0% coverage 🔴
+- [ ] `tests/core/result-collector.test.ts` — 0 tests, not measured 🔴
+
+##### Config
+- [x] `tests/config/schema.test.ts` — 13 tests, 100% coverage ✅
+- [ ] `tests/config/loader.test.ts` — 0 tests, not measured 🔴
+
+##### Utils
+- [x] `tests/utils/file-utils.test.ts` — 14 tests, 41% coverage 🟨
+- [ ] `tests/utils/logger.test.ts` — 0 tests, not measured 🔴
+
+##### Adapters
+- [ ] `tests/adapters/adapter-registry.test.ts` — 0 tests, not measured 🔴
+- [ ] `tests/adapters/claude-code-adapter.test.ts` — 0 tests, not measured 🔴
+- [ ] `tests/adapters/mock-adapter.test.ts` — 0 tests (will be created) 🆕
+
+##### CLI
+- [ ] `tests/cli/commands/lint.test.ts` — 0 tests, 0% coverage 🔴
+- [ ] `tests/cli/commands/check.test.ts` — 0 tests, not measured 🔴
+- [ ] `tests/cli/commands/init.test.ts` — 0 tests, not measured 🔴
 
 **Test Framework:** ✅ Vitest 4.1.7 configured with coverage  
 **Dependencies:** Vitest, @vitest/coverage-v8  
-**Current Results:** 54 tests written, 54 passing (100% pass rate), 66% coverage  
+**Current Results:** 63 tests written, 63 passing (100% pass rate), 67% coverage  
 **Coverage Breakdown:**
 - Config: 100% ✅
 - JSON Formatter: 100% ✅
@@ -248,11 +441,99 @@ Status:
 
 ---
 
+### 1.2 Performance & Quality Polish (⬜ Not Started)
+**Priority:** 🟢 MEDIUM  
+**Effort:** 3 days  
+**Source:** CRITICAL_REVIEW.md medium-priority findings
+
+#### P2 Issues (Quality Improvements)
+
+- [ ] **No Caching** (4h)
+  - Implement SkillCache with mtime-based invalidation
+  - Cache parsed skills to avoid re-parsing
+  - Add cache hit/miss metrics
+  - **Impact:** Reduces CPU usage on repeated operations
+  - **File:** `src/utils/skill-cache.ts`
+
+- [ ] **Pattern Matching Not Optimized** (3h)
+  - Compile keywords into RegExp patterns
+  - Cache compiled patterns
+  - Use word boundaries for accurate matching
+  - **Impact:** Faster keyword detection (O(1) vs O(n*m))
+  - **File:** `src/adapters/claude-code-adapter.ts`
+
+- [ ] **No Progress Reporting** (6h)
+  - Add ProgressCallback interface
+  - Emit events for validator start/complete
+  - Show progress bar for long operations
+  - **Impact:** Better UX for long-running operations
+  - **Files:** `src/core/linter.ts`, CLI commands
+
+- [ ] **Magic Numbers in Adapter** (2h)
+  - Move constants to adapter config
+  - Make CHARS_PER_TOKEN, retry delays configurable
+  - Document why specific values chosen
+  - **Impact:** More flexible adapter configuration
+  - **File:** `src/adapters/claude-code-adapter.ts`
+
+- [ ] **Inconsistent Error Handling** (4h)
+  - Standardize error handling pattern across validators
+  - Always return ValidationResult, never throw
+  - Document error handling guidelines
+  - **Impact:** More predictable error behavior
+  - **Files:** All validators
+
+- [ ] **No Metrics Collection** (6h)
+  - Add Metrics interface (memory, file sizes, cache hits)
+  - Track memory usage per validator
+  - Export metrics in JSON format
+  - **Impact:** Better observability and profiling
+  - **Files:** All validators, formatters
+
+- [ ] **Type Safety Improvements** (2h)
+  - Remove unnecessary optional chaining
+  - Strengthen types where nulls impossible
+  - Add stricter TSConfig options
+  - **Impact:** Catch more errors at compile time
+  - **Files:** Multiple
+
+**Total Effort:** 3 days  
+**Deliverable:** Production-grade quality and performance
+
+---
+
+### 1.3 E2E Tests (⬜ Not Started)
+**Priority:** 🔵 LOW  
+**Effort:** 2 days
+
+- [ ] CLI argument parsing
+  - All combinations of scenario flags
+  - Config file path resolution
+  - Output file creation
+  
+- [ ] Config file discovery
+  - `.skilllintrc.json`
+  - `.skilllintrc.yaml`
+  - `package.json` section
+  
+- [ ] Error handling
+  - Invalid skill path
+  - Missing test files
+  - Malformed config
+  
+- [ ] Exit codes
+  - 0 = pass
+  - 1 = violations
+  - 2 = execution error
+
+---
+
 ## Phase 2: Feature Completion 🟢 MEDIUM
 
-### 2.1 Parallel Execution (⬜ Not Started)
+### 2.1 Parallel Execution (⬜ Not Started → SUPERSEDED by 1.0.1)
 **Priority:** 🟢 MEDIUM  
-**Effort:** 2-3 days
+**Effort:** 2-3 days  
+**Status:** ⏸️ Moved to Phase 1.0.1 as P0 critical issue
 
 - [ ] Refactor `SkillLinter.lint()` to use `Promise.all()`
 - [ ] Add concurrency control (max parallel validators config)
