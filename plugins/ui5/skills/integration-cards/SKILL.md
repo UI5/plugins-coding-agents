@@ -5,119 +5,99 @@ description: MUST be loaded before any UI Integration Cards (also called UI5 Int
 
 # UI Integration Cards Development Guidelines
 
-> *This document outlines the fundamental rules and best practices an AI agent must follow when developing or modifying Integration Cards. Adherence to these guidelines is critical for creating modern, maintainable, and performant UI Integration Cards.*
+Rules an agent must follow when creating, modifying, validating, or previewing a UI Integration Card. Adherence is critical for working cards.
 
-## 1. Coding Guidelines
-- **ALWAYS** strive to create declarative Integration Card, such as "Calendar", "List", "Table", "Timeline", "Object" or "Analytical".
-  - create an Integration Card Extension only in exceptional cases.
-- **ALWAYS** create links using the `actions` property.
-- **ALWAYS** refer to parameters using correct syntax - `{parameters>/parameterKey/value}`.
-- **ALWAYS** perform validation of the integration card as described in [2. Validation](#2-validation).
-- **ALWAYS** show a preview of the generated card following the [4. Preview Instructions](#4-preview-instructions).
-- **ALWAYS** generate new declarative integration cards using the `create_integration_card` tool.
+## When to load each reference
 
-### 1.1 Data
-- **NEVER** modify the provided data under any circumstances.
-- **ALWAYS** include the service URL directly in the card manifest when one is supplied.
-- **ALWAYS** reference destinations by name when available. Configure the destination in the `sap.card/configuration/destinations/` and reuse it with binding syntax like `{{destinations.destinationName}}`.
-- **NEVER** replace destination name with its URL.
-- **ALWAYS** place data configuration in: `"sap.card"/data/`
-- **NEVER** place data configuration in:
-  - `"sap.card"/content/data/`
-  - `"sap.card"/header/data/`
-- Data can be provided via:
-  1. Inline JSON object
-  2. Network request (HTTP/HTTPS/Destination)
-  3. Extension method call
-- **ALWAYS** verify these paths are correctly set:
-  - `"sap.card"/data/path` (Primary data path)
-  - `"sap.card"/content/data/path` (Content-specific path. It overrides the primary data path)
-  - `"sap.card"/header/data/path` (Header-specific path. It overrides the primary data path)
+| Trigger | Load |
+|---|---|
+| Working on or planning an Analytical card | [`references/analytical_chart_types.md`](references/analytical_chart_types.md) |
+| `dt/Configuration.js` exists, is being created, or is being modified | [`references/configuration_editor_example.md`](references/configuration_editor_example.md) |
 
-#### 1.1.1 Data Errors Detection
-- Symptom: "No data to display" message appears.
-- Cause: Incorrect data configuration or data path in the content incorrectly overrides the primary data path.
-- Solution: Verify all rules in [1.1 Data](#11-data) are properly followed.
+If the trigger applies, load before producing any output. Do not work from memory.
 
-### 1.2 Internationalization
-- **ALWAYS** bind properties that are not bound to the data to the `i18n` model.
+## 1. Core rules
 
-### 1.3 Analytical Cards
-- **ALWAYS** follow [6. Analytical Cards Coding Guidelines](#6-analytical-cards-coding-guidelines) when developing Analytical cards.
+| Rule | Detail |
+|---|---|
+| Prefer declarative cards | Types: List, Table, Calendar, Timeline, Object, Analytical. Create an Extension only in exceptional cases. |
+| Use `create_integration_card` MCP tool | When creating a new declarative card. |
+| Parameter binding syntax | `{parameters>/parameterKey/value}` — single braces, `>` separator, `value` suffix. |
+| Destination binding syntax | `{{destinations.destinationName}}` — double braces, dot. Configure under `sap.card/configuration/destinations/`. Reference by name; never replace with raw URL. |
+| i18n binding | Bind every non-data, user-visible string to the i18n model. |
+| Links | Use the `actions` property; never inline `<a>` or hand-rolled URL handlers. |
+| Validate before declaring done | See [3. Validation](#3-validation). |
+| Show preview when requested | See [4. Preview](#4-preview). |
+| Don't modify provided data | Use it as supplied. |
 
-### 1.4 Configuration Editor
-- **ALWAYS** follow [5. Configuration Editor](#5-configuration-editor) guidelines when creating or modifying Configuration Editors for Integration Cards.
-- **ALWAYS** load [references/configuration_editor_example.md](references/configuration_editor_example.md) whenever a `dt/Configuration.js` file is present in the project, is being created, or is being modified — even if the user did not explicitly mention the Configuration Editor.
+## 2. Data placement
 
-## 2. Validation
-- **ALWAYS** ensure that `manifest.json` file is valid JSON.
-- **ALWAYS** ensure that in `manifest.json` file the property `sap.app/type` is set to `"card"`.
-- **ALWAYS** validate the `manifest.json` against the UI5 Manifest schema. Use the `run_manifest_validation` tool to do this.
-- **ALWAYS** avoid using deprecated properties in `manifest.json` and elsewhere.
-- **NEVER** treat Integration Cards' project as UI5 project, except for cards of type "Component".
+`sap.card/data/` is the only correct top-level location for the data request.
 
-## 3. Card Explorer
-- The Card Explorer provides detailed documentation for the Integration Cards schema, including descriptions of every property, guidance for integrating cards into hosting environments, configuration editor documentation with examples, and broader best practices. It is available at: https://ui5.sap.com/test-resources/sap/ui/integration/demokit/cardExplorer/webapp/index.html
-- The Card Explorer sample sources (manifest.json, data.json, etc.) are available in the openui5 GitHub repository: https://github.com/UI5/openui5/tree/master/src/sap.ui.integration/test/sap/ui/integration/demokit/cardExplorer/webapp/samples
+| Path | Purpose |
+|---|---|
+| `sap.card/data/path` | Primary data path |
+| `sap.card/content/data/path` | Content-specific path; **overrides** the primary path if set |
+| `sap.card/header/data/path` | Header-specific path; **overrides** the primary path if set |
 
-## 4. Preview Instructions
-- If preview of the card must be shown, **ALWAYS** check the card folder for an existing preview file and any accompanying instructions or scripts, and reuse them if available.
-  * for example, in NodeJS-based projects, search the `package.json` file for `start` or similar script. If such is available, use it
-  * also search in the `README.md` file.
-- If preview instructions are not available, you have to create an HTML page that contains a `ui-integration` card element which references the card manifest. Then serve the HTML page using `http` server.
+Forbidden: putting the request itself under `sap.card/content/data/` or `sap.card/header/data/`.
+
+**Symptom — "No data to display":** typically caused by a `content/data` block that overrides the primary data path. Verify [2. Data placement](#2-data-placement) before debugging anything else.
+
+## 3. Validation
+
+| Rule | Detail |
+|---|---|
+| Valid JSON | `manifest.json` must parse. |
+| `sap.app/type` | Must be `"card"`. |
+| Schema validation | Use `run_manifest_validation` MCP tool. |
+| No deprecated properties | In `manifest.json` or elsewhere. |
+| Not a UI5 project | Except for `Component`-type cards. |
+
+## 4. Preview
+
+If asked to preview, first check the card folder for an existing preview entry point — `package.json` `start` script, `README.md`, or an existing HTML file. Reuse it if present. Otherwise create an HTML page with a `<ui-integration-card>` element pointing at the manifest, and serve via an `http` server.
 
 ## 5. Configuration Editor
-Configuration Editor allows different personas to customize Integration Cards without modifying the manifest file directly.
-The following roles/personas are supported:
-- Administrator
-- Page/Content Administrator
-- Translator
 
-The Configuration Editor is implemented through two key components:
+The editor lets the Administrator, Page/Content Administrator, and Translator personas customise a card without editing `manifest.json` directly.
 
-1. **Definition file**: Create a `dt/Configuration.js` file that exports a Designtime definition object
-2. **Manifest reference**: Reference this definition in the `manifest.json` under the `sap.card/configuration/editor` property
+Two pieces:
+1. `dt/Configuration.js` — exports a function that returns `new Designtime({ form: {...} })`.
+2. `manifest.json` — references the file at `sap.card/configuration/editor`.
 
-The `dt/Configuration.js` file defines the Configuration Editor's structure by specifying:
-- Form layout and field definitions
-- Input controls and visualizations
-- Validation rules and field relationships
-- Grouping and organization of configuration options
+Design as the **Administrator** persona.
 
-When creating or modifying Integration Cards, follow these guidelines for Configuration Editors:
-- Assume the role of Administrator persona when designing the Configuration Editor.
-- **ALWAYS** ensure that the Configuration Editor reflects the current structure and fields of the `manifest.json`.
-- **ALWAYS** make the existing fields in the `manifest.json` configurable via the editor. For example manifest parameters, title, subtitle, icon of the header, etc.
-- **ALWAYS** ask the user if they agree to make all fields editable and what other fields should be added.
-- **NEVER** add fields to the editor that do not exist in the `manifest.json`.
-- **ALWAYS** remove fields from the editor when removing them from the `manifest.json`.
-- **ALWAYS** add fields in the Configuration Editor when adding them to the `manifest.json`.
+| Rule | Detail |
+|---|---|
+| Mirror the manifest | Editor reflects the current structure and parameters of `manifest.json` exactly. |
+| All existing fields editable | Title, subtitle, header icon, parameters — make them configurable. |
+| Ask the user | Before deciding which fields to expose, ask: "Make all manifest fields editable? Anything else to add?" |
+| No invented fields | Never add an editor field that does not exist in `manifest.json`. |
+| Keep in sync | Add to or remove from the editor when adding to or removing from `manifest.json`. |
 
-- **ALWAYS** load [references/configuration_editor_example.md](references/configuration_editor_example.md) before creating or modifying a Configuration Editor (i.e. a `dt/Configuration.js` file). It contains a complete example of a `manifest.json` paired with the corresponding `dt/Configuration.js` file.
+Load [`references/configuration_editor_example.md`](references/configuration_editor_example.md) for the canonical paired example.
 
-## 6. Analytical Cards Coding Guidelines
-- **ALWAYS** set `sap.card/content/chartType` property.
-- **ALWAYS** adjust `sap.card/content/measures`, `sap.card/content/dimensions` and `sap.card/content/feeds` to match the `sap.card/content/chartType` property and data structure. This is critical for proper data display.
-- **ALWAYS** use `sap.card/content/chartProperties` to adjust labels, colors, the legend, and other chart aspects.
-- **ALWAYS** define each feed with its type (Dimension or Measure), its unique identifier (uid), and the associated values using defined measures and dimensions. Example (for a donut/pie chart):
+## 6. Analytical cards
+
+Load [`references/analytical_chart_types.md`](references/analytical_chart_types.md) for the full chart-type catalog (UIDs and per-type examples).
+
+| Rule | Detail |
+|---|---|
+| Set `chartType` | `sap.card/content/chartType` is required. |
+| Match feeds to chart type | `measures`, `dimensions`, and `feeds` must match the UIDs the chart type expects. The reference file lists them per chart. |
+| Each feed needs three keys | `type` (`Dimension`\|`Measure`), `uid`, `values`. |
+| `chartProperties` | Use it for labels, colours, legend, etc. Do not invent keys. Omit entirely if defaults are fine. |
+
+Minimal feeds example (donut/pie):
 ```json
 "feeds": [
-  {
-    "type": "Dimension",
-    "uid": "color",
-    "values": [
-      "Store Name"
-    ]
-  },
-  {
-    "type": "Measure",
-    "uid": "size",
-    "values": [
-      "Revenue"
-    ]
-  }
+  { "type": "Dimension", "uid": "color", "values": ["Store Name"] },
+  { "type": "Measure", "uid": "size", "values": ["Revenue"] }
 ]
 ```
-- **ALWAYS** ensure the `uid` in `feeds` exactly matches the UID required for the selected chartType (e.g., color, size, dataFrame).
 
-- **ALWAYS** load [references/analytical_chart_types.md](references/analytical_chart_types.md) before creating or modifying an Analytical card. It contains the comprehensive list of all supported chart types, their required UIDs, and example configurations.
+## 7. Card Explorer (reference)
+
+- Schema docs and live samples: <https://ui5.sap.com/test-resources/sap/ui/integration/demokit/cardExplorer/webapp/index.html>
+- Sample sources: <https://github.com/UI5/openui5/tree/master/src/sap.ui.integration/test/sap/ui/integration/demokit/cardExplorer/webapp/samples>
