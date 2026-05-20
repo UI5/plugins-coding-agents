@@ -111,11 +111,14 @@ Status:
   - Reduced code duplication by ~100 lines
   - **Completed:** 2026-05-20
 
-- [ ] **Line Counting Inconsistency** - Standardize approach
-  - Split `countLines()` into `countLinesFromFile()` and `countLinesFromContent()`
-  - Or update to accept string | path parameter
-  - Document the design decision
-  - **Effort:** 1-2 hours
+- [x] **Line Counting Inconsistency** - Standardize approach ✅
+  - Created `countLinesFromContent(content: string)` function
+  - Updated `countLines(filePath)` to use countLinesFromContent internally
+  - Handles edge cases: empty strings (returns 0), trailing newlines, CRLF
+  - Added 9 comprehensive test cases (100% branch coverage)
+  - Updated PerformanceValidator to use countLinesFromContent
+  - Documented design decisions in JSDoc comments
+  - **Completed:** 2026-05-20
 
 - [ ] **Missing JSDoc Comments** - Document test cases
   - Add JSDoc to complex test cases explaining "why"

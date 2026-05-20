@@ -7,7 +7,7 @@
 import { existsSync, readFileSync, readdirSync, statSync } from 'fs';
 import { join } from 'path';
 import { BaseValidator } from './base-validator.js';
-import { estimateTokens, countLines } from '../utils/file-utils.js';
+import { estimateTokens, countLines, countLinesFromContent } from '../utils/file-utils.js';
 import type { ValidationResult, Violation, Skill, LintConfig } from '../types/index.js';
 
 export class PerformanceValidator extends BaseValidator {
@@ -23,8 +23,7 @@ export class PerformanceValidator extends BaseValidator {
     const maxTokens = config.thresholds.performance.maxTokens;
 
     // ── SKILL.md line count ──
-    // Note: Empty string split by '\n' gives [''], so check for empty content first
-    const lineCount = skill.content.length === 0 ? 0 : skill.content.split('\n').length;
+    const lineCount = countLinesFromContent(skill.content);
     if (lineCount === 0) {
       violations.push(this.createViolation('error', 'skill-empty', 'SKILL.md is empty'));
     } else if (lineCount > maxLines) {

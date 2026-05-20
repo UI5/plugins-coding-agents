@@ -77,11 +77,62 @@ export function findPluginRoot(startDir: string): string {
 }
 
 /**
- * Count lines in a file
+ * Count lines in a file.
+ * Reads the file from disk and counts newline characters.
+ * 
+ * @param filePath - Absolute path to the file
+ * @returns Number of lines in the file
+ * 
+ * @example
+ * ```typescript
+ * const lines = countLines('/path/to/SKILL.md');
+ * console.log(`File has ${lines} lines`);
+ * ```
  */
 export function countLines(filePath: string): number {
   const content = readFileSync(filePath, 'utf-8');
-  return content.split('\n').length;
+  return countLinesFromContent(content);
+}
+
+/**
+ * Count lines in a string content.
+ * Handles edge case of empty strings (returns 0, not 1).
+ * 
+ * Design Decision:
+ * - Empty string returns 0 (no lines)
+ * - Single line with no newline returns 1
+ * - Content ending with newline counts the final line
+ * 
+ * This ensures consistent line counting across validators
+ * and prevents off-by-one errors in performance checks.
+ * 
+ * @param content - String content to count lines in
+ * @returns Number of lines in the content
+ * 
+ * @example
+ * ```typescript
+ * countLinesFromContent('') // => 0
+ * countLinesFromContent('line1') // => 1
+ * countLinesFromContent('line1\nline2') // => 2
+ * countLinesFromContent('line1\nline2\n') // => 2
+ * ```
+ */
+export function countLinesFromContent(content: string): number {
+  // Empty string has no lines
+  if (content.length === 0) {
+    return 0;
+  }
+  
+  // Count newline characters + 1 for the last line
+  // But if content ends with newline, don't count extra line
+  const lines = content.split('\n');
+  
+  // If last element is empty string (content ended with \n), don't count it
+  if (lines.length > 0 && lines[lines.length - 1] === '') {
+    return lines.length - 1;
+  }
+  
+  return lines.length;
 }
 
 /**
