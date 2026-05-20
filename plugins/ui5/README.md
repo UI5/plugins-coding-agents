@@ -30,7 +30,7 @@ Development guidelines and coding standards derived from official SAP UI5 guidel
 
 ## Installation
 
-### Via Claude CLI (Recommended)
+### Via Claude CLI
 ```bash
 claude plugin install ui5@claude-plugins-official
 ```
