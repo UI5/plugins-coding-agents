@@ -1,6 +1,34 @@
 {
-  "version": "2.0.0",
+  "version": "3.0.0",
   "description": "Skill triggering test cases for ui5-best-practices (single skill scope)",
+  "skill": {
+    "name": "ui5-best-practices",
+    "triggerKeywords": [
+      "ui5", "sap.ui", "odata", "csp", "cap", "component",
+      "componentsupp", "simpleform", "columnlayout",
+      "typescript event", "button$press", "data binding",
+      "i18n", "translation", "get_api_reference", "run_ui5_linter",
+      "simpletype", "validation", "event handler", "xml view",
+      "opa5", "integration card"
+    ],
+    "antiKeywords": [
+      "react", "vue", "angular", "python", "express", "django"
+    ],
+    "detectionPatterns": [
+      "sap.ui.define", "sap.ui.require", "sap/m/", "sap/ui/",
+      "sap.ui.core", "sap.m.", "sap.ui.model",
+      "columnlayout", "simpleform", "component.js", "manifest.json",
+      "odata type", "odata v2", "odata v4", "odata model", "sap.ui.model.odata",
+      "button$press", "button$pressevent", "event$", "ui5 types",
+      "cds watch", "cds serve", "cap project",
+      "content security policy", "csp violation", "nonce",
+      "ui5.yaml", "ui5 tooling", "ui5-tooling",
+      "get_api_reference", "run_ui5_linter"
+    ],
+    "criticalKeywords": [
+      "sap.ui.", "sapui5", "ui5 best practices", "ui5 guidelines"
+    ]
+  },
   "tests": [
     {
       "prompt": "How do I set up async module loading in UI5?",

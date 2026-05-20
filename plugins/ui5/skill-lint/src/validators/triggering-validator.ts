@@ -17,11 +17,15 @@ import type {
   LintConfig,
   TriggerTestCase,
   TriggerTestResult,
+  SkillTestConfiguration,
+  TriggerTestCaseFile,
 } from '../types/index.js';
 
 export class TriggeringValidator extends BaseValidator {
   readonly name = 'triggering';
   readonly description = 'Simulates keyword-based triggering accuracy (NOT real Claude behavior)';
+  
+  private skillConfig: SkillTestConfiguration | null = null;
 
   async validate(skill: Skill, config: LintConfig): Promise<ValidationResult> {
     const start = Date.now();
@@ -133,7 +137,10 @@ export class TriggeringValidator extends BaseValidator {
     for (const p of paths) {
       if (existsSync(p)) {
         try {
-          const data = JSON.parse(readFileSync(p, 'utf-8'));
+          const data: TriggerTestCaseFile = JSON.parse(readFileSync(p, 'utf-8'));
+          if (data.skill) {
+            this.skillConfig = data.skill;
+          }
           if (Array.isArray(data.tests)) return data.tests;
         } catch {
           // skip bad file
@@ -146,11 +153,12 @@ export class TriggeringValidator extends BaseValidator {
 
   private runCase(tc: TriggerTestCase, _description: string): TriggerTestResult {
     const triggered = this.simulateTriggering(tc.prompt);
+    const skillName = this.skillConfig?.name ?? tc.expected_skill ?? 'unknown-skill';
     return {
       passed: triggered === tc.should_trigger,
       prompt: tc.prompt,
       expected: tc.expected_skill,
-      actual: triggered ? 'ui5-best-practices' : null,
+      actual: triggered ? skillName : null,
       category: tc.category,
     };
   }
@@ -160,22 +168,19 @@ export class TriggeringValidator extends BaseValidator {
    * ⚠️  NOT how Claude actually decides — only a coverage proxy.
    */
   private simulateTriggering(prompt: string): boolean {
+    if (!this.skillConfig) {
+      // Fallback: no configuration available
+      return false;
+    }
+
     const lower = prompt.toLowerCase();
 
-    const ui5Keywords = [
-      'ui5', 'sap.ui', 'odata', 'csp', 'cap', 'component',
-      'componentsupp', 'simpleform', 'columnlayout',
-      'typescript event', 'button$press', 'data binding',
-      'i18n', 'translation', 'get_api_reference', 'run_ui5_linter',
-      'simpletype', 'validation', 'event handler', 'xml view',
-      'opa5', 'integration card',
-    ];
+    const triggerKeywords = this.skillConfig.triggerKeywords;
+    const antiKeywords = this.skillConfig.antiKeywords;
 
-    const nonUI5Keywords = ['react', 'vue', 'angular', 'python', 'express', 'django'];
+    const hasTrigger = triggerKeywords.some(kw => lower.includes(kw.toLowerCase()));
+    const hasAnti = antiKeywords.some(kw => lower.includes(kw.toLowerCase()));
 
-    const hasUI5 = ui5Keywords.some(kw => lower.includes(kw));
-    const hasNonUI5 = nonUI5Keywords.some(kw => lower.includes(kw));
-
-    return hasUI5 && !hasNonUI5;
+    return hasTrigger && !hasAnti;
   }
 }

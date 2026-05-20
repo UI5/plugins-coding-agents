@@ -13,8 +13,25 @@
     "build": "tsc",
     "clean": "rm -rf dist",
     "lint": "node ./bin/skill-lint.js",
-    "test": "node --test dist/tests/**/*.test.js",
     "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "claude-code",
+    "skill-linter",
+    "validation",
+    "cli",
+    "ui5",
+    "sap",
+    "static-analysis"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/UI5/plugins-claude.git",
+    "directory": "plugins/ui5/skill-lint"
+  },
+  "homepage": "https://github.com/UI5/plugins-claude/tree/main/plugins/ui5/skill-lint",
+  "bugs": {
+    "url": "https://github.com/UI5/plugins-claude/issues"
   },
   "dependencies": {
     "commander": "^13.0.0",

@@ -11,6 +11,7 @@ import type {
   ExecutionResult,
   SkillVerification,
   AdapterInfo,
+  SkillTestConfiguration,
 } from '../types/index.js';
 
 export class ClaudeCodeAdapter extends BaseAdapter {
@@ -136,7 +137,7 @@ export class ClaudeCodeAdapter extends BaseAdapter {
         if (code === 0) {
           safeResolve({
             success: true,
-            skillTriggered: this.detectSkillUsage(stdout),
+            skillTriggered: this.detectSkillUsage(stdout, request.skillConfig),
             responseContent: stdout,
             tokensUsed: this.estimateTokens(request.prompt, stdout),
             latencyMs: Date.now() - startTime,
@@ -183,27 +184,21 @@ export class ClaudeCodeAdapter extends BaseAdapter {
     });
   }
 
-  private detectSkillUsage(response: string): string | null {
+  private detectSkillUsage(response: string, skillConfig?: SkillTestConfiguration): string | null {
+    if (!skillConfig) {
+      // Fallback: no configuration available
+      return null;
+    }
+
     const lower = response.toLowerCase();
 
-    const ui5Patterns = [
-      'sap.ui.define', 'sap.ui.require', 'sap/m/', 'sap/ui/',
-      'sap.ui.core', 'sap.m.', 'sap.ui.model',
-      'columnlayout', 'simpleform', 'component.js', 'manifest.json',
-      'odata type', 'odata v2', 'odata v4', 'odata model', 'sap.ui.model.odata',
-      'button$press', 'button$pressevent', 'event$', 'ui5 types',
-      'cds watch', 'cds serve', 'cap project',
-      'content security policy', 'csp violation', 'nonce',
-      'ui5.yaml', 'ui5 tooling', 'ui5-tooling',
-      'get_api_reference', 'run_ui5_linter',
-    ];
+    const detectionPatterns = skillConfig.detectionPatterns;
+    const criticalKeywords = skillConfig.criticalKeywords;
 
-    const criticalKeywords = ['sap.ui.', 'sapui5', 'ui5 best practices', 'ui5 guidelines'];
+    const matchCount = detectionPatterns.filter(p => lower.includes(p.toLowerCase())).length;
+    const hasCritical = criticalKeywords.some(k => lower.includes(k.toLowerCase()));
 
-    const matchCount = ui5Patterns.filter(p => lower.includes(p)).length;
-    const hasCritical = criticalKeywords.some(k => lower.includes(k));
-
-    return (matchCount >= 1 || hasCritical) ? 'ui5-best-practices' : null;
+    return (matchCount >= 1 || hasCritical) ? skillConfig.name : null;
   }
 
   private estimateTokens(prompt: string, response: string): number {

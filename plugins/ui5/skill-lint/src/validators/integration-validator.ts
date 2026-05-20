@@ -14,6 +14,8 @@ import type {
   Violation,
   Skill,
   LintConfig,
+  SkillTestConfiguration,
+  TriggerTestCaseFile,
 } from '../types/index.js';
 
 interface IntegrationTestCase {
@@ -29,6 +31,8 @@ interface IntegrationTestCase {
 export class IntegrationValidator extends BaseValidator {
   readonly name = 'integration';
   readonly description = 'Runs real prompts through Claude Code CLI and checks skill detection';
+  
+  private skillConfig: SkillTestConfiguration | null = null;
 
   async validate(skill: Skill, config: LintConfig): Promise<ValidationResult> {
     const start = Date.now();
@@ -68,6 +72,7 @@ export class IntegrationValidator extends BaseValidator {
       const result = await adapter.execute({
         prompt: tc.prompt,
         skillId: skill.metadata.name,
+        skillConfig: this.skillConfig ?? undefined,
         timeout: config.execution.timeout,
         maxRetries: config.execution.maxRetries,
       });
@@ -140,10 +145,12 @@ export class IntegrationValidator extends BaseValidator {
   }
 
   private loadTestCases(skill: Skill, config: LintConfig): IntegrationTestCase[] {
-    // Try config-specified path first
+    // Try config-specified path first, then integration path, finally triggering path (unified format)
     const paths = [
       config.testCases.integration,
       join(skill.pluginRoot, 'test/integration/fixtures/test-cases.json'),
+      config.testCases.triggering,
+      join(skill.pluginRoot, 'test/fixtures/trigger-cases.json'),
     ].filter(Boolean) as string[];
 
     for (const p of paths) {
@@ -151,8 +158,26 @@ export class IntegrationValidator extends BaseValidator {
         try {
           const raw = readFileSync(p, 'utf-8');
           const data = JSON.parse(raw);
+          
+          // Check if data has skill configuration
+          if ((data as TriggerTestCaseFile).skill) {
+            this.skillConfig = (data as TriggerTestCaseFile).skill;
+          }
+          
+          // Return tests array
           if (Array.isArray(data)) return data;
-          if (Array.isArray(data.tests)) return data.tests;
+          if (Array.isArray(data.tests)) {
+            // Convert TriggerTestCase format to IntegrationTestCase format
+            return (data.tests as any[]).map((tc, i) => ({
+              id: (tc as any).id ?? i + 1,
+              name: (tc as any).name ?? `case-${i + 1}`,
+              description: tc.prompt,
+              prompt: tc.prompt,
+              category: tc.category,
+              expectedSkill: tc.expected_skill,
+              expectedContent: (tc as any).expectedContent,
+            }));
+          }
         } catch {
           // skip bad file
         }

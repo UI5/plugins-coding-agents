@@ -37,7 +37,7 @@ export const lintConfigSchema = z.object({
   }).default({}),
 
   formatters: z.object({
-    default: z.enum(['text', 'json', 'html', 'markdown', 'github-actions']).default('text'),
+    default: z.enum(['text', 'json', 'github-actions']).default('text'),
     options: z.object({
       colors: z.boolean().default(true),
       verbose: z.boolean().default(false),

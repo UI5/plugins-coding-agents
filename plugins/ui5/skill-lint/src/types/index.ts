@@ -59,6 +59,21 @@ export interface Skill {
 
 // ── Test Cases ──
 
+export interface SkillTestConfiguration {
+  readonly name: string;
+  readonly triggerKeywords: readonly string[];
+  readonly antiKeywords: readonly string[];
+  readonly detectionPatterns: readonly string[];
+  readonly criticalKeywords: readonly string[];
+}
+
+export interface TriggerTestCaseFile {
+  readonly version: string;
+  readonly description: string;
+  readonly skill: SkillTestConfiguration;
+  readonly tests: readonly TriggerTestCase[];
+}
+
 export interface TriggerTestCase {
   readonly prompt: string;
   readonly expected_skill: string | null;
@@ -80,6 +95,7 @@ export interface TriggerTestResult {
 export interface ExecutionRequest {
   readonly prompt: string;
   readonly skillId?: string;
+  readonly skillConfig?: SkillTestConfiguration;
   readonly timeout?: number;
   readonly maxRetries?: number;
 }
