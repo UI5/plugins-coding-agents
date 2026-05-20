@@ -109,7 +109,7 @@ sap.ui.define(["sap/ui/integration/Designtime"], function (Designtime) {
 					},
 
 					icon: {
-						manifestpath: "/sap.card/header/icon/src",
+						manifestpath: "/sap.card/configuration/parameters/icon/value",
 						type: "string",
 						label: "Icon",
 						visualization: {
