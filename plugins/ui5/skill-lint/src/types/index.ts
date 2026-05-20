@@ -125,6 +125,13 @@ export interface AdapterInfo {
   readonly supportedModels: readonly string[];
 }
 
+export interface HealthCheckResult {
+  readonly healthy: boolean;
+  readonly details: string;
+  readonly reconnectable: boolean;
+  readonly timestamp: number;
+}
+
 // ── Config ──
 
 export interface LintConfig {

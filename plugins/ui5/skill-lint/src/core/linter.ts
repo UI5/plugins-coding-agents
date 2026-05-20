@@ -10,6 +10,7 @@ import { BaseValidator } from '../validators/base-validator.js';
 import { collectResults } from './result-collector.js';
 import { loadSkill } from '../utils/file-utils.js';
 import { promiseAllBatched } from '../utils/concurrency.js';
+import { globalSkillCache } from '../utils/skill-cache.js';
 import type { LintConfig, LintResult, Skill, ValidationResult } from '../types/index.js';
 
 export class SkillLinter {
@@ -39,7 +40,10 @@ export class SkillLinter {
     }
 
     const startTime = Date.now();
-    const skill = await loadSkill(skillPath);
+    // Use cache if available (5-10x speedup for repeated runs)
+    const skill = globalSkillCache
+      ? await globalSkillCache.get(skillPath)
+      : await loadSkill(skillPath);
     const results = await this.runValidators(skill, config);
     return collectResults(skill, results, startTime);
   }
