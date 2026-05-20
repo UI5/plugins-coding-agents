@@ -3,8 +3,10 @@
  */
 
 import { readFile, access, constants, readdir, stat } from 'fs/promises';
+import { createReadStream } from 'fs';
 import { existsSync } from 'fs';
 import { join, dirname } from 'path';
+import { createInterface } from 'readline';
 import * as yaml from 'js-yaml';
 import { TOKEN_ESTIMATION } from './constants.js';
 import { sanitizePath } from './path-security.js';
@@ -112,8 +114,60 @@ export async function findPluginRoot(startDir: string): Promise<string> {
 }
 
 /**
+ * File size threshold for switching to streaming (10 MB)
+ * Files larger than this will be processed with streams to prevent OOM
+ */
+const STREAMING_THRESHOLD_BYTES = 10 * 1024 * 1024; // 10 MB
+
+/**
+ * Count lines in a file using streaming.
+ * Memory-efficient approach for large files (>10MB).
+ * Uses Node.js readline interface with createReadStream.
+ * 
+ * @param filePath - Absolute path to the file
+ * @returns Number of lines in the file
+ * 
+ * @example
+ * ```typescript
+ * // Efficiently count lines in a 500MB file
+ * const lines = await countLinesStreaming('/path/to/huge.log');
+ * console.log(`Large file has ${lines} lines`);
+ * ```
+ */
+async function countLinesStreaming(filePath: string): Promise<number> {
+  return new Promise((resolve, reject) => {
+    let lineCount = 0;
+    
+    const stream = createReadStream(filePath, { encoding: 'utf-8' });
+    const rl = createInterface({
+      input: stream,
+      crlfDelay: Infinity, // Treat \r\n as single line break
+    });
+
+    rl.on('line', () => {
+      lineCount++;
+    });
+
+    rl.on('close', () => {
+      resolve(lineCount);
+    });
+
+    stream.on('error', (error) => {
+      reject(error);
+    });
+
+    rl.on('error', (error) => {
+      reject(error);
+    });
+  });
+}
+
+/**
  * Count lines in a file.
- * Reads the file from disk and counts newline characters.
+ * Automatically chooses between in-memory and streaming approach based on file size.
+ * 
+ * - Files ≤10MB: In-memory (fast, simple)
+ * - Files >10MB: Streaming (memory-efficient, prevents OOM)
  * 
  * @param filePath - Absolute path to the file
  * @returns Number of lines in the file
@@ -125,6 +179,15 @@ export async function findPluginRoot(startDir: string): Promise<string> {
  * ```
  */
 export async function countLines(filePath: string): Promise<number> {
+  // Check file size to decide approach
+  const size = await getFileSize(filePath);
+  
+  if (size > STREAMING_THRESHOLD_BYTES) {
+    // Large file: use streaming to prevent OOM
+    return retryOperation(() => countLinesStreaming(filePath));
+  }
+  
+  // Small file: load into memory (faster)
   const content = await retryOperation(() => readFile(filePath, 'utf-8'));
   return countLinesFromContent(content);
 }
