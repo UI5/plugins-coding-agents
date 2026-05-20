@@ -29,7 +29,6 @@ describe('IntegrationValidator', () => {
     
     // Create temporary directory
     tempDir = join(tmpdir(), `skill-lint-test-${Date.now()}`);
-    tempDir = join(tmpdir(), `skill-lint-test-${Date.now()}`);
     mkdirSync(tempDir, { recursive: true });
     
     mockSkill = {
@@ -132,7 +131,8 @@ describe('IntegrationValidator', () => {
         skillTriggered: 'test-skill',
         responseContent: 'Response',
         tokensUsed: 100,
-        latencyMs: 500
+        latencyMs: 500,
+        cost: 0
       });
       
       const result = await validator.validate(mockSkill, mockConfig);
@@ -165,17 +165,26 @@ describe('IntegrationValidator', () => {
       };
       
       writeFileSync(testCasePath, JSON.stringify(testData, null, 2));
-      mockConfig.testCases.integration = undefined;
+      
+      // Create new config without integration path to force fallback to trigger-cases.json
+      const configWithoutIntegration: LintConfig = {
+        ...mockConfig,
+        testCases: {
+          ...mockConfig.testCases,
+          integration: undefined
+        }
+      };
       
       mockAdapter.setDefaultResponse({
         success: true,
         skillTriggered: 'test-skill',
         responseContent: 'Response',
         tokensUsed: 100,
-        latencyMs: 500
+        latencyMs: 500,
+        cost: 0
       });
       
-      const result = await validator.validate(mockSkill, mockConfig);
+      const result = await validator.validate(mockSkill, configWithoutIntegration);
       
       expect(result.metrics?.totalCases).toBe(1);
       expect(result.metrics?.passed).toBe(1);
@@ -219,7 +228,8 @@ describe('IntegrationValidator', () => {
         skillTriggered: 'test-skill',
         responseContent: 'Response',
         tokensUsed: 100,
-        latencyMs: 500
+        latencyMs: 500,
+        cost: 0
       });
       
       const result = await validator.validate(mockSkill, mockConfig);
@@ -248,7 +258,8 @@ describe('IntegrationValidator', () => {
         skillTriggered: null,
         responseContent: 'Response',
         tokensUsed: 100,
-        latencyMs: 500
+        latencyMs: 500,
+        cost: 0
       });
       
       const result = await validator.validate(mockSkill, mockConfig);
@@ -280,7 +291,8 @@ describe('IntegrationValidator', () => {
         skillTriggered: null,
         responseContent: 'Response',
         tokensUsed: 100,
-        latencyMs: 500
+        latencyMs: 500,
+        cost: 0
       });
       
       const result = await validator.validate(mockSkill, mockConfig);
@@ -315,7 +327,8 @@ describe('IntegrationValidator', () => {
         skillTriggered: 'test-skill',
         responseContent: 'Response contains expected phrase here',
         tokensUsed: 100,
-        latencyMs: 500
+        latencyMs: 500,
+        cost: 0
       });
       
       const result = await validator.validate(mockSkill, mockConfig);
@@ -343,7 +356,8 @@ describe('IntegrationValidator', () => {
         skillTriggered: 'test-skill',
         responseContent: 'Response without the expected content',
         tokensUsed: 100,
-        latencyMs: 500
+        latencyMs: 500,
+        cost: 0
       });
       
       const result = await validator.validate(mockSkill, mockConfig);
@@ -380,7 +394,8 @@ describe('IntegrationValidator', () => {
           skillTriggered: i < 6 ? 'test-skill' : null,
           responseContent: 'Response',
           tokensUsed: 100,
-          latencyMs: 500
+          latencyMs: 500,
+          cost: 0
         });
       });
       
@@ -412,7 +427,8 @@ describe('IntegrationValidator', () => {
           skillTriggered: i < 8 ? 'test-skill' : null,
           responseContent: 'Response',
           tokensUsed: 100,
-          latencyMs: 500
+          latencyMs: 500,
+          cost: 0
         });
       });
       
@@ -442,7 +458,8 @@ describe('IntegrationValidator', () => {
         skillTriggered: 'test-skill',
         responseContent: 'Response',
         tokensUsed: 100,
-        latencyMs: 500
+        latencyMs: 500,
+        cost: 0
       });
       
       const result = await validator.validate(mockSkill, mockConfig);
@@ -480,8 +497,7 @@ describe('IntegrationValidator', () => {
         skillTriggered: null,
         responseContent: '',
         tokensUsed: 0,
-        latencyMs: 0,
-        error: 'Execution failed'
+        latencyMs: 0,        cost: 0,        error: 'Execution failed'
       });
       
       const result = await validator.validate(mockSkill, mockConfig);
@@ -514,6 +530,7 @@ describe('IntegrationValidator', () => {
         responseContent: '',
         tokensUsed: 0,
         latencyMs: 0,
+        cost: 0,
         error: 'Timeout exceeded'
       });
       
@@ -547,7 +564,8 @@ describe('IntegrationValidator', () => {
         skillTriggered: 'test-skill',
         responseContent: 'Response',
         tokensUsed: 250,
-        latencyMs: 1500
+        latencyMs: 1500,
+        cost: 0
       });
       
       const result = await validator.validate(mockSkill, mockConfig);
@@ -575,7 +593,8 @@ describe('IntegrationValidator', () => {
           skillTriggered: 'test-skill',
           responseContent: 'Response',
           tokensUsed: 100,
-          latencyMs: (i + 1) * 100
+          latencyMs: (i + 1) * 100,
+          cost: 0
         });
       });
       
@@ -605,7 +624,8 @@ describe('IntegrationValidator', () => {
         skillTriggered: 'test-skill',
         responseContent: 'Response',
         tokensUsed: 100,
-        latencyMs: 10
+        latencyMs: 10,
+        cost: 0
       });
       
       const start = Date.now();

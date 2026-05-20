@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { GithubActionsFormatter } from '../../src/formatters/github-actions-formatter.js';
 import type { LintResult } from '../../src/types/index.js';
 
@@ -165,8 +165,8 @@ describe('GithubActionsFormatter', () => {
         passed: true,
         summary: {
           totalValidators: 3,
-          passed: 3,
-          failed: 0,
+          passedValidators: 3,
+          failedValidators: 0,
           errors: 0,
           warnings: 1,
           infos: 2,
@@ -182,8 +182,8 @@ describe('GithubActionsFormatter', () => {
         passed: false,
         summary: {
           totalValidators: 3,
-          passed: 2,
-          failed: 1,
+          passedValidators: 2,
+          failedValidators: 1,
           errors: 2,
           warnings: 1,
           infos: 0,
@@ -266,8 +266,8 @@ describe('GithubActionsFormatter', () => {
         passed: false,
         summary: {
           totalValidators: 3,
-          passed: 2,
-          failed: 1,
+          passedValidators: 2,
+          failedValidators: 1,
           errors: 1,
           warnings: 1,
           infos: 1,
@@ -328,8 +328,8 @@ describe('GithubActionsFormatter', () => {
         passed: true,
         summary: {
           totalValidators: 1,
-          passed: 1,
-          failed: 0,
+          passedValidators: 1,
+          failedValidators: 0,
           errors: 0,
           warnings: 0,
           infos: 0,
@@ -422,12 +422,13 @@ function createMockResult(partial?: Partial<LintResult>): LintResult {
   return {
     skill: 'test-skill',
     skillPath: '/path/to/SKILL.md',
+    timestamp: '2026-05-20T10:00:00.000Z',
     passed: true,
     duration: 10,
     summary: {
       totalValidators: 1,
-      passed: 1,
-      failed: 0,
+      passedValidators: 1,
+      failedValidators: 0,
       errors: 0,
       warnings: 0,
       infos: 0,
