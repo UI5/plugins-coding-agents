@@ -84,56 +84,44 @@ export class SkillLinter {
   }
 
   /**
-   * Run validators sequentially with error boundaries
+   * Run validators sequentially with error boundaries and progress reporting
    */
   private async runValidatorsSequential(
     skill: Skill,
     config: LintConfig,
   ): Promise<ValidationResult[]> {
     const results: ValidationResult[] = [];
+    const onProgress = config.execution.onProgress;
 
     for (const validator of this.validators) {
+      // Emit start event
+      if (onProgress) {
+        onProgress({
+          type: 'validator-start',
+          validator: validator.name,
+          timestamp: Date.now(),
+        });
+      }
+
       try {
         const result = await validator.validate(skill, config);
         results.push(result);
+
+        // Emit complete event with result
+        if (onProgress) {
+          onProgress({
+            type: 'validator-complete',
+            validator: validator.name,
+            timestamp: Date.now(),
+            result,
+          });
+        }
       } catch (error) {
         // Don't let one validator crash bring down the entire tool
         const errorMessage = error instanceof Error ? error.message : String(error);
         console.error(`[SkillLinter] Validator "${validator.name}" crashed:`, errorMessage);
         
-        results.push({
-          validator: validator.name,
-          passed: false,
-          duration: 0,
-          violations: [{
-            level: 'error',
-            rule: 'validator-crash',
-            message: `Validator "${validator.name}" crashed: ${errorMessage}`,
-            suggestion: 'This is likely a bug in the validator. Please report this issue.',
-          }],
-        });
-      }
-    }
-
-    return results;
-  }
-
-  /**
-   * Run validators in parallel with error boundaries and concurrency control
-   */
-  private async runValidatorsParallel(
-    skill: Skill,
-    config: LintConfig,
-  ): Promise<ValidationResult[]> {
-    const tasks = this.validators.map(validator => async (): Promise<ValidationResult> => {
-      try {
-        return await validator.validate(skill, config);
-      } catch (error) {
-        // Don't let one validator crash bring down the entire tool
-        const errorMessage = error instanceof Error ? error.message : String(error);
-        console.error(`[SkillLinter] Validator "${validator.name}" crashed:`, errorMessage);
-        
-        return {
+        const errorResult: ValidationResult = {
           validator: validator.name,
           passed: false,
           duration: 0,
@@ -144,6 +132,87 @@ export class SkillLinter {
             suggestion: 'This is likely a bug in the validator. Please report this issue.',
           }],
         };
+        
+        results.push(errorResult);
+
+        // Emit error event
+        if (onProgress) {
+          onProgress({
+            type: 'validator-error',
+            validator: validator.name,
+            timestamp: Date.now(),
+            error: errorMessage,
+            result: errorResult,
+          });
+        }
+      }
+    }
+
+    return results;
+  }
+
+  /**
+   * Run validators in parallel with error boundaries, concurrency control, and progress reporting
+   */
+  private async runValidatorsParallel(
+    skill: Skill,
+    config: LintConfig,
+  ): Promise<ValidationResult[]> {
+    const onProgress = config.execution.onProgress;
+
+    const tasks = this.validators.map(validator => async (): Promise<ValidationResult> => {
+      // Emit start event
+      if (onProgress) {
+        onProgress({
+          type: 'validator-start',
+          validator: validator.name,
+          timestamp: Date.now(),
+        });
+      }
+
+      try {
+        const result = await validator.validate(skill, config);
+
+        // Emit complete event with result
+        if (onProgress) {
+          onProgress({
+            type: 'validator-complete',
+            validator: validator.name,
+            timestamp: Date.now(),
+            result,
+          });
+        }
+
+        return result;
+      } catch (error) {
+        // Don't let one validator crash bring down the entire tool
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        console.error(`[SkillLinter] Validator "${validator.name}" crashed:`, errorMessage);
+        
+        const errorResult: ValidationResult = {
+          validator: validator.name,
+          passed: false,
+          duration: 0,
+          violations: [{
+            level: 'error',
+            rule: 'validator-crash',
+            message: `Validator "${validator.name}" crashed: ${errorMessage}`,
+            suggestion: 'This is likely a bug in the validator. Please report this issue.',
+          }],
+        };
+
+        // Emit error event
+        if (onProgress) {
+          onProgress({
+            type: 'validator-error',
+            validator: validator.name,
+            timestamp: Date.now(),
+            error: errorMessage,
+            result: errorResult,
+          });
+        }
+
+        return errorResult;
       }
     });
 

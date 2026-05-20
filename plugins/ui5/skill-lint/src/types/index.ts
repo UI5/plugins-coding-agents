@@ -132,6 +132,16 @@ export interface HealthCheckResult {
   readonly timestamp: number;
 }
 
+export interface ProgressEvent {
+  readonly type: 'validator-start' | 'validator-complete' | 'validator-error';
+  readonly validator: string;
+  readonly timestamp: number;
+  readonly result?: ValidationResult;
+  readonly error?: string;
+}
+
+export type ProgressCallback = (event: ProgressEvent) => void;
+
 // ── Config ──
 
 export interface LintConfig {
@@ -160,6 +170,7 @@ export interface LintConfig {
     readonly maxRetries: number;
     readonly parallel: boolean;
     readonly maxConcurrency?: number;
+    readonly onProgress?: ProgressCallback;
   };
   readonly formatters: {
     readonly default: string;
