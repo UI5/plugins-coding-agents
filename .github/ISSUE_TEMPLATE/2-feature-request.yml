@@ -5,7 +5,7 @@ body:
   - type: markdown
     attributes:
       value: | 
-        Please have a look at our [contributing guidelines](https://github.com/UI5/plugins-claude/blob/main/CONTRIBUTING.md#-feature-requests) on requesting features to be added to UI5 plugins for coding agents.
+        Please have a look at our [contributing guidelines](https://github.com/UI5/plugins-coding-agents/blob/main/CONTRIBUTING.md#-feature-requests) on requesting features to be added to UI5 plugins for coding agents.
   - type: textarea
     id: background-information
     attributes:

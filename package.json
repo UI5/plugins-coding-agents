@@ -18,10 +18,10 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/UI5/plugins-claude.git"
+    "url": "git+https://github.com/UI5/plugins-coding-agents.git"
   },
   "bugs": {
-    "url": "https://github.com/UI5/plugins-claude/issues"
+    "url": "https://github.com/UI5/plugins-coding-agents/issues"
   },
   "scripts": {
     "check-licenses": "licensee --errors-only",

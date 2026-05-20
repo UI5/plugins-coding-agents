@@ -9,13 +9,13 @@
 
 ### ⚡️ Quick Links for Maintainers
 
-- [All Open Pull Requests](https://github.com/UI5/plugins-claude/pulls)
-- [All Open Issues](https://github.com/UI5/plugins-claude/issues)
+- [All Open Pull Requests](https://github.com/UI5/plugins-coding-agents/pulls)
+- [All Open Issues](https://github.com/UI5/plugins-coding-agents/issues)
 
 ## 📝 Reporting Issues
 
 ### Seeking Help / Not a Bug
-If you need help setting something up, or if you have questions regarding UI5 plugins for coding agents, please seek help on a community platform like [SAP Community](https://pages.community.sap.com/topics/ui5), [StackOverflow](http://stackoverflow.com/questions/tagged/ui5-plugins-claude) or the `#plugins-claude` channel of the [OpenUI5 Community Slack](https://ui5-slack-invite.cfapps.eu10.hana.ondemand.com/). -->
+If you need help setting something up, or if you have questions regarding UI5 plugins for coding agents, please seek help on a community platform like [SAP Community](https://pages.community.sap.com/topics/ui5), [StackOverflow](http://stackoverflow.com/questions/tagged/ui5-plugins-for-coding-agents) or the `#ai` channel of the [OpenUI5 Community Slack](https://ui5-slack-invite.cfapps.eu10.hana.ondemand.com/). -->
 
 ### How to Report an Issue
 
@@ -24,7 +24,7 @@ If you need help setting something up, or if you have questions regarding UI5 pl
         * Issues caused by dependencies.
         * Issues caused by the use of non-public/internal methods. Only the public methods listed in the API documentation may be used.
         * Something you do not get to work properly, see [Not a Bug / Questions](#not-a-bug--questions).
-2. **No duplicate**: You have searched the [issue tracker](https://github.com/UI5/plugins-claude/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc) to make sure the bug has not already been reported.
+2. **No duplicate**: You have searched the [issue tracker](https://github.com/UI5/plugins-coding-agents/issues?q=is%3Aissue+is%3Aopen+sort%3Aupdated-desc) to make sure the bug has not already been reported.
 3. **Good summary**: The summary should be specific to the issue.
 4. **Current bug**: The bug can be reproduced in the current version of the relevant module(s).
 5. **Reproducible bug**: There are step-by-step instructions provided on how to reproduce the issue.
@@ -37,11 +37,11 @@ If you need help setting something up, or if you have questions regarding UI5 pl
 
 We encourage you to follow the issue template that will be presented to you when creating a new issue.
 
-When you are ready, report your issue here: https://github.com/UI5/plugins-claude/issues/new
+When you are ready, report your issue here: https://github.com/UI5/plugins-coding-agents/issues/new
 
 ### Reporting Security Issues
 
-If you find any bug that may be a security problem, please follow the instructions given in [Security Policy](https://github.com/UI5/plugins-claude/security/policy) on how to report it. Please do not create GitHub issues for security-related concerns or problems.
+If you find any bug that may be a security problem, please follow the instructions given in [Security Policy](https://github.com/UI5/plugins-coding-agents/security/policy) on how to report it. Please do not create GitHub issues for security-related concerns or problems.
 
 ### Use of Labels
 
@@ -79,7 +79,7 @@ Bug report analysis support is always very welcome! See [Analyze Issues](#-analy
 
 ## 🤩 Feature Requests
 
-You can request features by creating an issue in the UI5 plugins for coding agents repository: https://github.com/UI5/plugins-claude/issues/new
+You can request features by creating an issue in the UI5 plugins for coding agents repository: https://github.com/UI5/plugins-coding-agents/issues/new
 
 For bigger features, an RFC (Request for Comment) might be necessary. You should always clarify the need for an RFC with the project contributors upfront. You could do this either by opening an issue or by posting in our [Slack channel](#seeking-help--not-a-bug). Use [this template](rfcs/0000-template.md) for creating an RFC.
 

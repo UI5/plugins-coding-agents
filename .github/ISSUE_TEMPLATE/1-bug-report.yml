@@ -5,7 +5,7 @@ body:
   - type: markdown
     attributes: 
       value: |
-        Please have a look at our [contributing guidelines](https://github.com/UI5/plugins-claude/blob/main/CONTRIBUTING.md#-reporting-issues) on reporting issues.
+        Please have a look at our [contributing guidelines](https://github.com/UI5/plugins-coding-agents/blob/main/CONTRIBUTING.md#-reporting-issues) on reporting issues.
 
         > [!TIP]
         > You can easily create an MRE using a fork of our [OpenUI5 sample app](https://github.com/UI5/sample-app).
