@@ -25,12 +25,12 @@
     "noFallthroughCasesInSwitch": true
   },
   "include": [
-    "skill-lint/src/**/*",
-    "skill-lint/bin/**/*"
+    "src/**/*",
+    "bin/**/*",
+    "tests/**/*"
   ],
   "exclude": [
     "node_modules",
-    "dist",
-    "skills"
+    "dist"
   ]
 }

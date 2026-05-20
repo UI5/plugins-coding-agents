@@ -1,0 +1,39 @@
+{
+  "name": "@ui5/skill-lint",
+  "version": "1.0.0",
+  "private": true,
+  "description": "CLI linter for Claude Code skills — validates structure, performance, triggering, and integration",
+  "type": "module",
+  "bin": {
+    "skill-lint": "./bin/skill-lint.js"
+  },
+  "main": "./dist/src/index.js",
+  "types": "./dist/src/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf dist",
+    "lint": "node ./bin/skill-lint.js",
+    "test": "node --test dist/tests/**/*.test.js",
+    "prepublishOnly": "npm run build"
+  },
+  "dependencies": {
+    "commander": "^13.0.0",
+    "cosmiconfig": "^9.0.0",
+    "js-yaml": "^4.1.0",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^22.0.0",
+    "typescript": "^5.9.3"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "author": {
+    "name": "SAP SE",
+    "email": "openui5@sap.com",
+    "url": "https://www.sap.com"
+  },
+  "license": "Apache-2.0"
+}

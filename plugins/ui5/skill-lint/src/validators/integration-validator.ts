@@ -1,0 +1,164 @@
+/**
+ * Integration Validator
+ * Runs real prompts through an adapter (e.g. Claude Code CLI) and checks skill detection.
+ * This executes ACTUAL Claude prompts — it is slow and uses real API calls.
+ */
+
+import { existsSync, readFileSync } from 'fs';
+import { join } from 'path';
+import { BaseValidator } from './base-validator.js';
+import { getAdapter } from '../adapters/adapter-registry.js';
+import { Logger } from '../utils/logger.js';
+import type {
+  ValidationResult,
+  Violation,
+  Skill,
+  LintConfig,
+} from '../types/index.js';
+
+interface IntegrationTestCase {
+  readonly id: number;
+  readonly name: string;
+  readonly description: string;
+  readonly prompt: string;
+  readonly category: string;
+  readonly expectedSkill: string | null;
+  readonly expectedContent?: string;
+}
+
+export class IntegrationValidator extends BaseValidator {
+  readonly name = 'integration';
+  readonly description = 'Runs real prompts through Claude Code CLI and checks skill detection';
+
+  async validate(skill: Skill, config: LintConfig): Promise<ValidationResult> {
+    const start = Date.now();
+    const violations: Violation[] = [];
+
+    // Load adapter
+    const adapter = getAdapter(config.adapter);
+    const available = await adapter.isAvailable();
+
+    if (!available) {
+      violations.push(this.createViolation('error', 'adapter-unavailable',
+        `Adapter "${config.adapter}" is not available in this environment`,
+        { suggestion: 'Install Claude Code CLI or use a different adapter' }));
+      return this.buildResult(violations, start);
+    }
+
+    // Load test cases
+    const testCases = this.loadTestCases(skill, config);
+    if (testCases.length === 0) {
+      violations.push(this.createViolation('warning', 'no-integration-cases',
+        'No integration test cases found — skipping',
+        { suggestion: 'Create test/integration/fixtures/test-cases.ts or a JSON equivalent' }));
+      return this.buildResult(violations, start);
+    }
+
+    Logger.info(`Running ${testCases.length} integration test(s) with "${config.adapter}" adapter...`);
+
+    let passed = 0;
+    let failed = 0;
+    let timedOut = 0;
+    let totalTokens = 0;
+    let totalLatency = 0;
+
+    for (const tc of testCases) {
+      Logger.plain(`  [${tc.id}] ${tc.name}: "${tc.prompt.substring(0, 60)}..."`);
+
+      const result = await adapter.execute({
+        prompt: tc.prompt,
+        skillId: skill.metadata.name,
+        timeout: config.execution.timeout,
+        maxRetries: config.execution.maxRetries,
+      });
+
+      totalTokens += result.tokensUsed;
+      totalLatency += result.latencyMs;
+
+      if (!result.success) {
+        failed++;
+        if (result.error?.includes('Timeout')) timedOut++;
+
+        violations.push(this.createViolation('error', 'execution-failed',
+          `[${tc.name}] Execution failed: ${result.error ?? 'unknown error'}`));
+        continue;
+      }
+
+      // Check skill detection
+      const skillMatch = result.skillTriggered === tc.expectedSkill;
+      if (!skillMatch) {
+        failed++;
+        violations.push(this.createViolation('warning', 'skill-not-detected',
+          `[${tc.name}] Expected skill "${tc.expectedSkill}", got "${result.skillTriggered ?? 'none'}"`));
+        continue;
+      }
+
+      // Check expected content if specified
+      if (tc.expectedContent) {
+        const hasContent = result.responseContent.toLowerCase().includes(tc.expectedContent.toLowerCase());
+        if (!hasContent) {
+          failed++;
+          violations.push(this.createViolation('info', 'content-mismatch',
+            `[${tc.name}] Expected content "${tc.expectedContent}" not found in response`));
+          continue;
+        }
+      }
+
+      passed++;
+    }
+
+    const total = testCases.length;
+    const accuracy = total > 0 ? (passed / total) * 100 : 0;
+    const avgLatency = total > 0 ? totalLatency / total : 0;
+
+    if (accuracy < 70) {
+      violations.push(this.createViolation('error', 'integration-accuracy-low',
+        `Integration accuracy ${accuracy.toFixed(1)}% is below 70% threshold`));
+    } else if (accuracy < 90) {
+      violations.push(this.createViolation('warning', 'integration-accuracy-moderate',
+        `Integration accuracy ${accuracy.toFixed(1)}% is below 90% — consider investigating failed cases`));
+    }
+
+    Logger.metrics(`Integration: ${passed}/${total} passed (${accuracy.toFixed(1)}%), ` +
+      `${timedOut} timeouts, ${totalTokens} tokens, avg ${avgLatency.toFixed(0)}ms`);
+
+    try {
+      await adapter.cleanup();
+    } catch {
+      // ignore cleanup errors
+    }
+
+    return this.buildResult(violations, start, {
+      totalCases: total,
+      passed,
+      failed,
+      timedOut,
+      accuracy,
+      totalTokens,
+      averageLatency: avgLatency,
+    });
+  }
+
+  private loadTestCases(skill: Skill, config: LintConfig): IntegrationTestCase[] {
+    // Try config-specified path first
+    const paths = [
+      config.testCases.integration,
+      join(skill.pluginRoot, 'test/integration/fixtures/test-cases.json'),
+    ].filter(Boolean) as string[];
+
+    for (const p of paths) {
+      if (existsSync(p)) {
+        try {
+          const raw = readFileSync(p, 'utf-8');
+          const data = JSON.parse(raw);
+          if (Array.isArray(data)) return data;
+          if (Array.isArray(data.tests)) return data.tests;
+        } catch {
+          // skip bad file
+        }
+      }
+    }
+
+    return [];
+  }
+}
