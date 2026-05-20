@@ -7,9 +7,9 @@
  * This is only a keyword coverage proxy useful during development.
  */
 
-import { existsSync, readFileSync } from 'fs';
 import { join } from 'path';
 import { BaseValidator } from './base-validator.js';
+import { globalFileSystemService, type FileSystemService } from '../services/file-system.service.js';
 import type {
   ValidationResult,
   Violation,
@@ -25,9 +25,15 @@ export class TriggeringValidator extends BaseValidator {
   readonly name = 'triggering';
   readonly description = 'Simulates keyword-based triggering accuracy (NOT real Claude behavior)';
   
+  private readonly fs: FileSystemService;
   private skillConfig: SkillTestConfiguration | null = null;
   private triggerKeywordsLower: Set<string> = new Set();
   private antiKeywordsLower: Set<string> = new Set();
+
+  constructor(fs: FileSystemService = globalFileSystemService) {
+    super();
+    this.fs = fs;
+  }
 
   async validate(skill: Skill, config: LintConfig): Promise<ValidationResult> {
     const start = Date.now();
@@ -137,9 +143,9 @@ export class TriggeringValidator extends BaseValidator {
     ].filter(Boolean) as string[];
 
     for (const p of paths) {
-      if (existsSync(p)) {
+      if (this.fs.exists(p)) {
         try {
-          const data: TriggerTestCaseFile = JSON.parse(readFileSync(p, 'utf-8'));
+          const data: TriggerTestCaseFile = JSON.parse(this.fs.readFile(p));
           if (data.skill) {
             this.skillConfig = data.skill;
             this.initializeKeywordCaches();

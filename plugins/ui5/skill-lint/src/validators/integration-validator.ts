@@ -4,12 +4,12 @@
  * This executes ACTUAL Claude prompts — it is slow and uses real API calls.
  */
 
-import { existsSync, readFileSync } from 'fs';
 import { join } from 'path';
 import { BaseValidator } from './base-validator.js';
 import { getAdapter } from '../adapters/adapter-registry.js';
 import { Logger } from '../utils/logger.js';
 import { TEST_THRESHOLDS } from '../utils/constants.js';
+import { globalFileSystemService, type FileSystemService } from '../services/file-system.service.js';
 import type {
   ValidationResult,
   Violation,
@@ -33,7 +33,13 @@ export class IntegrationValidator extends BaseValidator {
   readonly name = 'integration';
   readonly description = 'Runs real prompts through Claude Code CLI and checks skill detection';
   
+  private readonly fs: FileSystemService;
   private skillConfig: SkillTestConfiguration | null = null;
+
+  constructor(fs: FileSystemService = globalFileSystemService) {
+    super();
+    this.fs = fs;
+  }
 
   async validate(skill: Skill, config: LintConfig): Promise<ValidationResult> {
     const start = Date.now();
@@ -156,9 +162,9 @@ export class IntegrationValidator extends BaseValidator {
     ].filter(Boolean) as string[];
 
     for (const p of paths) {
-      if (existsSync(p)) {
+      if (this.fs.exists(p)) {
         try {
-          const raw = readFileSync(p, 'utf-8');
+          const raw = this.fs.readFile(p);
           const data = JSON.parse(raw);
           
           // Check if data has skill configuration
