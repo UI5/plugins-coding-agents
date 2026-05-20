@@ -57,7 +57,25 @@ export class PerformanceValidator extends BaseValidator {
         { suggestion: `Keep total plugin context under ${PERFORMANCE_THRESHOLDS.MAX_CONTEXT_BUDGET / 1000}k tokens` }));
     }
 
-    // ── Reference files ──
+    // ── Parallel checks for independent file operations ──
+    const [refViolations, readmeViolations, duplicateViolations, fixtureViolations] = await Promise.all([
+      this.checkReferenceFiles(skill),
+      this.checkReadmeConciseness(root),
+      this.checkDuplicateContent(root, skill),
+      this.checkFixtureSize(root),
+    ]);
+
+    violations.push(...refViolations, ...readmeViolations, ...duplicateViolations, ...fixtureViolations);
+
+    return this.buildResult(violations, start, {
+      lineCount,
+      tokens,
+      totalTokens,
+    });
+  }
+
+  private async checkReferenceFiles(skill: Skill): Promise<Violation[]> {
+    const violations: Violation[] = [];
     const skillDir = join(skill.path, '..');
     try {
       const files = await retryOperation(() => readdir(skillDir));
@@ -69,8 +87,11 @@ export class PerformanceValidator extends BaseValidator {
     } catch (error) {
       // Expected: skill directory may not be accessible or may not contain additional files
     }
+    return violations;
+  }
 
-    // ── README conciseness ──
+  private async checkReadmeConciseness(root: string): Promise<Violation[]> {
+    const violations: Violation[] = [];
     const readmePath = join(root, 'README.md');
     try {
       await retryOperation(() => access(readmePath, constants.R_OK));
@@ -83,11 +104,11 @@ export class PerformanceValidator extends BaseValidator {
     } catch (error) {
       // Expected: README.md may not exist
     }
+    return violations;
+  }
 
-    // ── Duplicate content between README & SKILL ──
-    violations.push(...await this.checkDuplicateContent(root, skill));
-
-    // ── Fixture size ──
+  private async checkFixtureSize(root: string): Promise<Violation[]> {
+    const violations: Violation[] = [];
     const fixturesPath = join(root, 'test/fixtures/trigger-cases.json');
     try {
       const stats = await retryOperation(() => stat(fixturesPath));
@@ -100,12 +121,7 @@ export class PerformanceValidator extends BaseValidator {
     } catch (error) {
       // Expected: fixture file may not exist
     }
-
-    return this.buildResult(violations, start, {
-      lineCount,
-      tokens,
-      totalTokens,
-    });
+    return violations;
   }
 
   private async checkDuplicateContent(root: string, skill: Skill): Promise<Violation[]> {

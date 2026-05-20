@@ -20,9 +20,6 @@ export class StructureValidator extends BaseValidator {
     const violations: Violation[] = [];
     const root = skill.pluginRoot;
 
-    // ── plugin.json ──
-    violations.push(...await this.checkPluginJson(root));
-
     // ── SKILL.md existence ──
     try {
       await access(skill.path, constants.R_OK);
@@ -31,23 +28,20 @@ export class StructureValidator extends BaseValidator {
       violations.push(this.createViolation('error', 'skill-exists', `SKILL.md not found at ${skill.path}`));
     }
 
-    // ── Frontmatter quality ──
+    // ── Synchronous checks (no parallelization needed) ──
     violations.push(...this.checkFrontmatter(skill));
-
-    // ── Major sections ──
     violations.push(...this.checkSections(skill));
 
-    // ── Broken links ──
-    violations.push(...await this.checkLinks(skill));
+    // ── Parallel async checks for independent file operations ──
+    const [pluginViolations, linksViolations, readmeViolations, fixturesViolations, projectViolations] = await Promise.all([
+      this.checkPluginJson(root),
+      this.checkLinks(skill),
+      this.checkReadme(root, skill),
+      this.checkTestFixtures(root),
+      this.checkProjectFiles(root),
+    ]);
 
-    // ── README.md ──
-    violations.push(...await this.checkReadme(root, skill));
-
-    // ── Test fixtures ──
-    violations.push(...await this.checkTestFixtures(root));
-
-    // ── package.json / tsconfig.json ──
-    violations.push(...await this.checkProjectFiles(root));
+    violations.push(...pluginViolations, ...linksViolations, ...readmeViolations, ...fixturesViolations, ...projectViolations);
 
     return this.buildResult(violations, start);
   }
