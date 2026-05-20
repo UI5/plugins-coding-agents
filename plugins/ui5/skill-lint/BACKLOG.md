@@ -103,11 +103,13 @@ Status:
 - [x] Add test constants for magic numbers
 
 #### High Priority Issues
-- [ ] **Code Duplication** - Extract shared test helpers
-  - Create `tests/helpers/test-fixtures.ts`
-  - Move createMockSkill, createMockResult, createMockConfig
-  - Update all test files to import from shared helpers
-  - **Effort:** 2-3 hours
+- [x] **Code Duplication** - Extract shared test helpers ✅
+  - Created `tests/helpers/test-fixtures.ts` with comprehensive JSDoc
+  - Consolidated createMockSkill, createMockResult, createMockConfig
+  - Added PERFORMANCE_THRESHOLDS and TRIGGERING_THRESHOLDS constants
+  - Updated all test files to import from shared helpers
+  - Reduced code duplication by ~100 lines
+  - **Completed:** 2026-05-20
 
 - [ ] **Line Counting Inconsistency** - Standardize approach
   - Split `countLines()` into `countLinesFromFile()` and `countLinesFromContent()`

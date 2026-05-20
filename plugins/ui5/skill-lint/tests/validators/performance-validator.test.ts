@@ -1,49 +1,30 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { PerformanceValidator } from '../../src/validators/performance-validator.js';
 import type { Skill, LintConfig } from '../../src/types/index.js';
+import { 
+  createMockSkill, 
+  createMockConfig, 
+  PERFORMANCE_THRESHOLDS 
+} from '../helpers/test-fixtures.js';
 
 describe('PerformanceValidator', () => {
   let validator: PerformanceValidator;
   let mockConfig: LintConfig;
 
-  // Test constants aligned with default config thresholds
-  const MAX_LINES = 700;
-  const WARN_THRESHOLD_LINES = 600; // ~85% of max (700 * 0.7 = 490, but using 600 for clearer tests)
-  const SAFE_LINES = 400; // Well under limit
-  const OVER_LIMIT_LINES = 750; // Exceeds max
+  // Import test constants from shared fixtures
+  const { MAX_LINES, WARN_THRESHOLD_LINES, SAFE_LINES, OVER_LIMIT_LINES } = PERFORMANCE_THRESHOLDS;
 
   beforeEach(() => {
     validator = new PerformanceValidator();
     
-    mockConfig = {
+    mockConfig = createMockConfig({
       scenarios: {
         structure: false,
         triggering: false,
         performance: true,
         integration: false
-      },
-      adapter: 'claude-code',
-      thresholds: {
-        performance: { maxLines: 700, maxTokens: 4000 },
-        triggering: { minAccuracy: 90 }
-      },
-      testCases: {},
-      execution: { timeout: 60000, maxRetries: 2, parallel: false },
-      formatters: { default: 'text' as const, options: { colors: true, verbose: false } },
-      output: { directory: '.lint-reports', formats: ['text'] }
-    };
-  });
-
-  const createMockSkill = (overrides: Partial<Skill> = {}): Skill => ({
-    path: '/test/skills/test-skill/SKILL.md',
-    content: 'Line 1\nLine 2\nLine 3',
-    metadata: {
-      name: 'test-skill',
-      description: 'Test description',
-      compatibility: []
-    },
-    pluginRoot: '/test/skills/test-skill',
-    ...overrides
+      }
+    });
   });
 
   describe('Basic Properties', () => {

@@ -1,37 +1,13 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { JsonFormatter } from '../../src/formatters/json-formatter.js';
 import type { LintResult, ValidationResult } from '../../src/types/index.js';
+import { createMockResult } from '../helpers/test-fixtures.js';
 
 describe('JsonFormatter', () => {
   let formatter: JsonFormatter;
 
   beforeEach(() => {
     formatter = new JsonFormatter();
-  });
-
-  const createMockResult = (overrides: Partial<LintResult> = {}): LintResult => ({
-    skill: 'test-skill',
-    skillPath: '/test/skill/SKILL.md',
-    timestamp: '2026-05-20T10:00:00.000Z',
-    duration: 100,
-    passed: true,
-    results: [
-      {
-        validator: 'structure',
-        passed: true,
-        duration: 50,
-        violations: []
-      } as ValidationResult
-    ],
-    summary: {
-      totalValidators: 1,
-      passedValidators: 1,
-      failedValidators: 0,
-      errors: 0,
-      warnings: 0,
-      infos: 0
-    },
-    ...overrides
   });
 
   describe('Basic Properties', () => {

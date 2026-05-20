@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { StructureValidator } from '../../src/validators/structure-validator.js';
 import type { Skill, LintConfig } from '../../src/types/index.js';
+import { createMockSkill, createMockConfig } from '../helpers/test-fixtures.js';
 
 describe('StructureValidator', () => {
   let validator: StructureValidator;
@@ -9,35 +10,14 @@ describe('StructureValidator', () => {
   beforeEach(() => {
     validator = new StructureValidator();
     
-    mockConfig = {
+    mockConfig = createMockConfig({
       scenarios: {
         structure: true,
         triggering: false,
         performance: false,
         integration: false
-      },
-      adapter: 'claude-code',
-      thresholds: {
-        performance: { maxLines: 700, maxTokens: 4000 },
-        triggering: { minAccuracy: 90 }
-      },
-      testCases: {},
-      execution: { timeout: 60000, maxRetries: 2, parallel: false },
-      formatters: { default: 'text' as const, options: { colors: true, verbose: false } },
-      output: { directory: '.lint-reports', formats: ['text'] }
-    };
-  });
-
-  const createMockSkill = (overrides: Partial<Skill> = {}): Skill => ({
-    path: '/test/skills/test-skill/SKILL.md',
-    content: '# Test Skill\n\nDescription here',
-    metadata: {
-      name: 'test-skill',
-      description: 'Test skill description that is long enough to pass validation rules and requirements',
-      compatibility: []
-    },
-    pluginRoot: '/test/skills/test-skill',
-    ...overrides
+      }
+    });
   });
 
   describe('Basic Properties', () => {
