@@ -51,20 +51,21 @@ This reference shows a complete pairing of a `manifest.json` and the correspondi
       }
     },
     "data": {
-        "request": {
-          "url": "{{destinations.northwind}}/Customers",
-          "parameters": {
-            "$select": "CustomerID,CompanyName,ContactName",
-            "$top": "{parameters>/maxItems/value}"
-          }
+      "request": {
+        "url": "{{destinations.northwind}}/Customers",
+        "parameters": {
+          "$select": "CustomerID,CompanyName,ContactName",
+          "$top": "{parameters>/maxItems/value}"
         }
-      },
+      }
+    },
     "header": {
       "title": "{parameters>/cardTitle/value}",
       "subtitle": "As of {parameters>/dateContext/value}",
       "icon": {
         "src": "{parameters>/icon/value}",
-        "shape": "Circle"
+        "shape": "Circle",
+        "backgroundColor": "Transparent"
       }
     },
     "content": {

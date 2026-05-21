@@ -383,6 +383,7 @@ For each chart type, the `feeds` array must use the listed UIDs to bind the corr
 
 11. timeseries_stacked_column
     * UIDs: timeAxis, color, valueAxis
+    * Note: Stacking requires a second dimension fed to `color`; without it the chart renders as a plain timeseries_column
     * Example:
         ```json
         {
@@ -397,6 +398,10 @@ For each chart type, the `feeds` array must use the listed UIDs to bind the corr
               "name": "Year",
               "value": "{yearField}",
               "dataType": "date"
+            },
+            {
+              "name": "Sector",
+              "value": "{sectorField}"
             }
           ],
           "feeds": [
@@ -409,6 +414,11 @@ For each chart type, the `feeds` array must use the listed UIDs to bind the corr
               "type": "Measure",
               "uid": "valueAxis",
               "values": ["Investment"]
+            },
+            {
+              "type": "Dimension",
+              "uid": "color",
+              "values": ["Sector"]
             }
           ]
         }
@@ -500,6 +510,7 @@ For each chart type, the `feeds` array must use the listed UIDs to bind the corr
 
 14. timeseries_100_stacked_column
     * UIDs: timeAxis, color, valueAxis
+    * Note: Stacking requires a second dimension fed to `color`; without it the chart renders as a plain timeseries_column
     * Example:
         ```json
         {
@@ -514,6 +525,10 @@ For each chart type, the `feeds` array must use the listed UIDs to bind the corr
               "name": "Year",
               "value": "{yearField}",
               "dataType": "date"
+            },
+            {
+              "name": "Sector",
+              "value": "{sectorField}"
             }
           ],
           "feeds": [
@@ -526,6 +541,11 @@ For each chart type, the `feeds` array must use the listed UIDs to bind the corr
               "type": "Measure",
               "uid": "valueAxis",
               "values": ["Investment"]
+            },
+            {
+              "type": "Dimension",
+              "uid": "color",
+              "values": ["Sector"]
             }
           ]
         }

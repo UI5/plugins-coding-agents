@@ -60,7 +60,7 @@ If asked to preview, first check the card folder for an existing preview entry p
 
 ## 5. Configuration Editor
 
-The editor lets the Administrator, Page/Content Administrator, and Translator personas customise a card without editing `manifest.json` directly.
+The editor lets the Administrator, Page/Content Administrator, and Translator personas customize a card without editing `manifest.json` directly.
 
 Two pieces:
 1. `dt/Configuration.js` — exports a function that returns `new Designtime({ form: {...} })`.
@@ -70,7 +70,7 @@ Design as the **Administrator** persona.
 
 | Rule | Detail |
 |---|---|
-| Mirror the manifest | Editor reflects the current structure and parameters of `manifest.json` exactly. |
+| Mirror the manifest | Editor reflects the current structure and parameters of `manifest.json` exactly. `manifestpath` can target any existing path — a `configuration/parameters/*/value` for parameterized fields, or a direct path like `/sap.card/header/icon/shape` for static manifest properties. |
 | All existing fields editable | Title, subtitle, header icon, parameters — make them configurable. |
 | Ask the user | Before deciding which fields to expose, ask: "Make all manifest fields editable? Anything else to add?" |
 | No invented fields | Never add an editor field that does not exist in `manifest.json`. |
@@ -87,7 +87,7 @@ Load [`references/analytical_chart_types.md`](references/analytical_chart_types.
 | Set `chartType` | `sap.card/content/chartType` is required. |
 | Match feeds to chart type | `measures`, `dimensions`, and `feeds` must match the UIDs the chart type expects. The reference file lists them per chart. |
 | Each feed needs three keys | `type` (`Dimension`\|`Measure`), `uid`, `values`. |
-| `chartProperties` | Use it for labels, colours, legend, etc. Do not invent keys. Omit entirely if defaults are fine. |
+| `chartProperties` | Use it for labels, colors, legend, etc. Do not invent keys. Omit entirely if defaults are fine. |
 
 Minimal feeds example (donut/pie):
 ```json
