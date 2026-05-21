@@ -18,3 +18,10 @@ In Claude Code:
 /plugin install ui5-typescript-conversion@claude-plugins-official
 ```
 
+## Installing skills only
+
+If your coding agent does not support plugins, you can install the skills directly using the [skills](https://www.npmjs.com/package/skills) package:
+
+```bash
+npx skills add UI5/plugins-coding-agents
+```
