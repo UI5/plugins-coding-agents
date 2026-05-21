@@ -24,6 +24,7 @@ If the trigger applies, load before producing any output. Do not work from memor
 | Use `create_integration_card` MCP tool | When creating a new declarative card. |
 | Parameter binding syntax | `{parameters>/parameterKey/value}` — single braces, `>` separator, `value` suffix. |
 | Destination binding syntax | `{{destinations.destinationName}}` — double braces, dot. Configure under `sap.card/configuration/destinations/`. Reference by name; never replace with raw URL. |
+| Use destinations for service URLs | Wrap every external service URL in a destination under `sap.card/configuration/destinations/` and reference it as `{{destinations.name}}`. |
 | i18n binding | Bind every non-data, user-visible string to the i18n model. |
 | Links | Use the `actions` property; never inline `<a>` or hand-rolled URL handlers. |
 | Validate before declaring done | See [3. Validation](#3-validation). |
