@@ -29,6 +29,7 @@ If the trigger applies, load before producing any output. Do not work from memor
 | Validate before declaring done | See [3. Validation](#3-validation). |
 | Show preview when requested | See [4. Preview](#4-preview). |
 | Don't modify provided data | Use it as supplied. |
+| JSON responses only | The endpoint behind `sap.card/data/request` must return JSON. For OData services, append `$format=json` to the request URL or parameters. |
 
 ## 2. Data placement
 
