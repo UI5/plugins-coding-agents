@@ -28,6 +28,18 @@ Development guidelines and coding standards derived from official SAP UI5 guidel
 
 ---
 
+### 📋 Skills: integration-cards
+
+Development guidelines for UI Integration Cards (also known as UI5 Integration Cards) — `manifest.json`, Configuration Editor, and Analytical cards:
+- **Declarative card types** - List, Table, Calendar, Timeline, Object, Analytical
+- **Parameter and destination binding** - `{parameters>/key/value}` and `{{destinations.name}}` syntax
+- **Data placement rules** - When `sap.card/data` vs `content/data` vs `header/data` applies
+- **Manifest validation** - JSON, schema, and deprecated-property checks before declaring done
+- **Local preview workflow** - Reusing existing entry points or serving via a `<ui-integration-card>` HTML page
+- **Configuration Editor patterns** - `dt/Configuration.js` paired with `manifest.json`, mirroring fields and `manifestpath` targets
+- **Analytical cards** - 44 chart types with required UIDs, feeds, and per-type examples
+- **i18n and actions** - Bind user-visible strings; use `actions` for links instead of inline `<a>`
+
 ## Installation
 
 ### Via Claude CLI
