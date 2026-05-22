@@ -1,4 +1,4 @@
-# UI5 plugin for Coding Agents
+# UI5 Plugin for Coding Agents
 
 ## Key Features
 

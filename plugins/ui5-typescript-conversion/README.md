@@ -1,8 +1,8 @@
-# UI5 TypeScript conversion plugin for Coding Agents
+# UI5 TypeScript Conversion Plugin for Coding Agents
 
 ## Key Features
 
-- Convert JavaScript based UI5 project to TypeScript
+- Converts JavaScript-based UI5 projects to TypeScript
 
 ## Installation
 
