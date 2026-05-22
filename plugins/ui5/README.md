@@ -30,4 +30,4 @@ If your coding agent doesn't support plugins, install the skills directly using 
 npx skills add UI5/plugins-coding-agents
 ```
 
-> **Note:** You also need to install the [UI5 MCP server](https://github.com/UI5/mcp-server) manually. When using the plugin, this is handled automatically.
+> **Note:** When installing the skills only, you will need to install the [UI5 MCP server](https://github.com/UI5/mcp-server) manually.
