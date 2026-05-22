@@ -1,17 +1,17 @@
 name: Feature Request
-description: Request a new feature to be added to UI5 plugins for Claude
+description: Request a new feature to be added to UI5 plugins for coding agents
 type: Feature
 body:
   - type: markdown
     attributes:
       value: | 
-        Please have a look at our [contributing guidelines](https://github.com/UI5/plugins-claude/blob/main/CONTRIBUTING.md#-feature-requests) on requesting features to be added to UI5 plugins for Claude.
+        Please have a look at our [contributing guidelines](https://github.com/UI5/plugins-coding-agents/blob/main/CONTRIBUTING.md#-feature-requests) on requesting features to be added to UI5 plugins for coding agents.
   - type: textarea
     id: background-information
     attributes:
       label: Why are you proposing this feature?
-      description: A clear and concise description of the underlying scenario to be covered and whats's missing in UI5 plugins for Claude. Provide any relevant background information that helps explain why this feature would be beneficial.
-      placeholder: A clear and concise description of the underlying scenario to be covered and whats's missing in UI5 plugins for Claude. Provide any relevant background information that helps explain why this feature would be beneficial.
+      description: A clear and concise description of the underlying scenario to be covered and whats's missing in UI5 plugins for coding agents. Provide any relevant background information that helps explain why this feature would be beneficial.
+      placeholder: A clear and concise description of the underlying scenario to be covered and whats's missing in UI5 plugins for coding agents. Provide any relevant background information that helps explain why this feature would be beneficial.
     validations:
       required: true
   - type: textarea

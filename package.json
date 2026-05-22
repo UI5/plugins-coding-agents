@@ -1,8 +1,8 @@
 {
-  "name": "@ui5/plugins-claude",
+  "name": "@ui5/plugins-for-coding-agents",
   "version": "0.1.0",
   "private": "true",
-  "description": "UI5 plugins for Claude",
+  "description": "UI5 plugins for Coding Agents",
   "author": {
     "name": "SAP SE",
     "email": "openui5@sap.com",
@@ -18,10 +18,10 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/UI5/plugins-claude.git"
+    "url": "git+https://github.com/UI5/plugins-coding-agents.git"
   },
   "bugs": {
-    "url": "https://github.com/UI5/plugins-claude/issues"
+    "url": "https://github.com/UI5/plugins-coding-agents/issues"
   },
   "scripts": {
     "check-licenses": "licensee --errors-only",
