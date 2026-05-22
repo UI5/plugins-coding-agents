@@ -1,23 +1,41 @@
 # UI5 Plugin for Coding Agents
 
+Complete SAPUI5 / OpenUI5 plugin for Claude Code with MCP tools, API documentation access, linting capabilities, and development guidelines.
+
+---
+
 ## Key Features
 
-- Helps with the creation of new UI5 projects when working with coding agents
-- Supports the developer to detect and fix UI5-specific errors
-- Provides additional UI5-specific information for coding agents
+### 🛠️ MCP Tools
+- **Create and validate UI5 projects** - Project scaffolding and validation
+- **Access API documentation** - Query UI5 control APIs and documentation
+- **Run UI5 linter** - Code quality validation and best practices checks
+- **UI5 tooling integration** - Version info and project management
 
+### 📋 Skills: ui5-best-practices
+
+Development guidelines and coding standards derived from official SAP UI5 guidelines:
+- **Async module loading** - sap.ui.define patterns
+- **Data binding with OData types** - Type-safe data binding
+- **CSP compliance** - Content Security Policy best practices
+- **TypeScript event handlers** - Modern event handling (UI5 >= 1.115.0)
+- **CAP integration** - Integration with SAP Cloud Application Programming Model
+- **Form creation rules** - Form and SimpleForm patterns
+- **i18n management** - Internationalization workflows
+- **Component initialization** - ComponentSupport patterns
+
+**Note**: For TypeScript conversion specifically, use the separate [`ui5-typescript-conversion`](https://github.com/UI5/plugins-claude/tree/main/plugins/ui5-typescript-conversion) plugin.
+
+---
 
 ## Installation
 
-
-### Claude Code
-
-Via Claude CLI:
+### Via Claude CLI
 ```bash
 claude plugin install ui5@claude-plugins-official
 ```
 
-In Claude Code:
+### In Claude Code
 ```
 /plugin install ui5@claude-plugins-official
 ```
