@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.1](https://github.com/UI5/plugins-coding-agents/compare/v0.1.0...v0.1.1) (2026-05-26)
+
+
+### Features
+
+* **ui5:** Add UI Integration Cards Guidelines as Skills ([#51](https://github.com/UI5/plugins-coding-agents/issues/51)) ([11e3c4b](https://github.com/UI5/plugins-coding-agents/commit/11e3c4bfcdabeb8fa63454fe6a5046b2a571f584))
+* **ui5:** Add UI5 Guidelines as Skills ([#49](https://github.com/UI5/plugins-coding-agents/issues/49)) ([5eca5d0](https://github.com/UI5/plugins-coding-agents/commit/5eca5d066dc7d936e1bc978cc43438dca18b3013))
+
 ## [0.1.0](https://github.com/UI5/plugins-claude/compare/v0.0.1...v0.1.0) (2026-03-27)
 
 
