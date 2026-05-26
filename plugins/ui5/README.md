@@ -28,7 +28,7 @@ Development guidelines and coding standards derived from official SAP UI5 guidel
 
 **Note**: For TypeScript conversion specifically, use the separate [`ui5-typescript-conversion`](https://github.com/UI5/plugins-claude/tree/main/plugins/ui5-typescript-conversion) plugin.
 
-#### integration-cards
+#### ui5-best-practices-integration-cards
 
 Development guidelines for UI Integration Cards (also known as UI5 Integration Cards):
 - **Declarative card types** - List, Table, Calendar, Timeline, Object, Analytical

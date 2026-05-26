@@ -1,5 +1,5 @@
 ---
-name: integration-cards
+name: ui5-best-practices-integration-cards
 description: MUST be loaded before any UI Integration Cards (also called UI5 Integration Cards) task — creating, modifying, validating, previewing, or reviewing a card, its `manifest.json`, its Configuration Editor (`dt/Configuration.js`), or any analytical chart configuration. Provides the official guidelines, validation rules, supported chart types, and Configuration Editor patterns.
 ---
 
