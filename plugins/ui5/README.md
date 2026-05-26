@@ -12,7 +12,9 @@ Complete SAPUI5 / OpenUI5 plugin for Claude Code with MCP tools, API documentati
 - **Run UI5 linter** - Code quality validation and best practices checks
 - **UI5 tooling integration** - Version info and project management
 
-### 📋 Skills: ui5-best-practices
+### 📋 Skills
+
+#### ui5-best-practices
 
 Development guidelines and coding standards derived from official SAP UI5 guidelines:
 - **Async module loading** - sap.ui.define patterns
@@ -25,6 +27,20 @@ Development guidelines and coding standards derived from official SAP UI5 guidel
 - **Component initialization** - ComponentSupport patterns
 
 **Note**: For TypeScript conversion specifically, use the separate [`ui5-typescript-conversion`](https://github.com/UI5/plugins-claude/tree/main/plugins/ui5-typescript-conversion) plugin.
+
+#### ui5-best-practices-integration-cards
+
+Development guidelines for UI Integration Cards (also known as UI5 Integration Cards):
+- **Declarative card types** - List, Table, Calendar, Timeline, Object, Analytical
+- **Building a card** - Structure of the declarative `manifest.json` format for a UI Integration Card
+- **Parameter and destination binding** - `{parameters>/key/value}` and `{{destinations.name}}` syntax
+- **Data rules** - Where the data block goes (`sap.card/data`/`content/data`/`header/data`), wrapping URLs in destinations, and requiring JSON responses
+- **Manifest validation** - JSON, schema, and deprecated-property checks before declaring done
+- **Local preview workflow** - Reusing existing entry points or serving via a `<ui-integration-card>` HTML page
+- **Configuration Editor patterns** - `dt/Configuration.js` paired with `manifest.json`, mirroring fields and `manifestpath` targets
+- **Analytical cards** - 44 chart types with required UIDs, feeds, and per-type examples
+- **i18n** - Bind all user-facing strings to the i18n model; never hardcode
+- **Actions** - Use the `actions` property for links and interactions; never inline `<a>` tags or hand-roll URL handlers
 
 ---
 
