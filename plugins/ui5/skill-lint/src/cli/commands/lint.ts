@@ -119,11 +119,18 @@ async function resolveSkillPaths(skillPath: string): Promise<string[]> {
     throw new Error(`Invalid skill path: ${error instanceof Error ? error.message : String(error)}`);
   }
 
-  const workspaceRoot = await findGitRoot() || process.cwd();
-  const resolved = resolve(workspaceRoot, sanitized);
+  // Resolve from cwd (for relative paths) or as-is (for absolute paths)
+  const resolved = resolve(process.cwd(), sanitized);
 
   if (!existsSync(resolved)) {
     throw new Error(`Skill path does not exist: ${skillPath}`);
+  }
+
+  // Validate that resolved path is within workspace
+  const workspaceRoot = await findGitRoot() || process.cwd();
+  const rel = relative(workspaceRoot, resolved);
+  if (rel.startsWith('..') || isAbsolute(rel)) {
+    throw new Error(`Skill path must be within workspace: ${skillPath}`);
   }
 
   // If it's a file, treat as single skill
@@ -173,9 +180,8 @@ async function validateSkillPath(skillPath: string): Promise<string> {
     throw new Error(`Invalid skill path: ${error instanceof Error ? error.message : String(error)}`);
   }
 
-  // Use git root as workspace root if available, otherwise cwd
-  const workspaceRoot = await findGitRoot() || process.cwd();
-  const resolved = resolve(workspaceRoot, sanitized);
+  // Resolve from cwd (for relative paths) or as-is (for absolute paths)
+  const resolved = resolve(process.cwd(), sanitized);
   
   // Check if path exists
   if (!existsSync(resolved)) {
@@ -191,6 +197,7 @@ async function validateSkillPath(skillPath: string): Promise<string> {
   }
   
   // Ensure path is within workspace (prevents path traversal)
+  const workspaceRoot = await findGitRoot() || process.cwd();
   const rel = relative(workspaceRoot, realPath);
   if (rel.startsWith('..') || isAbsolute(rel)) {
     throw new Error(`Skill path must be within workspace: ${skillPath}`);
