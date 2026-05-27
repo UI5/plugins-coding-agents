@@ -16,8 +16,11 @@ import { BaseValidator } from './base-validator.js';
 import { getAdapter } from '../adapters/adapter-registry.js';
 import { Logger } from '../utils/logger.js';
 import { TEST_THRESHOLDS } from '../utils/constants.js';
+import { AUTO_GENERATION_LIMITS } from '../utils/extraction-constants.js';
+import { sanitizeSkillName, deduplicateStrings } from '../utils/sanitization.js';
 import { globalFileSystemService, type FileSystemService } from '../services/file-system.service.js';
 import { TriggerExtractor } from './trigger-extractor.js';
+import { DEFAULT_CONFIG } from '../config/schema.js';
 import type {
   ValidationResult,
   Violation,
@@ -265,56 +268,93 @@ export class HarnessValidator extends BaseValidator {
   private async autoGenerateTestCases(skill: Skill): Promise<IntegrationTestCase[]> {
     try {
       const extractor = new TriggerExtractor();
-      const config = { adapter: 'claude-code' } as LintConfig; // Minimal config for extraction
-      const result = await extractor.validate(skill, config);
+      // Use DEFAULT_CONFIG instead of unsafe partial cast
+      const result = await extractor.validate(skill, DEFAULT_CONFIG);
       
-      // Extract keywords from violations
+      // Extract data from violations metadata
       const primaryViolation = result.violations.find(v => v.rule === 'extracted-primary-keywords');
       const actionViolation = result.violations.find(v => v.rule === 'extracted-action-phrases');
+      const antiViolation = result.violations.find(v => v.rule === 'suggested-anti-keywords');
       
-      const primaryKeywords = primaryViolation?.metadata?.keywords as string[] ?? [];
-      const actionPhrases = actionViolation?.metadata?.phrases as string[] ?? [];
+      const primaryKeywords = (primaryViolation?.metadata?.keywords as string[]) ?? [];
+      const actionPhrases = (actionViolation?.metadata?.phrases as string[]) ?? [];
+      const antiKeywords = (antiViolation?.metadata?.antiKeywords as string[]) ?? [];
       
       const testCases: IntegrationTestCase[] = [];
+      const prompts = new Set<string>(); // Track to deduplicate
       let id = 1;
       
-      // Generate test prompts from primary keywords (top 5)
-      primaryKeywords.slice(0, 5).forEach(keyword => {
-        testCases.push({
-          id: id++,
-          name: `auto-keyword-${keyword}`,
-          description: `Auto-generated from keyword: ${keyword}`,
-          prompt: `How do I use ${keyword}?`,
-          category: 'auto-keyword',
-          expectedSkill: skill.metadata.name,
-        });
+      // Sanitize skill name for safe use in prompts
+      const safeName = sanitizeSkillName(skill.metadata.name);
+      
+      // Generate positive test prompts from primary keywords (top N)
+      primaryKeywords.slice(0, AUTO_GENERATION_LIMITS.KEYWORD_PROMPTS).forEach(keyword => {
+        const prompt = `How do I use ${keyword}?`;
+        if (!prompts.has(prompt.toLowerCase())) {
+          prompts.add(prompt.toLowerCase());
+          testCases.push({
+            id: id++,
+            name: `auto-keyword-${keyword.replace(/[^a-z0-9]/gi, '-')}`,
+            description: `Auto-generated from keyword: ${keyword}`,
+            prompt,
+            category: 'auto-keyword',
+            expectedSkill: skill.metadata.name,
+          });
+        }
       });
       
-      // Generate test prompts from action phrases (top 3)
-      actionPhrases.slice(0, 3).forEach((phrase, i) => {
-        testCases.push({
-          id: id++,
-          name: `auto-action-${i + 1}`,
-          description: `Auto-generated from action phrase`,
-          prompt: phrase,
-          category: 'auto-action',
-          expectedSkill: skill.metadata.name,
-        });
+      // Generate positive test prompts from action phrases (top N)
+      actionPhrases.slice(0, AUTO_GENERATION_LIMITS.ACTION_PROMPTS).forEach((phrase, i) => {
+        if (!prompts.has(phrase.toLowerCase())) {
+          prompts.add(phrase.toLowerCase());
+          testCases.push({
+            id: id++,
+            name: `auto-action-${i + 1}`,
+            description: `Auto-generated from action phrase`,
+            prompt: phrase,
+            category: 'auto-action',
+            expectedSkill: skill.metadata.name,
+          });
+        }
       });
       
-      // Add a generic prompt
-      testCases.push({
-        id: id++,
-        name: 'auto-generic',
-        description: 'Generic skill invocation',
-        prompt: `Help me with ${skill.metadata.name.replace(/-/g, ' ')}`,
-        category: 'auto-generic',
-        expectedSkill: skill.metadata.name,
+      // Generate negative test cases from anti-keywords (NEW!)
+      antiKeywords.slice(0, AUTO_GENERATION_LIMITS.NEGATIVE_PROMPTS).forEach(antiKeyword => {
+        const prompt = `How do I use ${antiKeyword}?`;
+        if (!prompts.has(prompt.toLowerCase())) {
+          prompts.add(prompt.toLowerCase());
+          testCases.push({
+            id: id++,
+            name: `auto-negative-${antiKeyword.replace(/[^a-z0-9]/gi, '-')}`,
+            description: `Auto-generated negative test for: ${antiKeyword}`,
+            prompt,
+            category: 'auto-negative',
+            expectedSkill: null, // Should NOT trigger this skill
+          });
+        }
       });
+      
+      // Add a generic positive prompt
+      const genericPrompt = `Help me with ${safeName.replace(/-/g, ' ')}`;
+      if (!prompts.has(genericPrompt.toLowerCase())) {
+        testCases.push({
+          id: id++,
+          name: 'auto-generic',
+          description: 'Generic skill invocation',
+          prompt: genericPrompt,
+          category: 'auto-generic',
+          expectedSkill: skill.metadata.name,
+        });
+      }
       
       return testCases;
     } catch (error) {
-      Logger.warning(`Failed to auto-generate test cases: ${error}`);
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      const errorStack = error instanceof Error ? error.stack : undefined;
+      Logger.warning(`Failed to auto-generate test cases: ${errorMessage}`);
+      if (errorStack) {
+        Logger.warning(`Stack trace: ${errorStack}`);
+      }
       return [];
     }
   }

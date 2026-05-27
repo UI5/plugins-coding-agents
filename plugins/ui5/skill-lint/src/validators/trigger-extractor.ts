@@ -15,6 +15,8 @@
 
 import { BaseValidator } from './base-validator.js';
 import { DESCRIPTION_SCORING } from '../utils/constants.js';
+import { EXTRACTION_LIMITS, DEFAULT_CONFUSION_DOMAINS } from '../utils/extraction-constants.js';
+import { validateContentSize, deduplicateStrings } from '../utils/sanitization.js';
 import type { ValidationResult, Violation, Skill, LintConfig } from '../types/index.js';
 
 export class TriggerExtractor extends BaseValidator {
@@ -25,6 +27,17 @@ export class TriggerExtractor extends BaseValidator {
     const start = Date.now();
     const violations: Violation[] = [];
 
+    // Validate input sizes to prevent ReDoS and resource exhaustion
+    try {
+      validateContentSize(skill.content, EXTRACTION_LIMITS.MAX_CONTENT_SIZE, 'Skill content');
+      validateContentSize(skill.metadata.description, EXTRACTION_LIMITS.MAX_DESCRIPTION_SIZE, 'Skill description');
+    } catch (error) {
+      violations.push(this.createViolation('error', 'content-too-large',
+        error instanceof Error ? error.message : 'Content size validation failed',
+        { suggestion: 'Reduce skill file size or split into reference files' }));
+      return this.buildResult(violations, start);
+    }
+
     // Extract keywords from different sources
     const primaryKeywords = this.extractPrimaryKeywords(skill);
     const secondaryKeywords = this.extractSecondaryKeywords(skill);
@@ -32,61 +45,34 @@ export class TriggerExtractor extends BaseValidator {
     const actionPhrases = this.extractActionPhrases(skill.metadata.description);
     const antiKeywords = this.suggestAntiKeywords(primaryKeywords);
 
-    // Report extracted keywords
-    violations.push(this.createViolation('info', 'extracted-primary-keywords',
-      `Primary keywords (${primaryKeywords.length}): ${primaryKeywords.slice(0, 20).join(', ')}${primaryKeywords.length > 20 ? '...' : ''}`,
-      { 
-        metadata: { 
-          keywords: primaryKeywords,
-          source: 'YAML description + critical terms from body'
-        } 
-      }
-    ));
+    // Report extracted keywords using helper
+    this.addExtractionViolation(violations, 'extracted-primary-keywords', 'Primary keywords',
+      primaryKeywords, EXTRACTION_LIMITS.PRIMARY_KEYWORDS_DISPLAY, ', ',
+      'YAML description + critical terms from body');
 
     if (secondaryKeywords.length > 0) {
-      violations.push(this.createViolation('info', 'extracted-secondary-keywords',
-        `Secondary keywords (${secondaryKeywords.length}): ${secondaryKeywords.slice(0, 15).join(', ')}${secondaryKeywords.length > 15 ? '...' : ''}`,
-        { 
-          metadata: { 
-            keywords: secondaryKeywords,
-            source: 'Multi-word phrases from description and headings'
-          } 
-        }
-      ));
+      this.addExtractionViolation(violations, 'extracted-secondary-keywords', 'Secondary keywords',
+        secondaryKeywords, EXTRACTION_LIMITS.SECONDARY_KEYWORDS_DISPLAY, ', ',
+        'Multi-word phrases from description and headings');
     }
 
     if (codePatterns.length > 0) {
-      violations.push(this.createViolation('info', 'extracted-code-patterns',
-        `Code patterns (${codePatterns.length}): ${codePatterns.slice(0, 15).join(', ')}${codePatterns.length > 15 ? '...' : ''}`,
-        { 
-          metadata: { 
-            patterns: codePatterns,
-            source: 'Import statements, API calls, and code blocks'
-          } 
-        }
-      ));
+      this.addExtractionViolation(violations, 'extracted-code-patterns', 'Code patterns',
+        codePatterns, EXTRACTION_LIMITS.CODE_PATTERNS_DISPLAY, ', ',
+        'Import statements, API calls, and code blocks');
     }
 
     if (actionPhrases.length > 0) {
-      violations.push(this.createViolation('info', 'extracted-action-phrases',
-        `Action phrases (${actionPhrases.length}): ${actionPhrases.slice(0, 5).join('; ')}${actionPhrases.length > 5 ? '...' : ''}`,
-        { 
-          metadata: { 
-            phrases: actionPhrases,
-            source: 'Descriptions of what the skill does'
-          } 
-        }
-      ));
+      this.addExtractionViolation(violations, 'extracted-action-phrases', 'Action phrases',
+        actionPhrases, EXTRACTION_LIMITS.ACTION_PHRASES_DISPLAY, '; ',
+        'Descriptions of what the skill does');
     }
 
     if (antiKeywords.length > 0) {
       violations.push(this.createViolation('info', 'suggested-anti-keywords',
         `Anti-keywords (${antiKeywords.length}): ${antiKeywords.join(', ')}`,
         { 
-          metadata: { 
-            antiKeywords,
-            source: 'Common confusion domains based on primary keywords'
-          },
+          metadata: { antiKeywords, source: 'Common confusion domains based on primary keywords' },
           suggestion: 'Use these to prevent false positive skill triggers'
         }
       ));
@@ -157,12 +143,12 @@ export class TriggerExtractor extends BaseValidator {
     });
     
     Array.from(frequency.entries())
-      .filter(([, count]) => count >= 3)
+      .filter(([, count]) => count >= EXTRACTION_LIMITS.WORD_FREQUENCY_MIN)
       .sort((a, b) => b[1] - a[1])
-      .slice(0, 20) // Top 20 most frequent
+      .slice(0, EXTRACTION_LIMITS.FREQUENT_WORDS_TOP_N)
       .forEach(([word]) => keywords.add(word));
 
-    return Array.from(keywords).sort();
+    return deduplicateStrings(Array.from(keywords).sort());
   }
 
   /**
@@ -238,10 +224,12 @@ export class TriggerExtractor extends BaseValidator {
       }
     });
 
-    return Array.from(patterns)
-      .filter(p => p.length > 2)
-      .sort()
-      .slice(0, 30); // Limit to top 30
+    return deduplicateStrings(
+      Array.from(patterns)
+        .filter(p => p.length > 2)
+        .sort()
+        .slice(0, EXTRACTION_LIMITS.CODE_PATTERNS_MAX)
+    );
   }
 
   /**
@@ -270,7 +258,7 @@ export class TriggerExtractor extends BaseValidator {
       }
     });
 
-    return phrases.slice(0, 10); // Limit to 10 most relevant
+    return phrases.slice(0, EXTRACTION_LIMITS.ACTION_PHRASES_MAX);
   }
 
   /**
@@ -279,32 +267,8 @@ export class TriggerExtractor extends BaseValidator {
   private suggestAntiKeywords(primaryKeywords: string[]): string[] {
     const antiKeywords = new Set<string>();
     
-    // Domain confusion mappings
-    const confusionDomains: Record<string, string[]> = {
-      // Frontend frameworks
-      react: ['vue', 'angular', 'svelte'],
-      vue: ['react', 'angular'],
-      angular: ['react', 'vue'],
-      
-      // Backend frameworks
-      express: ['django', 'flask', 'fastapi'],
-      django: ['express', 'rails', 'laravel'],
-      
-      // Languages
-      typescript: ['python', 'java', 'rust'],
-      python: ['javascript', 'java', 'ruby'],
-      javascript: ['python', 'java'],
-      
-      // Mobile
-      ios: ['android', 'flutter'],
-      android: ['ios', 'flutter'],
-      
-      // SAP/UI5 specific
-      ui5: ['react', 'vue', 'angular'],
-      sapui5: ['react', 'vue', 'angular'],
-      odata: ['rest', 'graphql'],
-      cap: ['express', 'nestjs'],
-    };
+    // Use configurable confusion domains (can be extended via config in future)
+    const confusionDomains = DEFAULT_CONFUSION_DOMAINS;
 
     // Check if any primary keywords trigger confusion domains
     primaryKeywords.forEach(keyword => {
@@ -314,16 +278,28 @@ export class TriggerExtractor extends BaseValidator {
       }
     });
 
-    // If UI5/SAP related, add common web framework anti-keywords
-    const isUI5Related = primaryKeywords.some(k => 
-      /ui5|sap|odata|fiori/i.test(k)
-    );
-    if (isUI5Related) {
-      ['react', 'vue', 'angular', 'python', 'django', 'express'].forEach(k => 
-        antiKeywords.add(k)
-      );
-    }
+    return deduplicateStrings(Array.from(antiKeywords).sort());
+  }
 
-    return Array.from(antiKeywords).sort();
+  /**
+   * Helper to add extraction violation with consistent formatting
+   */
+  private addExtractionViolation(
+    violations: Violation[],
+    rule: string,
+    label: string,
+    items: readonly string[],
+    displayLimit: number,
+    separator: string,
+    source: string
+  ): void {
+    const preview = items.slice(0, displayLimit).join(separator);
+    const truncated = items.length > displayLimit ? '...' : '';
+    const metadataKey = rule.includes('keywords') ? 'keywords' : rule.includes('patterns') ? 'patterns' : 'phrases';
+    
+    violations.push(this.createViolation('info', rule,
+      `${label} (${items.length}): ${preview}${truncated}`,
+      { metadata: { [metadataKey]: items, source } }
+    ));
   }
 }
