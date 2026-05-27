@@ -196,6 +196,9 @@ describe('SkillLinter', () => {
           size: {
             maxLines: 1,
             maxTokens: 10,
+          },
+          keywords: {
+            minAccuracy: 90,
           }
         }
       });
