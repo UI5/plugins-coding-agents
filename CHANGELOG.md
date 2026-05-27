@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.2](https://github.com/UI5/plugins-coding-agents/compare/v0.1.1...v0.1.2) (2026-05-27)
+
+
+### Bug Fixes
+
+* Trigger release workflow ([#60](https://github.com/UI5/plugins-coding-agents/issues/60)) ([78f657e](https://github.com/UI5/plugins-coding-agents/commit/78f657e6a5004b5cdd1b998aabea616023eeabbb))
+
 ## [0.1.1](https://github.com/UI5/plugins-coding-agents/compare/v0.1.0...v0.1.1) (2026-05-26)
 
 
