@@ -20,5 +20,6 @@ export { ReferenceValidator } from './validators/reference-validator.js';
 export { LinkValidator } from './validators/link-validator.js';
 export { KeywordValidator } from './validators/keyword-validator.js';
 export { HarnessValidator } from './validators/harness-validator.js';
+export { TriggerExtractor } from './validators/trigger-extractor.js';
 
 export type * from './types/index.js';

@@ -13,6 +13,7 @@ export interface Violation {
   readonly file?: string;
   readonly line?: number;
   readonly suggestion?: string;
+  readonly metadata?: Readonly<Record<string, unknown>>;
 }
 
 export interface ValidationResult {

@@ -81,10 +81,255 @@ node bin/skill-lint.js lint skills/my-skill -f github-actions
 # Check if skill loads correctly
 node bin/skill-lint.js check skills/my-skill
 
+# Analyze skill and suggest trigger keywords (NEW!)
+node bin/skill-lint.js analyze skills/my-skill
+
 # Generate config file
 node bin/skill-lint.js init
 ```
 
+## 🆕 Automatic Keyword Extraction
+
+**No more manual trigger-cases.json creation!** The `analyze` command reads your skill and suggests trigger keywords automatically.
+
+### Usage
+
+```bash
+# Analyze a skill
+node bin/skill-lint.js analyze ../skills/ui5-best-practices
+```
+
+### Example Output
+
+```
+📊 Trigger Keyword Analysis for "ui5-best-practices"
+
+======================================================================
+
+✨ Primary keywords (42): ui5, sap.ui, odata, typescript, component...
+
+🔤 Secondary keywords (18): async loading, data binding, i18n translation...
+
+⚙️  Code patterns (25): sap.ui.define, Button$Press, core:require...
+
+🎯 Action phrases (5): Use when writing UI5 applications; Covers async module loading...
+
+🚫 Anti-keywords (6): react, vue, angular, python, express, django
+   💡 Use these to prevent false positive skill triggers
+
+======================================================================
+📈 Extracted 60 keywords, 25 code patterns, 5 action phrases, 6 anti-keywords
+💡 Use these to create or update test/fixtures/trigger-cases.json
+
+💾 Example trigger-cases.json structure:
+{
+  "version": "3.0.0",
+  "skill": {
+    "name": "ui5-best-practices",
+    "triggerKeywords": "(use extracted primary keywords here)",
+    "antiKeywords": "(use suggested anti-keywords here)",
+    ...
+  }
+}
+```
+
+### What It Extracts
+
+1. **Primary Keywords** — Single words and technical terms from description + skill body
+   - Extracted from explicit "Keywords:" section
+   - Technical terms with dots/slashes (e.g., `sap.ui.define`)
+   - Domain-specific words (4+ chars, not common English)
+   - Frequently mentioned terms (3+ occurrences in body)
+
+2. **Secondary Keywords** — Multi-word phrases
+   - Technical phrases (e.g., "async loading", "data binding")
+   - Markdown headings from skill body
+   - Capitalized phrases
+
+3. **Code Patterns** — From code blocks
+   - Import statements and module paths
+   - API calls and method names
+   - Special type names (e.g., `Button$PressEvent`)
+
+4. **Action Phrases** — What the skill does
+   - Extracted from patterns like "Use when...", "Helps with..."
+   - Up to 10 most relevant phrases
+
+5. **Anti-Keywords** — What should NOT trigger it
+   - Based on domain confusion (e.g., UI5 → suggest excluding React, Vue)
+   - Common framework conflicts
+
+### Benefits
+
+- ✅ **No manual work** — reads skill content automatically
+- ✅ **Always up-to-date** — re-run after skill changes
+- ✅ **Suggests anti-keywords** — prevents false triggers
+- ✅ **Shows action phrases** — helps create test prompts
+- ✅ **Code-aware** — finds API patterns in code blocks
+
+## 🧪 Integration Testing (Harness)
+
+**Run REAL prompts through Claude Code CLI** to verify your skill is triggered correctly.
+
+### Two Modes: Manual or Auto-Generated
+
+#### 1️⃣ **Auto-Generated Mode** (No test cases required!)
+
+```bash
+# Just run --harness without any test case files
+node bin/skill-lint.js lint ../skills/ui5-best-practices --harness
+```
+
+**What happens:**
+- Reads your skill with TriggerExtractor
+- Auto-generates 5-10 test prompts from extracted keywords and action phrases
+- Runs them through Claude Code CLI
+- Shows which prompts successfully triggered your skill
+
+**Example auto-generated prompts:**
+- "How do I use ui5?" (from primary keyword)
+- "How do I use sap.ui.define?" (from code pattern)
+- "writing UI5 applications" (from action phrase)
+- "Help me with ui5 best practices" (generic)
+
+**Use this to:**
+- ✅ Quickly validate skill is triggerable
+- ✅ Understand how Claude perceives your skill
+- ✅ Test without writing any test cases
+- ✅ See real-world detection accuracy
+
+#### 2️⃣ **Manual Mode** (Full control with test cases)
+
+Create `test/fixtures/trigger-cases.json`:
+
+```json
+{
+  "version": "3.0.0",
+  "skill": {
+    "name": "ui5-best-practices",
+    "triggerKeywords": ["ui5", "sap.ui", "odata"],
+    "antiKeywords": ["react", "vue"]
+  },
+  "tests": [
+    {
+      "prompt": "How do I set up async module loading in UI5?",
+      "expected_skill": "ui5-best-practices",
+      "should_trigger": true,
+      "category": "module-loading"
+    }
+  ]
+}
+```
+
+Then run:
+```bash
+node bin/skill-lint.js lint ../skills/ui5-best-practices --harness
+```
+
+### Enable Harness Validation
+
+```bash
+# Via CLI flag
+node bin/skill-lint.js lint ../skills/ui5-best-practices --harness
+
+# Or in .skilllintrc.json
+{
+  "scenarios": {
+    "harness": true
+  },
+  "adapter": "claude-code"
+}
+```
+
+### Example Output (Auto-Generated)
+
+```
+✅ harness (12456ms)
+   ℹ️  No manual test cases found — auto-generating from skill content...
+   ℹ️  Auto-generated 9 test prompts from skill keywords
+   ℹ️  Running 9 integration test(s) with "claude-code" adapter...
+   
+   ✅ [1] auto-keyword-ui5: "How do I use ui5?" (1.8s, skill detected)
+   ✅ [2] auto-keyword-sap.ui: "How do I use sap.ui?" (2.1s, skill detected)
+   ⚠️  [3] auto-keyword-odata: "How do I use odata?" (2.3s, SKILL NOT DETECTED)
+   ✅ [4] auto-action-1: "writing UI5 applications" (1.9s, skill detected)
+   ✅ [5] auto-action-2: "async module loading" (2.2s, skill detected)
+   ✅ [6] auto-generic: "Help me with ui5 best practices" (1.7s, skill detected)
+   
+   ✅ Integration accuracy: 6/9 (67%)
+   💡 This shows how Claude Code perceives your skill in real scenarios
+   
+   ℹ️  Average latency: 2.0s per response [harness-latency]
+   ℹ️  Token efficiency: 380 tokens average [harness-token-efficiency]
+```
+
+### Example Output (Manual Test Cases)
+
+```
+✅ harness (15234ms)
+   ℹ️  Running 10 integration test(s) with "claude-code" adapter...
+   
+   ✅ [1] async-module-loading: PASSED (2.3s, skill detected)
+   ✅ [2] xml-core-require: PASSED (1.8s, skill detected)
+   ⚠️  [3] odata-types-priority: SKILL NOT DETECTED (3.1s)
+   ✅ [4] custom-types-validation: PASSED (2.1s, skill detected)
+   ...
+   
+   ✅ Integration accuracy: 8/10 (80%)
+   ⚠️  2 cases did not detect expected skill [skill-not-detected]
+   
+   ℹ️  Response quality: 72% average keyword overlap [harness-response-quality]
+   ℹ️  Average latency: 2.4s per response [harness-latency]
+   ℹ️  Token efficiency: 450 tokens average [harness-token-efficiency]
+```
+
+### Requirements
+
+- **Claude Code CLI** must be installed and accessible
+- Test cases must be in expected location (configurable via `testCases.integration`)
+- Takes 1-3 seconds per test case (real API calls!)
+
+### When To Use
+
+- ✅ Before releasing a new skill
+- ✅ After major skill content changes
+- ✅ When validating skill detection accuracy
+- ✅ When testing negative cases (anti-keywords)
+- ❌ NOT in CI (too slow, uses API quota)
+- ❌ NOT during development iteration (use keyword validator instead)
+
+### Harness vs Keywords vs Analyze
+
+| Feature | Analyze | Keywords | Harness (Auto) | Harness (Manual) |
+|---------|---------|----------|----------------|------------------|
+| Speed | Instant | Fast (~10ms) | Slow (1-2 min) | Slow (2-5 min) |
+| Accuracy | N/A (extraction) | Proxy only ⚠️ | Real Claude ✅ | Real Claude ✅ |
+| Test cases | ❌ None | Required | ❌ None | Required |
+| Cost | Free | Free | Uses API quota | Uses API quota |
+| Use case | Understand skill | Development | Quick validation | Pre-release |
+| Output | Keywords/patterns | Simulation results | Detection % | Full coverage |
+
+**Recommendation**: 
+1. **Start with `analyze`** to understand how your skill is perceived
+2. **Use `keywords` during development** for fast iteration
+3. **Use `harness --harness` (auto)** for quick real-world validation
+4. **Use `harness` with manual test cases** before release for comprehensive coverage
+- ✅ When testing negative cases (anti-keywords) — requires manual test cases
+- ❌ NOT in CI (too slow, uses API quota)
+- ❌ NOT during development iteration (use `analyze` and `keywords` validators instead)
+
+### Workflow Recommendation
+
+```bash
+# 1. During development: Analyze keywords (instant, no API calls)
+node bin/skill-lint.js analyze ../skills/my-skill
+
+# 2. Quick validation: Auto-generated harness (1 minute, ~10 API calls)
+node bin/skill-lint.js lint ../skills/my-skill --harness
+
+# 3. Before release: Full lint + manual test cases (comprehensive)
+node bin/skill-lint.js lint ../skills/my-skill
+```
 ### Configuration
 
 Create `.skilllintrc.json` in your project root:

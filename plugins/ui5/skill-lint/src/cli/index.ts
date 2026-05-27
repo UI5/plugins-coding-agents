@@ -55,6 +55,19 @@ export function createCLI(): Command {
       process.exit(exitCode);
     });
 
+  // ── analyze ──
+  program
+    .command('analyze')
+    .description('Analyze skill and suggest trigger keywords (no test cases required)')
+    .argument('<path>', 'Path to skill directory or SKILL.md')
+    .option('-o, --output <path>', 'Output file path for generated trigger-cases.json')
+    .option('-f, --format <format>', 'Output format: text, json', 'text')
+    .action(async (path: string, options) => {
+      const { analyzeCommand } = await import('./commands/analyze.js');
+      const exitCode = await analyzeCommand(path, options);
+      process.exit(exitCode);
+    });
+
   // ── init ──
   program
     .command('init')

@@ -107,7 +107,7 @@ export abstract class BaseValidator {
     level: ViolationLevel,
     rule: string,
     message: string,
-    options?: { file?: string; line?: number; suggestion?: string },
+    options?: { file?: string; line?: number; suggestion?: string; metadata?: Readonly<Record<string, unknown>> },
   ): Violation {
     return {
       level,
@@ -116,6 +116,7 @@ export abstract class BaseValidator {
       file: options?.file,
       line: options?.line,
       suggestion: options?.suggestion,
+      metadata: options?.metadata,
     };
   }
 
