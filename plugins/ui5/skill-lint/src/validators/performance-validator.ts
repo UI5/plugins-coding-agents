@@ -22,8 +22,8 @@ export class PerformanceValidator extends BaseValidator {
     const violations: Violation[] = [];
     const root = skill.pluginRoot;
 
-    const maxLines = config.thresholds.performance.maxLines;
-    const maxTokens = config.thresholds.performance.maxTokens;
+    const maxLines = config.thresholds.size.maxLines;
+    const maxTokens = config.thresholds.size.maxTokens;
 
     // ── SKILL.md line count ──
     const lineCount = countLinesFromContent(skill.content);

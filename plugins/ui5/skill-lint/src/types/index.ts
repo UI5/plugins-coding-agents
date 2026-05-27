@@ -147,17 +147,34 @@ export type ProgressCallback = (event: ProgressEvent) => void;
 export interface LintConfig {
   readonly scenarios: {
     readonly structure: boolean;
-    readonly triggering: boolean;
-    readonly performance: boolean;
-    readonly integration: boolean;
+    readonly size: boolean;
+    readonly references: boolean;
+    readonly links: {
+      readonly enabled: boolean;
+      readonly checkExternal: boolean;
+    };
+    readonly keywords: boolean;
+    readonly harness: boolean;
+    // Backward compat (optional, mapped by Zod transform)
+    readonly performance?: boolean;
+    readonly triggering?: boolean;
+    readonly integration?: boolean;
   };
   readonly adapter: string;
   readonly thresholds: {
-    readonly performance: {
+    readonly size: {
       readonly maxLines: number;
       readonly maxTokens: number;
     };
-    readonly triggering: {
+    readonly keywords: {
+      readonly minAccuracy: number;
+    };
+    // Backward compat
+    readonly performance?: {
+      readonly maxLines: number;
+      readonly maxTokens: number;
+    };
+    readonly triggering?: {
       readonly minAccuracy: number;
     };
   };

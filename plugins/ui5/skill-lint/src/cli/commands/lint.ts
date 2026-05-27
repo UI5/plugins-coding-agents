@@ -3,7 +3,7 @@
  */
 
 import { resolve, relative, isAbsolute, join, dirname } from 'path';
-import { realpath, access, constants } from 'fs/promises';
+import { realpath, access, readdir, stat, constants } from 'fs/promises';
 import { existsSync } from 'fs';
 import { SkillLinter } from '../../core/linter.js';
 import { loadConfig, mergeWithDefaults } from '../../config/loader.js';
@@ -20,6 +20,12 @@ export interface LintOptions {
   format?: string;
   output?: string;
   structure?: boolean;
+  size?: boolean;
+  references?: boolean;
+  links?: boolean;
+  keywords?: boolean;
+  harness?: boolean;
+  // Backward compat CLI flags
   triggering?: boolean;
   performance?: boolean;
   integration?: boolean;
@@ -43,10 +49,36 @@ export async function lintCommand(
     }
 
     // Validate skill path for security (prevents path traversal attacks)
-    const resolvedPath = await validateSkillPath(skillPath);
+    const resolvedPaths = await resolveSkillPaths(skillPath);
     const config = await buildConfig(options);
     const formatter = getFormatter(config.formatters.default, config.formatters.options.colors);
     const isMachineFormat = config.formatters.default !== 'text';
+
+    if (resolvedPaths.length > 1) {
+      // Multi-skill mode
+      if (!isMachineFormat) {
+        Logger.start(`Linting ${resolvedPaths.length} skills in ${skillPath}`);
+      }
+
+      const linter = new SkillLinter(config);
+      let allPassed = true;
+
+      for (const resolvedPath of resolvedPaths) {
+        const result = await linter.lint(resolvedPath, config);
+        const output = formatter.format(result);
+        console.log(output);
+        if (!result.passed) allPassed = false;
+      }
+
+      if (options.output) {
+        Logger.document(`Multi-skill report: use --format json for combined output`);
+      }
+
+      return allPassed ? 0 : 1;
+    }
+
+    // Single-skill mode
+    const resolvedPath = resolvedPaths[0];
 
     if (!isMachineFormat) {
       Logger.start(`Linting ${resolvedPath}`);
@@ -71,6 +103,58 @@ export async function lintCommand(
     Logger.error(message);
     return 2;
   }
+}
+
+/**
+ * Resolve one or more SKILL.md paths from the given input path.
+ * If the path is a directory containing multiple skill subdirectories, returns all of them.
+ * Otherwise delegates to validateSkillPath for a single path.
+ */
+async function resolveSkillPaths(skillPath: string): Promise<string[]> {
+  // SECURITY: Sanitize path first
+  let sanitized: string;
+  try {
+    sanitized = sanitizePath(skillPath);
+  } catch (error) {
+    throw new Error(`Invalid skill path: ${error instanceof Error ? error.message : String(error)}`);
+  }
+
+  const workspaceRoot = await findGitRoot() || process.cwd();
+  const resolved = resolve(workspaceRoot, sanitized);
+
+  if (!existsSync(resolved)) {
+    throw new Error(`Skill path does not exist: ${skillPath}`);
+  }
+
+  // If it's a file, treat as single skill
+  const stats = await stat(resolved);
+  if (stats.isFile()) {
+    return [await validateSkillPath(skillPath)];
+  }
+
+  // If it's a directory, check for SKILL.md directly inside
+  const directSkill = join(resolved, 'SKILL.md');
+  if (existsSync(directSkill)) {
+    return [await validateSkillPath(skillPath)];
+  }
+
+  // Multi-skill mode: scan subdirectories for SKILL.md files
+  const entries = await readdir(resolved, { withFileTypes: true });
+  const skillPaths: string[] = [];
+
+  for (const entry of entries) {
+    if (!entry.isDirectory()) continue;
+    const subSkill = join(resolved, entry.name, 'SKILL.md');
+    if (existsSync(subSkill)) {
+      skillPaths.push(subSkill);
+    }
+  }
+
+  if (skillPaths.length === 0) {
+    throw new Error(`No SKILL.md files found in directory: ${skillPath}`);
+  }
+
+  return skillPaths;
 }
 
 /**
@@ -165,13 +249,22 @@ async function buildConfig(options: LintOptions): Promise<LintConfig> {
   // CLI flags override file config
   const overrides: Record<string, unknown> = {};
 
-  if (options.structure !== undefined || options.triggering !== undefined ||
-      options.performance !== undefined || options.integration !== undefined) {
+  const hasScenarioFlag = options.structure !== undefined || options.size !== undefined ||
+      options.references !== undefined || options.links !== undefined ||
+      options.keywords !== undefined || options.harness !== undefined ||
+      options.triggering !== undefined || options.performance !== undefined ||
+      options.integration !== undefined;
+
+  if (hasScenarioFlag) {
     overrides.scenarios = {
       structure: options.structure ?? fileConfig.scenarios.structure,
-      triggering: options.triggering ?? fileConfig.scenarios.triggering,
-      performance: options.performance ?? fileConfig.scenarios.performance,
-      integration: options.integration ?? fileConfig.scenarios.integration,
+      size: (options.size ?? options.performance) ?? fileConfig.scenarios.size,
+      references: options.references ?? fileConfig.scenarios.references,
+      links: options.links !== undefined
+        ? { enabled: options.links, checkExternal: fileConfig.scenarios.links?.checkExternal ?? false }
+        : fileConfig.scenarios.links,
+      keywords: (options.keywords ?? options.triggering) ?? fileConfig.scenarios.keywords,
+      harness: (options.harness ?? options.integration) ?? fileConfig.scenarios.harness,
     };
   }
 

@@ -5,8 +5,7 @@
  */
 
 import { readFile, access, constants } from 'fs/promises';
-import { existsSync } from 'fs';
-import { join, dirname } from 'path';
+import { join } from 'path';
 import { BaseValidator } from './base-validator.js';
 import { FRONTMATTER, TEST_THRESHOLDS } from '../utils/constants.js';
 import type { ValidationResult, Violation, Skill, LintConfig } from '../types/index.js';
@@ -33,15 +32,14 @@ export class StructureValidator extends BaseValidator {
     violations.push(...this.checkSections(skill));
 
     // ── Parallel async checks for independent file operations ──
-    const [pluginViolations, linksViolations, readmeViolations, fixturesViolations, projectViolations] = await Promise.all([
+    const [pluginViolations, readmeViolations, fixturesViolations, projectViolations] = await Promise.all([
       this.checkPluginJson(root),
-      this.checkLinks(skill),
       this.checkReadme(root, skill),
       this.checkTestFixtures(root),
       this.checkProjectFiles(root),
     ]);
 
-    violations.push(...pluginViolations, ...linksViolations, ...readmeViolations, ...fixturesViolations, ...projectViolations);
+    violations.push(...pluginViolations, ...readmeViolations, ...fixturesViolations, ...projectViolations);
 
     return this.buildResult(violations, start);
   }
@@ -123,36 +121,6 @@ export class StructureValidator extends BaseValidator {
       violations.push(this.createViolation('info', 'sections-count',
         `SKILL.md has only ${headingMatches.length} numbered section(s) — consider adding more`,
         { file: skill.path }));
-    }
-
-    return violations;
-  }
-
-  private async checkLinks(skill: Skill): Promise<Violation[]> {
-    const violations: Violation[] = [];
-    const linkPattern = /\[([^\]]+)\]\(([^)]+)\)/g;
-    const links = [...skill.content.matchAll(linkPattern)];
-    let checkedCount = 0;
-
-    for (const [, , url] of links) {
-      // Skip external URLs and anchors
-      if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('#')) {
-        continue;
-      }
-
-      const linkPath = join(dirname(skill.path), url);
-      try {
-        await access(linkPath, constants.R_OK);
-      } catch (error) {
-        // Expected: linked file may not exist
-        violations.push(this.createViolation('error', 'broken-link',
-          `Broken relative link: ${url}`, { file: skill.path }));
-      }
-      checkedCount++;
-    }
-
-    if (checkedCount > 0) {
-      // info-level: all links resolved
     }
 
     return violations;

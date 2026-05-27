@@ -1,14 +1,21 @@
 /**
- * Triggering Validator
+ * Keyword Validator
  * Simulates keyword-based triggering and measures accuracy.
- * Migrated from triggering.test.ts — all AVA dependencies removed.
+ * Renamed from TriggeringValidator — same core logic with enhanced scoring.
  *
  * ⚠️  WARNING: This is NOT how Claude actually decides to use skills!
  * This is only a keyword coverage proxy useful during development.
+ *
+ * New rules added:
+ * - description-quality-score: Heuristic 0–100 score for description quality
+ * - keyword-overlap: Warns about trigger keywords that are common English words
+ * - missing-critical-keywords: Domain terms in SKILL.md body absent from triggerKeywords
+ * - anti-keyword-gaps: Suggests anti-keywords for common false-positive domains
  */
 
 import { join } from 'path';
 import { BaseValidator } from './base-validator.js';
+import { DESCRIPTION_SCORING } from '../utils/constants.js';
 import { globalFileSystemService, type FileSystemService } from '../services/file-system.service.js';
 import type {
   ValidationResult,
@@ -21,10 +28,10 @@ import type {
   TriggerTestCaseFile,
 } from '../types/index.js';
 
-export class TriggeringValidator extends BaseValidator {
-  readonly name = 'triggering';
+export class KeywordValidator extends BaseValidator {
+  readonly name = 'keywords';
   readonly description = 'Simulates keyword-based triggering accuracy (NOT real Claude behavior)';
-  
+
   private readonly fs: FileSystemService;
   private skillConfig: SkillTestConfiguration | null = null;
   private triggerKeywordsLower: Set<string> = new Set();
@@ -122,6 +129,18 @@ export class TriggeringValidator extends BaseValidator {
         `Skill description is ${skill.metadata.description.length} chars — recommend ≤ 2000`));
     }
 
+    // ── NEW: Description quality score ──
+    violations.push(...this.scoreDescription(skill));
+
+    // ── NEW: Keyword overlap with common words ──
+    violations.push(...this.checkKeywordOverlap());
+
+    // ── NEW: Missing critical keywords ──
+    violations.push(...this.checkMissingCriticalKeywords(skill));
+
+    // ── NEW: Anti-keyword gaps ──
+    violations.push(...this.checkAntiKeywordGaps(skill));
+
     return this.buildResult(violations, start, {
       totalCases: results.length,
       passed,
@@ -133,10 +152,131 @@ export class TriggeringValidator extends BaseValidator {
     });
   }
 
-  // ── Helpers ──
+  // ── New Scoring Rules ──
+
+  private scoreDescription(skill: Skill): Violation[] {
+    const desc = skill.metadata.description;
+    if (!desc) return [];
+
+    const words = desc.split(/\s+/).filter(w => w.length > 0);
+    let score = 0;
+
+    // Word count score (0–30): 10–50 words is optimal
+    if (words.length >= DESCRIPTION_SCORING.MIN_WORD_COUNT && words.length <= DESCRIPTION_SCORING.MAX_WORD_COUNT) {
+      score += 30;
+    } else if (words.length >= 5) {
+      score += Math.min(20, Math.round(words.length / DESCRIPTION_SCORING.MIN_WORD_COUNT * 15));
+    }
+
+    // Action verbs (0–25): contains "use when", "helps", "creates", etc.
+    const actionPatterns = [
+      /\buse\s+when\b/i, /\bhelps?\b/i, /\bcreates?\b/i, /\bgenerates?\b/i,
+      /\banalyze[sd]?\b/i, /\bvalidates?\b/i, /\bchecks?\b/i, /\bconverts?\b/i,
+      /\boptimize[sd]?\b/i, /\bdetects?\b/i, /\bfix(es)?\b/i, /\breviews?\b/i,
+    ];
+    const actionCount = actionPatterns.filter(p => p.test(desc)).length;
+    score += Math.min(25, actionCount * 8);
+
+    // Specificity (0–25): contains technical terms (not common English)
+    const lowerWords = words.map(w => w.toLowerCase().replace(/[^a-z]/g, ''));
+    const specificWords = lowerWords.filter(w =>
+      w.length > 3 && !DESCRIPTION_SCORING.COMMON_WORDS.has(w),
+    );
+    const specificRatio = specificWords.length / Math.max(1, words.length);
+    score += Math.round(specificRatio * 25);
+
+    // Negative indicators (0–20): avoids vague or filler words
+    const fillerWords = ['stuff', 'things', 'various', 'etc', 'miscellaneous', 'general'];
+    const fillerCount = lowerWords.filter(w => fillerWords.includes(w)).length;
+    score += Math.max(0, 20 - fillerCount * 10);
+
+    return [this.createViolation('info', 'description-quality-score',
+      `Description quality score: ${score}/100 (${words.length} words, ${actionCount} action verb(s), ${specificWords.length} specific term(s))`)];
+  }
+
+  private checkKeywordOverlap(): Violation[] {
+    if (this.triggerKeywordsLower.size === 0) return [];
+
+    const overlapping = Array.from(this.triggerKeywordsLower).filter(kw =>
+      DESCRIPTION_SCORING.COMMON_WORDS.has(kw),
+    );
+
+    if (overlapping.length > 0) {
+      return [this.createViolation('warning', 'keyword-overlap',
+        `${overlapping.length} trigger keyword(s) are common English words: ${overlapping.join(', ')}`,
+        { suggestion: 'Replace with more specific domain terms to reduce false positives' })];
+    }
+
+    return [];
+  }
+
+  private checkMissingCriticalKeywords(skill: Skill): Violation[] {
+    if (this.triggerKeywordsLower.size === 0) return [];
+
+    // Extract words appearing 3+ times in skill content
+    const wordFreq = new Map<string, number>();
+    const contentWords = skill.content.toLowerCase().match(/\b[a-z]{4,}\b/g) ?? [];
+    for (const w of contentWords) {
+      if (!DESCRIPTION_SCORING.COMMON_WORDS.has(w)) {
+        wordFreq.set(w, (wordFreq.get(w) ?? 0) + 1);
+      }
+    }
+
+    const frequentWords = Array.from(wordFreq.entries())
+      .filter(([, count]) => count >= 3)
+      .map(([word]) => word);
+
+    const missing = frequentWords.filter(w => !this.triggerKeywordsLower.has(w));
+    // Limit to top 10 most relevant
+    const topMissing = missing.slice(0, 10);
+
+    if (topMissing.length > 0) {
+      return [this.createViolation('info', 'missing-critical-keywords',
+        `${topMissing.length} domain term(s) appear 3+ times in SKILL.md but aren't in triggerKeywords: ${topMissing.join(', ')}`,
+        { suggestion: 'Consider adding relevant terms to triggerKeywords' })];
+    }
+
+    return [];
+  }
+
+  private checkAntiKeywordGaps(skill: Skill): Violation[] {
+    if (!this.skillConfig || this.antiKeywordsLower.size === 0) return [];
+
+    // Common domain confusion pairs
+    const confusionDomains: Record<string, readonly string[]> = {
+      testing: ['unit test', 'jest', 'vitest', 'mocha', 'pytest'],
+      deployment: ['deploy', 'ci/cd', 'pipeline', 'docker', 'kubernetes'],
+      database: ['sql', 'postgres', 'mysql', 'mongodb', 'redis'],
+      frontend: ['react', 'vue', 'angular', 'css', 'html'],
+      backend: ['express', 'fastify', 'flask', 'django', 'spring'],
+    };
+
+    const skillLower = skill.content.toLowerCase();
+    const suggestions: string[] = [];
+
+    for (const [domain, terms] of Object.entries(confusionDomains)) {
+      // If skill doesn't cover this domain but has no anti-keywords for it
+      const skillCovers = terms.some(t => skillLower.includes(t));
+      if (skillCovers) continue;
+
+      const hasAnti = terms.some(t => this.antiKeywordsLower.has(t));
+      if (!hasAnti) {
+        suggestions.push(domain);
+      }
+    }
+
+    if (suggestions.length > 0) {
+      return [this.createViolation('info', 'anti-keyword-gaps',
+        `Consider adding anti-keywords for unrelated domains: ${suggestions.join(', ')}`,
+        { suggestion: 'Anti-keywords prevent false positive triggering for unrelated prompts' })];
+    }
+
+    return [];
+  }
+
+  // ── Existing Helpers ──
 
   private loadTestCases(skill: Skill, config: LintConfig): TriggerTestCase[] {
-    // Prefer config-specified path, then conventional location
     const paths = [
       config.testCases.triggering,
       join(skill.pluginRoot, 'test/fixtures/trigger-cases.json'),
@@ -151,9 +291,8 @@ export class TriggeringValidator extends BaseValidator {
             this.initializeKeywordCaches();
           }
           if (Array.isArray(data.tests)) return data.tests;
-        } catch (error) {
-          // Expected: test case file may be malformed JSON or have invalid structure
-          // Skip this file and continue searching
+        } catch {
+          // Test case file may be malformed
         }
       }
     }
@@ -161,19 +300,14 @@ export class TriggeringValidator extends BaseValidator {
     return [];
   }
 
-  /**
-   * Initialize keyword caches for performance optimization.
-   * Pre-lowercases all keywords to avoid repeated toLowerCase() calls.
-   * Reduces complexity from O(n×m) to O(n) for n test cases and m keywords.
-   */
   private initializeKeywordCaches(): void {
     if (!this.skillConfig) return;
 
     this.triggerKeywordsLower = new Set(
-      this.skillConfig.triggerKeywords.map(kw => kw.toLowerCase())
+      this.skillConfig.triggerKeywords.map(kw => kw.toLowerCase()),
     );
     this.antiKeywordsLower = new Set(
-      this.skillConfig.antiKeywords.map(kw => kw.toLowerCase())
+      this.skillConfig.antiKeywords.map(kw => kw.toLowerCase()),
     );
   }
 
@@ -189,21 +323,12 @@ export class TriggeringValidator extends BaseValidator {
     };
   }
 
-  /**
-   * Simple keyword-based matching simulation.
-   * ⚠️  NOT how Claude actually decides — only a coverage proxy.
-   * 
-   * Optimized with pre-lowercased keyword caches for 2-3x speedup.
-   */
   private simulateTriggering(prompt: string): boolean {
     if (!this.skillConfig || this.triggerKeywordsLower.size === 0) {
-      // Fallback: no configuration available
       return false;
     }
 
     const lower = prompt.toLowerCase();
-
-    // Use cached lowercased keywords for O(n) instead of O(n×m) complexity
     const hasTrigger = Array.from(this.triggerKeywordsLower).some(kw => lower.includes(kw));
     const hasAnti = Array.from(this.antiKeywordsLower).some(kw => lower.includes(kw));
 

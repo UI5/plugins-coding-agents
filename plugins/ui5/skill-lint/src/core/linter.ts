@@ -3,9 +3,11 @@
  */
 
 import { StructureValidator } from '../validators/structure-validator.js';
-import { PerformanceValidator } from '../validators/performance-validator.js';
-import { TriggeringValidator } from '../validators/triggering-validator.js';
-import { IntegrationValidator } from '../validators/integration-validator.js';
+import { SizeValidator } from '../validators/size-validator.js';
+import { ReferenceValidator } from '../validators/reference-validator.js';
+import { LinkValidator } from '../validators/link-validator.js';
+import { KeywordValidator } from '../validators/keyword-validator.js';
+import { HarnessValidator } from '../validators/harness-validator.js';
 import { BaseValidator } from '../validators/base-validator.js';
 import { collectResults } from './result-collector.js';
 import { loadSkill } from '../utils/file-utils.js';
@@ -20,9 +22,11 @@ export class SkillLinter {
     const validators: BaseValidator[] = [];
 
     if (config.scenarios.structure) validators.push(new StructureValidator());
-    if (config.scenarios.performance) validators.push(new PerformanceValidator());
-    if (config.scenarios.triggering) validators.push(new TriggeringValidator());
-    if (config.scenarios.integration) validators.push(new IntegrationValidator());
+    if (config.scenarios.size) validators.push(new SizeValidator());
+    if (config.scenarios.references) validators.push(new ReferenceValidator());
+    if (config.scenarios.links?.enabled) validators.push(new LinkValidator());
+    if (config.scenarios.keywords) validators.push(new KeywordValidator());
+    if (config.scenarios.harness) validators.push(new HarnessValidator());
 
     this.validators = validators;
   }

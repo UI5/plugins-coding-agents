@@ -13,4 +13,12 @@ export { ClaudeCodeAdapter } from './adapters/claude-code-adapter.js';
 export { getAdapter, listAdapters } from './adapters/adapter-registry.js';
 export { createCLI } from './cli/index.js';
 
+// Validators
+export { StructureValidator } from './validators/structure-validator.js';
+export { SizeValidator } from './validators/size-validator.js';
+export { ReferenceValidator } from './validators/reference-validator.js';
+export { LinkValidator } from './validators/link-validator.js';
+export { KeywordValidator } from './validators/keyword-validator.js';
+export { HarnessValidator } from './validators/harness-validator.js';
+
 export type * from './types/index.js';

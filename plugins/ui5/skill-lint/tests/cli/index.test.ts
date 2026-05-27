@@ -100,8 +100,10 @@ describe('CLI Index', () => {
     it('should have negation options', () => {
       const opts = lintCommand?.options || [];
       expect(opts.find(o => o.long === '--no-structure')).toBeDefined();
-      expect(opts.find(o => o.long === '--no-triggering')).toBeDefined();
-      expect(opts.find(o => o.long === '--no-performance')).toBeDefined();
+      expect(opts.find(o => o.long === '--no-size')).toBeDefined();
+      expect(opts.find(o => o.long === '--no-references')).toBeDefined();
+      expect(opts.find(o => o.long === '--no-links')).toBeDefined();
+      expect(opts.find(o => o.long === '--no-keywords')).toBeDefined();
     });
 
     it('should have verbose option', () => {

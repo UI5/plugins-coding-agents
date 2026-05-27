@@ -178,6 +178,70 @@ export const SECURITY_LIMITS = {
 } as const;
 
 /**
+ * Reference validator thresholds
+ */
+export const REFERENCE_THRESHOLDS = {
+  /**
+   * Line count threshold for suggesting reference file split
+   * Rationale: Skills over 400 lines benefit from splitting into reference files
+   */
+  SHOULD_SPLIT_LINES: 400,
+
+  /**
+   * Timeout for external link HEAD requests (milliseconds)
+   * Rationale: 5 seconds is enough for a healthy URL, avoids blocking on slow servers
+   */
+  EXTERNAL_LINK_TIMEOUT_MS: 5_000,
+} as const;
+
+/**
+ * Description quality scoring constants
+ */
+export const DESCRIPTION_SCORING = {
+  /**
+   * Minimum word count for optimal description
+   * Rationale: 10 words provides enough context for triggering
+   */
+  MIN_WORD_COUNT: 10,
+
+  /**
+   * Maximum word count for optimal description
+   * Rationale: 50 words keeps description focused
+   */
+  MAX_WORD_COUNT: 50,
+
+  /**
+   * Common English words to flag as low-specificity keywords
+   * Rationale: These words appear in too many prompts to be useful triggers
+   */
+  COMMON_WORDS: new Set([
+    'the', 'is', 'are', 'was', 'were', 'be', 'been', 'being',
+    'have', 'has', 'had', 'do', 'does', 'did', 'will', 'would',
+    'could', 'should', 'may', 'might', 'shall', 'can', 'need',
+    'dare', 'ought', 'used', 'to', 'of', 'in', 'for', 'on',
+    'with', 'at', 'by', 'from', 'as', 'into', 'through', 'during',
+    'before', 'after', 'above', 'below', 'between', 'out', 'off',
+    'over', 'under', 'again', 'further', 'then', 'once', 'here',
+    'there', 'when', 'where', 'why', 'how', 'all', 'each', 'every',
+    'both', 'few', 'more', 'most', 'other', 'some', 'such', 'only',
+    'same', 'than', 'too', 'very', 'just', 'because', 'but', 'and',
+    'or', 'nor', 'not', 'so', 'if', 'while', 'about', 'up', 'that',
+    'this', 'what', 'which', 'who', 'whom', 'these', 'those', 'also',
+    'make', 'like', 'time', 'know', 'take', 'come', 'think', 'look',
+    'want', 'give', 'use', 'find', 'tell', 'work', 'call', 'try',
+    'ask', 'seem', 'feel', 'leave', 'keep', 'let', 'begin', 'show',
+    'hear', 'play', 'run', 'move', 'live', 'believe', 'bring', 'happen',
+    'write', 'provide', 'sit', 'stand', 'lose', 'pay', 'meet', 'include',
+    'continue', 'set', 'learn', 'change', 'lead', 'understand', 'watch',
+    'follow', 'stop', 'create', 'speak', 'read', 'allow', 'add', 'spend',
+    'grow', 'open', 'walk', 'win', 'offer', 'remember', 'love', 'consider',
+    'appear', 'buy', 'wait', 'serve', 'die', 'send', 'expect', 'build',
+    'stay', 'fall', 'cut', 'reach', 'kill', 'remain', 'file', 'code',
+    'function', 'using', 'based', 'help', 'best', 'practices',
+  ]),
+} as const;
+
+/**
  * Export all constants as a single namespace
  */
 export const CONSTANTS = {
@@ -188,4 +252,6 @@ export const CONSTANTS = {
   DUPLICATE_DETECTION,
   INTEGRATION,
   SECURITY_LIMITS,
+  REFERENCE_THRESHOLDS,
+  DESCRIPTION_SCORING,
 } as const;

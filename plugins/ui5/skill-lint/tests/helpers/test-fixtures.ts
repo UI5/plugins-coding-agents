@@ -118,14 +118,16 @@ export function createMockConfig(overrides: Partial<LintConfig> = {}): LintConfi
   return {
     scenarios: {
       structure: true,
-      triggering: true,
-      performance: true,
-      integration: true
+      size: true,
+      references: true,
+      links: { enabled: true, checkExternal: false },
+      keywords: true,
+      harness: false,
     },
     adapter: 'claude-code',
     thresholds: {
-      performance: { maxLines: 700, maxTokens: 4000 },
-      triggering: { minAccuracy: 90 }
+      size: { maxLines: 700, maxTokens: 4000 },
+      keywords: { minAccuracy: 90 },
     },
     testCases: {},
     execution: { timeout: 60000, maxRetries: 2, parallel: false, maxConcurrency: 1 },

@@ -46,17 +46,20 @@ describe('Config Schema', () => {
       expect(DEFAULT_CONFIG.thresholds).toBeDefined();
     });
 
-    it('should enable structure/triggering/performance by default', () => {
+    it('should enable structure/size/references/links/keywords by default', () => {
       expect(DEFAULT_CONFIG.scenarios.structure).toBe(true);
-      expect(DEFAULT_CONFIG.scenarios.triggering).toBe(true);
-      expect(DEFAULT_CONFIG.scenarios.performance).toBe(true);
-      expect(DEFAULT_CONFIG.scenarios.integration).toBe(false);
+      expect(DEFAULT_CONFIG.scenarios.size).toBe(true);
+      expect(DEFAULT_CONFIG.scenarios.references).toBe(true);
+      expect(DEFAULT_CONFIG.scenarios.links.enabled).toBe(true);
+      expect(DEFAULT_CONFIG.scenarios.links.checkExternal).toBe(false);
+      expect(DEFAULT_CONFIG.scenarios.keywords).toBe(true);
+      expect(DEFAULT_CONFIG.scenarios.harness).toBe(false);
     });
 
     it('should have reasonable default thresholds', () => {
-      expect(DEFAULT_CONFIG.thresholds.performance.maxLines).toBe(700);
-      expect(DEFAULT_CONFIG.thresholds.performance.maxTokens).toBe(4000);
-      expect(DEFAULT_CONFIG.thresholds.triggering.minAccuracy).toBe(90);
+      expect(DEFAULT_CONFIG.thresholds.size.maxLines).toBe(700);
+      expect(DEFAULT_CONFIG.thresholds.size.maxTokens).toBe(4000);
+      expect(DEFAULT_CONFIG.thresholds.keywords.minAccuracy).toBe(90);
     });
   });
 
@@ -81,7 +84,7 @@ describe('Config Schema', () => {
     it('should validate positive numbers for thresholds', () => {
       expect(() => {
         parseConfig({
-          thresholds: { performance: { maxLines: -100 } }
+          thresholds: { size: { maxLines: -100 } }
         });
       }).toThrow();
     });
@@ -89,9 +92,25 @@ describe('Config Schema', () => {
     it('should validate accuracy range (0-100)', () => {
       expect(() => {
         parseConfig({
-          thresholds: { triggering: { minAccuracy: 150 } }
+          thresholds: { keywords: { minAccuracy: 150 } }
         });
       }).toThrow();
+    });
+
+    it('should map old config names to new names (backward compat)', () => {
+      const config = parseConfig({
+        scenarios: { performance: true, triggering: false, integration: true },
+        thresholds: {
+          performance: { maxLines: 500, maxTokens: 3000 },
+          triggering: { minAccuracy: 85 }
+        }
+      });
+      // Old names are mapped to new
+      expect(config.scenarios.size).toBe(true);
+      expect(config.scenarios.keywords).toBe(false);
+      expect(config.scenarios.harness).toBe(true);
+      expect(config.thresholds.size.maxLines).toBe(500);
+      expect(config.thresholds.keywords.minAccuracy).toBe(85);
     });
 
     it('should accept valid formatter types', () => {
@@ -113,13 +132,13 @@ describe('Config Schema', () => {
     it('should handle nested config objects', () => {
       const config = parseConfig({
         thresholds: {
-          performance: { maxLines: 500, maxTokens: 3000 },
-          triggering: { minAccuracy: 85 }
+          size: { maxLines: 500, maxTokens: 3000 },
+          keywords: { minAccuracy: 85 }
         }
       });
       
-      expect(config.thresholds.performance.maxLines).toBe(500);
-      expect(config.thresholds.triggering.minAccuracy).toBe(85);
+      expect(config.thresholds.size.maxLines).toBe(500);
+      expect(config.thresholds.keywords.minAccuracy).toBe(85);
     });
 
     it('should handle testCases paths', () => {
@@ -140,19 +159,38 @@ describe('Config Schema', () => {
       const validConfig = {
         scenarios: {
           structure: true,
-          triggering: true,
-          performance: true,
-          integration: false
+          size: true,
+          references: true,
+          links: { enabled: true, checkExternal: false },
+          keywords: true,
+          harness: false
         },
         adapter: 'claude-code',
         thresholds: {
-          performance: { maxLines: 700, maxTokens: 4000 },
-          triggering: { minAccuracy: 90 }
+          size: { maxLines: 700, maxTokens: 4000 },
+          keywords: { minAccuracy: 90 }
         },
         execution: { timeout: 60000, maxRetries: 2, parallel: false }
       };
       
       expect(() => lintConfigSchema.parse(validConfig)).not.toThrow();
+    });
+
+    it('should accept old config format (backward compat)', () => {
+      const oldConfig = {
+        scenarios: {
+          structure: true,
+          triggering: true,
+          performance: true,
+          integration: false
+        },
+        thresholds: {
+          performance: { maxLines: 700, maxTokens: 4000 },
+          triggering: { minAccuracy: 90 }
+        }
+      };
+      
+      expect(() => lintConfigSchema.parse(oldConfig)).not.toThrow();
     });
 
     it('should reject config with invalid types', () => {

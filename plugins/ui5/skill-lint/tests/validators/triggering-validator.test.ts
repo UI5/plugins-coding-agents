@@ -66,14 +66,16 @@ describe('TriggeringValidator', () => {
     mockConfig = {
       scenarios: {
         structure: false,
-        triggering: true,
-        performance: false,
-        integration: false
+        size: false,
+        references: false,
+        links: { enabled: false, checkExternal: false },
+        keywords: true,
+        harness: false,
       },
       adapter: 'claude-code',
       thresholds: {
-        performance: { maxLines: 700, maxTokens: 4000 },
-        triggering: { minAccuracy: 90 }
+        size: { maxLines: 700, maxTokens: 4000 },
+        keywords: { minAccuracy: 90 },
       },
       testCases: {
         triggering: join(tempDir, 'test/fixtures/trigger-cases.json')

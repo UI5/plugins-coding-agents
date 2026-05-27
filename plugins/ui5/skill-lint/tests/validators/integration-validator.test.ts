@@ -45,14 +45,16 @@ describe('IntegrationValidator', () => {
     mockConfig = {
       scenarios: {
         structure: false,
-        triggering: false,
-        performance: false,
-        integration: true
+        size: false,
+        references: false,
+        links: { enabled: false, checkExternal: false },
+        keywords: false,
+        harness: true,
       },
       adapter: 'mock',
       thresholds: {
-        performance: { maxLines: 700, maxTokens: 4000 },
-        triggering: { minAccuracy: 90 }
+        size: { maxLines: 700, maxTokens: 4000 },
+        keywords: { minAccuracy: 90 },
       },
       testCases: {
         integration: join(tempDir, 'test/integration/fixtures/test-cases.json')

@@ -1,0 +1,287 @@
+/**
+ * Harness Validator
+ * Runs real prompts through an adapter (e.g. Claude Code CLI) and checks skill detection.
+ * Renamed from IntegrationValidator — same core logic with enhanced quality metrics.
+ *
+ * This executes ACTUAL Claude prompts — it is slow and uses real API calls.
+ *
+ * New rules:
+ * - harness-response-quality: Keyword overlap between response and expected content
+ * - harness-latency: Warns when single response exceeds 10s
+ * - harness-token-efficiency: Tokens per quality ratio
+ */
+
+import { join } from 'path';
+import { BaseValidator } from './base-validator.js';
+import { getAdapter } from '../adapters/adapter-registry.js';
+import { Logger } from '../utils/logger.js';
+import { TEST_THRESHOLDS } from '../utils/constants.js';
+import { globalFileSystemService, type FileSystemService } from '../services/file-system.service.js';
+import type {
+  ValidationResult,
+  Violation,
+  Skill,
+  LintConfig,
+  SkillTestConfiguration,
+  TriggerTestCaseFile,
+} from '../types/index.js';
+
+interface IntegrationTestCase {
+  readonly id: number;
+  readonly name: string;
+  readonly description: string;
+  readonly prompt: string;
+  readonly category: string;
+  readonly expectedSkill: string | null;
+  readonly expectedContent?: string;
+}
+
+interface CaseResult {
+  readonly passed: boolean;
+  readonly latencyMs: number;
+  readonly tokensUsed: number;
+  readonly responseContent: string;
+  readonly expectedContent?: string;
+}
+
+export class HarnessValidator extends BaseValidator {
+  readonly name = 'harness';
+  readonly description = 'Runs real prompts through Claude Code CLI and checks skill detection';
+
+  private readonly fs: FileSystemService;
+  private skillConfig: SkillTestConfiguration | null = null;
+
+  constructor(fs: FileSystemService = globalFileSystemService) {
+    super();
+    this.fs = fs;
+  }
+
+  async validate(skill: Skill, config: LintConfig): Promise<ValidationResult> {
+    const start = Date.now();
+    const violations: Violation[] = [];
+
+    const adapter = getAdapter(config.adapter);
+    const available = await adapter.isAvailable();
+
+    if (!available) {
+      violations.push(this.createViolation('error', 'adapter-unavailable',
+        `Adapter "${config.adapter}" is not available in this environment`,
+        { suggestion: 'Install Claude Code CLI or use a different adapter' }));
+      return this.buildResult(violations, start);
+    }
+
+    const testCases = this.loadTestCases(skill, config);
+    if (testCases.length === 0) {
+      violations.push(this.createViolation('warning', 'no-integration-cases',
+        'No integration test cases found — skipping',
+        { suggestion: 'Create test/integration/fixtures/test-cases.ts or a JSON equivalent' }));
+      return this.buildResult(violations, start);
+    }
+
+    Logger.info(`Running ${testCases.length} integration test(s) with "${config.adapter}" adapter...`);
+
+    let passed = 0;
+    let failed = 0;
+    let timedOut = 0;
+    let totalTokens = 0;
+    let totalLatency = 0;
+    const caseResults: CaseResult[] = [];
+
+    for (const tc of testCases) {
+      Logger.plain(`  [${tc.id}] ${tc.name}: "${tc.prompt.substring(0, 60)}..."`);
+
+      const result = await adapter.execute({
+        prompt: tc.prompt,
+        skillId: skill.metadata.name,
+        skillConfig: this.skillConfig ?? undefined,
+        timeout: config.execution.timeout,
+        maxRetries: config.execution.maxRetries,
+      });
+
+      totalTokens += result.tokensUsed;
+      totalLatency += result.latencyMs;
+
+      if (!result.success) {
+        failed++;
+        if (result.error?.includes('Timeout')) timedOut++;
+
+        violations.push(this.createViolation('error', 'execution-failed',
+          `[${tc.name}] Execution failed: ${result.error ?? 'unknown error'}`));
+        caseResults.push({
+          passed: false, latencyMs: result.latencyMs, tokensUsed: result.tokensUsed,
+          responseContent: result.responseContent, expectedContent: tc.expectedContent,
+        });
+        continue;
+      }
+
+      const skillMatch = result.skillTriggered === tc.expectedSkill;
+      if (!skillMatch) {
+        failed++;
+        violations.push(this.createViolation('warning', 'skill-not-detected',
+          `[${tc.name}] Expected skill "${tc.expectedSkill}", got "${result.skillTriggered ?? 'none'}"`));
+        caseResults.push({
+          passed: false, latencyMs: result.latencyMs, tokensUsed: result.tokensUsed,
+          responseContent: result.responseContent, expectedContent: tc.expectedContent,
+        });
+        continue;
+      }
+
+      if (tc.expectedContent) {
+        const hasContent = result.responseContent.toLowerCase().includes(tc.expectedContent.toLowerCase());
+        if (!hasContent) {
+          failed++;
+          violations.push(this.createViolation('info', 'content-mismatch',
+            `[${tc.name}] Expected content "${tc.expectedContent}" not found in response`));
+          caseResults.push({
+            passed: false, latencyMs: result.latencyMs, tokensUsed: result.tokensUsed,
+            responseContent: result.responseContent, expectedContent: tc.expectedContent,
+          });
+          continue;
+        }
+      }
+
+      passed++;
+      caseResults.push({
+        passed: true, latencyMs: result.latencyMs, tokensUsed: result.tokensUsed,
+        responseContent: result.responseContent, expectedContent: tc.expectedContent,
+      });
+    }
+
+    const total = testCases.length;
+    const accuracy = total > 0 ? (passed / total) * 100 : 0;
+    const avgLatency = total > 0 ? totalLatency / total : 0;
+
+    if (accuracy < TEST_THRESHOLDS.INTEGRATION_ACCURACY.CRITICAL_THRESHOLD) {
+      violations.push(this.createViolation('error', 'integration-accuracy-low',
+        `Integration accuracy ${accuracy.toFixed(1)}% is below ${TEST_THRESHOLDS.INTEGRATION_ACCURACY.CRITICAL_THRESHOLD}% threshold`));
+    } else if (accuracy < TEST_THRESHOLDS.INTEGRATION_ACCURACY.WARNING_THRESHOLD) {
+      violations.push(this.createViolation('warning', 'integration-accuracy-moderate',
+        `Integration accuracy ${accuracy.toFixed(1)}% is below ${TEST_THRESHOLDS.INTEGRATION_ACCURACY.WARNING_THRESHOLD}% — consider investigating failed cases`));
+    }
+
+    // ── NEW: Harness latency check ──
+    violations.push(...this.checkLatency(caseResults));
+
+    // ── NEW: Response quality scoring ──
+    violations.push(...this.checkResponseQuality(caseResults));
+
+    // ── NEW: Token efficiency ──
+    violations.push(...this.checkTokenEfficiency(caseResults));
+
+    Logger.metrics(`Integration: ${passed}/${total} passed (${accuracy.toFixed(1)}%), ` +
+      `${timedOut} timeouts, ${totalTokens} tokens, avg ${avgLatency.toFixed(0)}ms`);
+
+    try {
+      await adapter.cleanup();
+    } catch {
+      // Cleanup errors are non-critical
+    }
+
+    return this.buildResult(violations, start, {
+      totalCases: total,
+      passed,
+      failed,
+      timedOut,
+      accuracy,
+      totalTokens,
+      averageLatency: avgLatency,
+    });
+  }
+
+  // ── New Quality Rules ──
+
+  private checkLatency(results: readonly CaseResult[]): Violation[] {
+    const violations: Violation[] = [];
+    const slowThresholdMs = 10_000;
+
+    const slowCases = results.filter(r => r.latencyMs > slowThresholdMs);
+    if (slowCases.length > 0) {
+      violations.push(this.createViolation('warning', 'harness-latency',
+        `${slowCases.length} response(s) exceeded ${slowThresholdMs / 1000}s (max: ${Math.round(Math.max(...slowCases.map(r => r.latencyMs)) / 1000)}s)`,
+        { suggestion: 'Consider simplifying the skill instructions to reduce response time' }));
+    }
+
+    return violations;
+  }
+
+  private checkResponseQuality(results: readonly CaseResult[]): Violation[] {
+    const violations: Violation[] = [];
+
+    const withExpected = results.filter(r => r.passed && r.expectedContent);
+    if (withExpected.length === 0) return violations;
+
+    let totalOverlap = 0;
+    for (const r of withExpected) {
+      if (!r.expectedContent) continue;
+      const expectedWords = new Set(r.expectedContent.toLowerCase().split(/\s+/));
+      const responseWords = r.responseContent.toLowerCase().split(/\s+/);
+      const matching = responseWords.filter(w => expectedWords.has(w)).length;
+      totalOverlap += matching / Math.max(1, expectedWords.size);
+    }
+
+    const avgOverlap = totalOverlap / withExpected.length;
+    const pct = Math.round(avgOverlap * 100);
+
+    violations.push(this.createViolation('info', 'harness-response-quality',
+      `Average keyword overlap with expected content: ${pct}%`));
+
+    return violations;
+  }
+
+  private checkTokenEfficiency(results: readonly CaseResult[]): Violation[] {
+    const violations: Violation[] = [];
+
+    const passedResults = results.filter(r => r.passed && r.tokensUsed > 0);
+    if (passedResults.length === 0) return violations;
+
+    const avgTokens = Math.round(
+      passedResults.reduce((sum, r) => sum + r.tokensUsed, 0) / passedResults.length,
+    );
+
+    violations.push(this.createViolation('info', 'harness-token-efficiency',
+      `Average tokens per successful response: ${avgTokens}`));
+
+    return violations;
+  }
+
+  // ── Existing Helpers ──
+
+  private loadTestCases(skill: Skill, config: LintConfig): IntegrationTestCase[] {
+    const paths = [
+      config.testCases.integration,
+      join(skill.pluginRoot, 'test/integration/fixtures/test-cases.json'),
+      config.testCases.triggering,
+      join(skill.pluginRoot, 'test/fixtures/trigger-cases.json'),
+    ].filter(Boolean) as string[];
+
+    for (const p of paths) {
+      if (this.fs.exists(p)) {
+        try {
+          const raw = this.fs.readFile(p);
+          const data = JSON.parse(raw);
+
+          if ((data as TriggerTestCaseFile).skill) {
+            this.skillConfig = (data as TriggerTestCaseFile).skill;
+          }
+
+          if (Array.isArray(data)) return data;
+          if (Array.isArray(data.tests)) {
+            return (data.tests as any[]).map((tc, i) => ({
+              id: (tc as any).id ?? i + 1,
+              name: (tc as any).name ?? `case-${i + 1}`,
+              description: tc.prompt,
+              prompt: tc.prompt,
+              category: tc.category,
+              expectedSkill: tc.expected_skill,
+              expectedContent: (tc as any).expectedContent,
+            }));
+          }
+        } catch {
+          // Test case file may be malformed
+        }
+      }
+    }
+
+    return [];
+  }
+}

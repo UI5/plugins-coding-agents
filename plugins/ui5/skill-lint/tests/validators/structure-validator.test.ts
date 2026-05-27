@@ -33,9 +33,11 @@ describe('StructureValidator', () => {
     mockConfig = createMockConfig({
       scenarios: {
         structure: true,
-        triggering: false,
-        performance: false,
-        integration: false
+        size: false,
+        references: false,
+        links: { enabled: false, checkExternal: false },
+        keywords: false,
+        harness: false,
       }
     });
   });
