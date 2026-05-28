@@ -74,20 +74,33 @@ export function createCLI(): Command {
     .description('Run comprehensive harness audit with statistical analysis')
     .argument('<path>', 'Path to skill directory or SKILL.md')
     .option('-i, --iterations <number>', 'Number of iterations to run', '1')
-    .option('-b, --benchmark', 'Include performance benchmarking')
     .option('-f, --format <format>', 'Output format: text, markdown, html, json', 'text')
     .option('-o, --output <path>', 'Save audit report to file')
     .option('--baseline <path>', 'Compare against historical baseline (JSON file)')
     .option('--confidence <level>', 'Confidence level for statistical tests', '0.95')
     .action(async (path: string, options) => {
       const { auditCommand } = await import('./commands/audit.js');
+
+      // Validate iterations parameter
+      const iterations = parseInt(options.iterations, 10);
+      if (isNaN(iterations) || iterations < 1 || iterations > 1000) {
+        console.error('Error: --iterations must be a number between 1 and 1000');
+        process.exit(2);
+      }
+
+      // Validate confidence level
+      const confidenceLevel = parseFloat(options.confidence);
+      if (isNaN(confidenceLevel) || confidenceLevel <= 0 || confidenceLevel >= 1) {
+        console.error('Error: --confidence must be a number between 0 and 1 (e.g., 0.95)');
+        process.exit(2);
+      }
+
       const exitCode = await auditCommand(path, {
-        iterations: parseInt(options.iterations, 10),
-        benchmark: options.benchmark,
+        iterations,
         format: options.format,
         output: options.output,
         baseline: options.baseline,
-        confidenceLevel: parseFloat(options.confidence),
+        confidenceLevel,
       });
       process.exit(exitCode);
     });

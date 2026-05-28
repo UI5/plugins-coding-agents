@@ -29,15 +29,44 @@ import type {
 } from '../../types/audit-types.js';
 import type { ValidationResult } from '../../types/index.js';
 
-// Claude Sonnet 4.6 pricing (USD per 1M tokens)
-const CLAUDE_SONNET_INPUT_COST_PER_MILLION = 3;
-const CLAUDE_SONNET_OUTPUT_COST_PER_MILLION = 15;
-const CLAUDE_SONNET_AVERAGE_COST_PER_MILLION = 9; // Approximate average
-const TOKENS_PER_MILLION = 1_000_000;
+/**
+ * Claude Sonnet 4.6 pricing configuration
+ * @see https://www.anthropic.com/pricing
+ */
+const PRICING_CONFIG = {
+  model: 'claude-sonnet-4.6',
+  inputCostPerMillion: 3,  // USD per 1M input tokens
+  outputCostPerMillion: 15, // USD per 1M output tokens
+  averageCostPerMillion: 9, // Approximate average (assuming 50/50 input/output)
+  effectiveDate: '2026-05-01',
+} as const;
+
+const TOKENS_PER_MILLION = 1_000_000 as const;
+
+/**
+ * Grade thresholds based on industry-standard academic grading scale
+ */
+const GRADE_THRESHOLDS = {
+  A: 90, // Excellent: ready for production
+  B: 80, // Good: minor improvements needed
+  C: 70, // Acceptable: significant improvements recommended
+  D: 60, // Poor: major issues must be addressed
+  F: 0,  // Failing: unsuitable for production
+} as const;
+
+/**
+ * Calculate letter grade from numerical score
+ */
+function calculateGrade(score: number): 'A' | 'B' | 'C' | 'D' | 'F' {
+  if (score >= GRADE_THRESHOLDS.A) return 'A';
+  if (score >= GRADE_THRESHOLDS.B) return 'B';
+  if (score >= GRADE_THRESHOLDS.C) return 'C';
+  if (score >= GRADE_THRESHOLDS.D) return 'D';
+  return 'F';
+}
 
 const DEFAULT_AUDIT_CONFIG: AuditConfig = {
   iterations: 1,
-  benchmark: false,
   format: 'text',
   confidenceLevel: 0.95,
   thresholds: {
@@ -47,6 +76,32 @@ const DEFAULT_AUDIT_CONFIG: AuditConfig = {
   },
 };
 
+/**
+ * Run comprehensive harness audit with statistical analysis
+ *
+ * Executes the harness validator multiple times and provides detailed
+ * statistical analysis including mean, median, standard deviation, and
+ * confidence intervals for accuracy, latency, and token usage.
+ *
+ * @param skillPath - Absolute or relative path to skill directory or SKILL.md
+ * @param options - Audit configuration options
+ * @returns Exit code: 0 for pass, 1 for fail, 2 for execution error
+ * @throws {Error} When skill path is invalid or cannot be loaded
+ *
+ * @example
+ * ```typescript
+ * // Basic audit
+ * const exitCode = await auditCommand('../skills/my-skill');
+ *
+ * // Statistical confidence with 10 iterations
+ * const exitCode = await auditCommand('../skills/my-skill', {
+ *   iterations: 10,
+ *   format: 'html',
+ *   output: 'reports/audit.html',
+ *   baseline: 'baselines/v1.0.0.json'
+ * });
+ * ```
+ */
 export async function auditCommand(
   skillPath: string,
   options: AuditOptions = {},
@@ -94,9 +149,22 @@ export async function auditCommand(
     if (config.baseline) {
       try {
         const data = await readFile(config.baseline, 'utf-8');
-        baselineData = JSON.parse(data) as AuditResult;
+        const parsed = JSON.parse(data);
+
+        // Validate baseline structure
+        if (!parsed.statistics?.accuracy?.mean ||
+            !parsed.statistics?.latency?.mean ||
+            !parsed.statistics?.tokenUsage?.mean ||
+            !parsed.timestamp) {
+          throw new Error('Invalid baseline format: missing required statistics or timestamp');
+        }
+
+        baselineData = parsed as AuditResult;
+        Logger.info(`Loaded baseline from ${config.baseline}`);
       } catch (error) {
-        Logger.warning(`Failed to load baseline: ${error instanceof Error ? error.message : String(error)}`);
+        const message = error instanceof Error ? error.message : String(error);
+        Logger.warning(`Failed to load baseline: ${message}`);
+        Logger.info('Continuing without baseline comparison');
       }
     }
 
@@ -130,18 +198,24 @@ export async function auditCommand(
   }
 }
 
+/**
+ * Extract harness metadata from validation result with runtime type checking
+ */
 function extractHarnessMetadata(result: ValidationResult): HarnessIterationMetadata | undefined {
   const metadata = result.metrics;
   if (!metadata) return undefined;
 
+  const getNumber = (value: unknown): number => {
+    return typeof value === 'number' && !isNaN(value) ? value : 0;
+  };
+
   return {
-    totalCases: (metadata.totalCases as number) ?? 0,
-    passed: (metadata.passed as number) ?? 0,
-    failed: (metadata.failed as number) ?? 0,
-    accuracy: (metadata.accuracy as number) ?? 0,
-    totalTokens: (metadata.totalTokens as number) ?? 0,
-    averageLatency: (metadata.averageLatency as number) ?? 0,
-    totalCost: 0,
+    totalCases: getNumber(metadata.totalCases),
+    passed: getNumber(metadata.passed),
+    failed: getNumber(metadata.failed),
+    accuracy: getNumber(metadata.accuracy),
+    totalTokens: getNumber(metadata.totalTokens),
+    averageLatency: getNumber(metadata.averageLatency),
   };
 }
 
@@ -149,15 +223,18 @@ function extractHarnessMetadata(result: ValidationResult): HarnessIterationMetad
  * Extract a specific metric from iterations
  * @param iterations - Array of audit iterations
  * @param key - Metadata key to extract
- * @returns Array of non-zero values for the metric
+ * @returns Array of metric values (includes zeros, excludes missing metadata)
  */
 function extractMetric(
   iterations: readonly AuditIteration[],
   key: keyof HarnessIterationMetadata
 ): number[] {
   return iterations
-    .map(it => (it.harnessMetadata?.[key] as number) ?? 0)
-    .filter(val => val > 0);
+    .filter(it => it.harnessMetadata !== undefined)
+    .map(it => {
+      const value = it.harnessMetadata![key];
+      return typeof value === 'number' && !isNaN(value) ? value : 0;
+    });
 }
 
 async function computeAuditResult(
@@ -171,7 +248,7 @@ async function computeAuditResult(
   const latencies = extractMetric(iterations, 'averageLatency');
   const tokens = extractMetric(iterations, 'totalTokens');
 
-  const costs = tokens.map(t => (t / TOKENS_PER_MILLION) * CLAUDE_SONNET_AVERAGE_COST_PER_MILLION);
+  const costs = tokens.map(t => (t / TOKENS_PER_MILLION) * PRICING_CONFIG.averageCostPerMillion);
 
   const statistics = {
     accuracy: summarize(accuracies, config.confidenceLevel),
@@ -212,6 +289,9 @@ async function computeAuditResult(
   return result;
 }
 
+/**
+ * Assess audit quality and assign grade based on performance metrics
+ */
 function assessQuality(
   statistics: AuditResult['statistics'],
   aggregated: AuditResult['aggregated'],
@@ -220,6 +300,18 @@ function assessQuality(
   const issues: string[] = [];
   const recommendations: string[] = [];
   let score = 100;
+
+  // Handle edge case: no tests executed
+  if (aggregated.totalTests === 0) {
+    issues.push('No test cases were executed');
+    return {
+      grade: 'F',
+      score: 0,
+      passed: false,
+      issues,
+      recommendations: ['Ensure harness validator has valid test cases'],
+    };
+  }
 
   if (statistics.accuracy.mean < config.thresholds.minAccuracy) {
     issues.push(`Accuracy ${statistics.accuracy.mean.toFixed(1)}% is below ${config.thresholds.minAccuracy}% threshold`);
@@ -236,7 +328,7 @@ function assessQuality(
     score -= 20;
   }
 
-  const tokensPerTest = aggregated.totalTokens / Math.max(1, aggregated.totalTests);
+  const tokensPerTest = aggregated.totalTokens / aggregated.totalTests;
   if (tokensPerTest > config.thresholds.maxTokensPerTest) {
     issues.push(`Average tokens per test ${tokensPerTest.toFixed(0)} exceeds ${config.thresholds.maxTokensPerTest} threshold`);
     recommendations.push('Reduce skill content size or use reference files');
@@ -249,8 +341,8 @@ function assessQuality(
     score -= 10;
   }
 
-  const grade = score >= 90 ? 'A' : score >= 80 ? 'B' : score >= 70 ? 'C' : score >= 60 ? 'D' : 'F';
-  const passed = score >= 70 && statistics.accuracy.mean >= config.thresholds.minAccuracy;
+  const grade = calculateGrade(score);
+  const passed = score >= GRADE_THRESHOLDS.C && statistics.accuracy.mean >= config.thresholds.minAccuracy;
 
   return {
     grade,
@@ -261,10 +353,27 @@ function assessQuality(
   };
 }
 
+/**
+ * Compare current audit results with historical baseline
+ * Warns if baseline is stale or iteration counts differ significantly
+ */
 function compareWithBaseline(
   current: AuditResult,
   baseline: AuditResult,
 ): AuditResult['baseline'] {
+  // Warn if baseline is old (> 30 days)
+  const baselineDate = new Date(baseline.timestamp);
+  const daysSinceBaseline = (Date.now() - baselineDate.getTime()) / (1000 * 60 * 60 * 24);
+
+  if (daysSinceBaseline > 30) {
+    Logger.warning(`Baseline is ${Math.floor(daysSinceBaseline)} days old - consider updating`);
+  }
+
+  // Warn if iteration counts differ significantly
+  if (Math.abs(current.iterations.length - baseline.iterations.length) > 2) {
+    Logger.warning('Baseline used different iteration count - comparison may be less reliable');
+  }
+
   const accuracyDelta = current.statistics.accuracy.mean - baseline.statistics.accuracy.mean;
   const latencyDelta = current.statistics.latency.mean - baseline.statistics.latency.mean;
   const tokenDelta = current.statistics.tokenUsage.mean - baseline.statistics.tokenUsage.mean;
@@ -283,7 +392,6 @@ async function buildAuditConfig(options: AuditOptions): Promise<AuditConfig> {
   return {
     ...DEFAULT_AUDIT_CONFIG,
     iterations: options.iterations ?? DEFAULT_AUDIT_CONFIG.iterations,
-    benchmark: options.benchmark ?? DEFAULT_AUDIT_CONFIG.benchmark,
     format: options.format ?? DEFAULT_AUDIT_CONFIG.format,
     output: options.output,
     baseline: options.baseline,

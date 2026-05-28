@@ -8,8 +8,6 @@ import type { ValidationResult, LintResult } from './index.js';
 export interface AuditOptions {
   /** Number of iterations to run (default: 1) */
   iterations?: number;
-  /** Include performance benchmarking */
-  benchmark?: boolean;
   /** Output format: text, markdown, html, json */
   format?: 'text' | 'markdown' | 'html' | 'json';
   /** Path to save audit report */
@@ -34,7 +32,6 @@ export interface HarnessIterationMetadata {
   readonly accuracy: number;
   readonly totalTokens: number;
   readonly averageLatency: number;
-  readonly totalCost: number;
 }
 
 export interface StatisticalSummary {
@@ -87,7 +84,6 @@ export interface AuditResult {
 
 export interface AuditConfig {
   readonly iterations: number;
-  readonly benchmark: boolean;
   readonly format: 'text' | 'markdown' | 'html' | 'json';
   readonly output?: string;
   readonly baseline?: string;

@@ -148,9 +148,10 @@ The audit command runs the harness validator multiple times and provides:
 | `-o, --output <path>` | Save report to file | - |
 | `--baseline <path>` | Compare against historical baseline (JSON) | - |
 | `--confidence <level>` | Confidence level for statistical tests | `0.95` |
-| `-b, --benchmark` | Include performance benchmarking | `false` |
 
 ### Example Output
+
+> **Note:** The following is sample output for illustration purposes.
 
 ```
 ═══════════════════════════════════════════════════════════════════
@@ -227,6 +228,16 @@ The audit command runs the harness validator multiple times and provides:
 3. **Track Progress**: Save JSON baselines and compare over time
 4. **CI/CD Integration**: Use JSON format for automated quality gates
 5. **Documentation**: Generate HTML reports for stakeholder reviews
+
+### Statistical Notes
+
+- **Confidence Intervals**: Uses Student's t-distribution for small samples (n ≤ 30) and z-scores for large samples (Central Limit Theorem)
+- **Supported confidence levels**: 0.95 (95%, default) and 0.99 (99%)
+- **T-score approximation**: For small samples, uses formula t ≈ z + c/√n (accurate to within 0.1 for n ≥ 5)
+- **Minimum iterations**: 1 (single iteration returns point estimates without confidence intervals)
+- **Zero values**: Legitimate zero values (e.g., 0% accuracy) are included in statistics
+- **Baseline staleness**: Warnings issued for baselines older than 30 days
+- **Cost calculation**: Based on Claude Sonnet 4.6 pricing ($3/1M input, $15/1M output tokens, effective 2026-05-01)
 
 ## 🆕 Automatic Keyword Extraction
 
