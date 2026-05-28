@@ -1,0 +1,29 @@
+[
+  {
+    "id": 1,
+    "name": "async-module-loading",
+    "description": "Async module loading with sap.ui.define",
+    "prompt": "Show me how to use sap.ui.define for async module loading in UI5",
+    "category": "module-loading",
+    "expectedSkill": "ui5-best-practices",
+    "expectedContent": "sap.ui.define"
+  },
+  {
+    "id": 2,
+    "name": "csp-violations",
+    "description": "CSP inline content violations",
+    "prompt": "What inline content violates CSP in UI5?",
+    "category": "security-csp",
+    "expectedSkill": "ui5-best-practices",
+    "expectedContent": "inline"
+  },
+  {
+    "id": 3,
+    "name": "form-layout-choice",
+    "description": "Form vs SimpleForm layout choice",
+    "prompt": "Should I use SimpleForm or Form with ColumnLayout in UI5?",
+    "category": "form-creation",
+    "expectedSkill": "ui5-best-practices",
+    "expectedContent": "ColumnLayout"
+  }
+]
