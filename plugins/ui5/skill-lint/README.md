@@ -81,12 +81,152 @@ node bin/skill-lint.js lint skills/my-skill -f github-actions
 # Check if skill loads correctly
 node bin/skill-lint.js check skills/my-skill
 
-# Analyze skill and suggest trigger keywords (NEW!)
+# Analyze skill and suggest trigger keywords
 node bin/skill-lint.js analyze skills/my-skill
+
+# Run comprehensive harness audit with statistical analysis (NEW!)
+node bin/skill-lint.js audit skills/my-skill
 
 # Generate config file
 node bin/skill-lint.js init
 ```
+
+## 🆕 Harness Audit Command
+
+**Run comprehensive statistical analysis of harness performance** with multiple iterations, baseline comparisons, and detailed reports.
+
+### Quick Start
+
+```bash
+# Basic audit (single run)
+node bin/skill-lint.js audit ../skills/my-skill
+
+# Statistical audit (10 iterations for confidence)
+node bin/skill-lint.js audit ../skills/my-skill --iterations 10
+
+# Generate markdown report
+node bin/skill-lint.js audit ../skills/my-skill --format markdown --output reports/audit.md
+
+# Generate HTML report
+node bin/skill-lint.js audit ../skills/my-skill --format html --output reports/audit.html
+
+# Compare with baseline
+node bin/skill-lint.js audit ../skills/my-skill --baseline baselines/previous-audit.json
+```
+
+### What It Measures
+
+The audit command runs the harness validator multiple times and provides:
+
+1. **Statistical Analysis**
+   - Mean, median, std dev, min/max for accuracy, latency, and token usage
+   - 95% confidence intervals
+   - Variance analysis for reliability assessment
+
+2. **Quality Assessment**
+   - Letter grade (A-F) based on performance
+   - Quality score (0-100)
+   - Specific issues and recommendations
+   - Pass/fail status
+
+3. **Cost Tracking**
+   - Total token usage across all iterations
+   - Estimated cost (Claude Sonnet 4.6 pricing)
+   - Cost per successful test
+
+4. **Baseline Comparison** (optional)
+   - Compare against historical performance
+   - Track accuracy improvements/regressions
+   - Monitor latency and token efficiency changes
+
+### Options
+
+| Option | Description | Default |
+|--------|-------------|---------|
+| `-i, --iterations <number>` | Number of iterations to run | `1` |
+| `-f, --format <format>` | Output format: text, markdown, html, json | `text` |
+| `-o, --output <path>` | Save report to file | - |
+| `--baseline <path>` | Compare against historical baseline (JSON) | - |
+| `--confidence <level>` | Confidence level for statistical tests | `0.95` |
+| `-b, --benchmark` | Include performance benchmarking | `false` |
+
+### Example Output
+
+```
+═══════════════════════════════════════════════════════════════════
+🔍 HARNESS AUDIT REPORT: ui5-lint
+═══════════════════════════════════════════════════════════════════
+
+📊 Summary
+   Skill: ui5-lint
+   Iterations: 5
+   Total Duration: 62.34s
+   Timestamp: 2026-05-28T10:30:00.000Z
+
+📈 Aggregated Metrics
+   Total Tests: 45
+   Passed: 38
+   Failed: 7
+   Overall Accuracy: 84.4%
+   Total Tokens: 20,450
+   Total Cost: $0.1841
+
+📊 Statistical Analysis
+
+   Accuracy:
+      Mean: 84.4%
+      Median: 85.0%
+      Std Dev: 3.2%
+      Range: [80.0%, 88.0%]
+      95% CI: [82.1%, 86.7%]
+
+   Latency:
+      Mean: 2134ms
+      Median: 2100ms
+      Std Dev: 245ms
+      Range: [1800ms, 2500ms]
+
+   Token Usage:
+      Mean: 4090
+      Median: 4050
+      Std Dev: 180
+      Range: [3800, 4350]
+
+✅ Quality Assessment
+   Grade: B
+   Score: 85/100
+   Status: ✅ PASSED
+
+   Recommendations:
+      💡 Consider adding more specific trigger keywords for higher accuracy
+      💡 Skill performs consistently across iterations (low variance)
+
+📉 Baseline Comparison
+   Accuracy: 📈 +4.2%
+   Latency: 📈 -340ms
+   Tokens: 📈 -120
+   Overall: ✅ IMPROVED
+
+═══════════════════════════════════════════════════════════════════
+```
+
+### Use Cases
+
+| Scenario | Command | Duration |
+|----------|---------|----------|
+| **Quick validation** | `audit skill` | ~1-2 min |
+| **Pre-release check** | `audit skill -i 5` | ~5-10 min |
+| **Statistical confidence** | `audit skill -i 10` | ~10-20 min |
+| **Track improvements** | `audit skill --baseline previous.json` | ~1-2 min |
+| **Generate report** | `audit skill -f html -o report.html` | ~1-2 min |
+
+### Best Practices
+
+1. **During Development**: Use single iteration (`audit skill`) for quick feedback
+2. **Before Release**: Run 5-10 iterations for statistical confidence
+3. **Track Progress**: Save JSON baselines and compare over time
+4. **CI/CD Integration**: Use JSON format for automated quality gates
+5. **Documentation**: Generate HTML reports for stakeholder reviews
 
 ## 🆕 Automatic Keyword Extraction
 

@@ -68,6 +68,30 @@ export function createCLI(): Command {
       process.exit(exitCode);
     });
 
+  // ── audit ──
+  program
+    .command('audit')
+    .description('Run comprehensive harness audit with statistical analysis')
+    .argument('<path>', 'Path to skill directory or SKILL.md')
+    .option('-i, --iterations <number>', 'Number of iterations to run', '1')
+    .option('-b, --benchmark', 'Include performance benchmarking')
+    .option('-f, --format <format>', 'Output format: text, markdown, html, json', 'text')
+    .option('-o, --output <path>', 'Save audit report to file')
+    .option('--baseline <path>', 'Compare against historical baseline (JSON file)')
+    .option('--confidence <level>', 'Confidence level for statistical tests', '0.95')
+    .action(async (path: string, options) => {
+      const { auditCommand } = await import('./commands/audit.js');
+      const exitCode = await auditCommand(path, {
+        iterations: parseInt(options.iterations, 10),
+        benchmark: options.benchmark,
+        format: options.format,
+        output: options.output,
+        baseline: options.baseline,
+        confidenceLevel: parseFloat(options.confidence),
+      });
+      process.exit(exitCode);
+    });
+
   // ── init ──
   program
     .command('init')

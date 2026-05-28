@@ -166,8 +166,8 @@ describe('CLI Index', () => {
   });
 
   describe('Command Structure', () => {
-    it('should have exactly 4 commands', () => {
-      expect(program.commands).toHaveLength(4);
+    it('should have exactly 5 commands', () => {
+      expect(program.commands).toHaveLength(5);
     });
 
     it('should have distinct command names', () => {
