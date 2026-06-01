@@ -16,5 +16,8 @@
         "plugin",
         "typescript",
         "conversion"
+    ],
+    "skills": [
+        "./skills/"
     ]
 }
