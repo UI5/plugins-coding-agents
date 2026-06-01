@@ -1,0 +1,66 @@
+{
+  "name": "ui5",
+  "metadata": {
+    "description": "SAPUI5 / OpenUI5 plugin for Claude. Create and validate UI5 projects, access API documentation, run UI5 linter, get development guidelines and best practices for UI5 development.",
+    "version": "0.1.2"
+  },
+  "owner": {
+    "name": "SAP SE",
+    "email": "openui5@sap.com"
+  },
+  "plugins": [
+    {
+      "name": "ui5",
+      "source": "./plugins/ui5",
+      "description": "SAPUI5 / OpenUI5 plugin for coding agents. Creates and validates UI5 projects, accesses API documentation, runs UI5 linter, retrieves development guidelines and best practices for UI5 development.",
+      "version": "0.1.2",
+      "skills": [
+        "./skills/ui5-best-practices",
+        "./skills/ui5-best-practices-integration-cards"
+      ],
+      "repository": "https://github.com/UI5/plugins-coding-agents",
+      "keywords": [
+        "sap",
+        "ui5",
+        "sapui5",
+        "openui5",
+        "claude",
+        "copilot",
+        "plugin",
+        "linter",
+        "api-documentation",
+        "development-guidelines",
+        "best-practices",
+        "mcp-tools",
+        "integration-cards",
+        "odata",
+        "cap-integration"
+      ],
+      "license": "Apache-2.0"
+    },
+    {
+      "name": "ui5-typescript-conversion",
+      "source": "./plugins/ui5-typescript-conversion",
+      "description": "SAPUI5 / OpenUI5 plugin for coding agents. Converts JavaScript-based UI5 projects to TypeScript.",
+      "version": "0.1.2",
+      "skills": [
+        "./skills"
+      ],
+      "repository": "https://github.com/UI5/plugins-coding-agents",
+      "keywords": [
+        "sap",
+        "ui5",
+        "sapui5",
+        "openui5",
+        "claude",
+        "copilot",
+        "plugin",
+        "typescript",
+        "conversion",
+        "javascript",
+        "migration"
+      ],
+      "license": "Apache-2.0"
+    }
+  ]
+}
