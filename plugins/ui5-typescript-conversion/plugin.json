@@ -17,7 +17,5 @@
         "typescript",
         "conversion"
     ],
-    "skills": [
-        "./skills/"
-    ]
+    "skills": ["./skills/"]
 }
