@@ -1,0 +1,61 @@
+{
+  "name": "@ui5/skill-lint",
+  "version": "1.0.0",
+  "private": true,
+  "description": "CLI linter for Claude Code skills — validates structure, performance, triggering, and integration",
+  "type": "module",
+  "bin": {
+    "skill-lint": "./bin/skill-lint.js"
+  },
+  "main": "./dist/src/index.js",
+  "types": "./dist/src/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf dist",
+    "lint": "node ./bin/skill-lint.js",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "claude-code",
+    "skill-linter",
+    "validation",
+    "cli",
+    "ui5",
+    "sap",
+    "static-analysis"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/UI5/plugins-claude.git",
+    "directory": "plugins/ui5/skill-lint"
+  },
+  "homepage": "https://github.com/UI5/plugins-claude/tree/main/plugins/ui5/skill-lint",
+  "bugs": {
+    "url": "https://github.com/UI5/plugins-claude/issues"
+  },
+  "dependencies": {
+    "commander": "^13.0.0",
+    "cosmiconfig": "^9.0.0",
+    "js-yaml": "^4.1.0",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/js-yaml": "^4.0.9",
+    "@types/node": "^22.0.0",
+    "@vitest/coverage-v8": "^4.1.7",
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.7"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "author": {
+    "name": "SAP SE",
+    "email": "openui5@sap.com",
+    "url": "https://www.sap.com"
+  },
+  "license": "Apache-2.0"
+}

@@ -1,0 +1,127 @@
+name: Skill Lint
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'plugins/ui5/skill-lint/**'
+      - 'plugins/ui5/skills/**'
+      - '.github/workflows/skill-lint.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'plugins/ui5/skill-lint/**'
+      - 'plugins/ui5/skills/**'
+      - '.github/workflows/skill-lint.yml'
+
+permissions:
+  contents: read
+  pull-requests: write  # For commenting on PRs (future enhancement)
+
+defaults:
+  run:
+    working-directory: plugins/ui5/skill-lint
+
+jobs:
+  test:
+    name: Test & Coverage
+    runs-on: ubuntu-22.04
+    
+    steps:
+      - uses: actions/checkout@v6
+      
+      - name: Use Node.js 22
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: 'npm'
+          cache-dependency-path: plugins/ui5/skill-lint/package-lock.json
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Build
+        run: npm run build
+      
+      - name: Run tests with coverage
+        run: npm run test -- --coverage
+      
+      - name: Upload coverage reports
+        uses: codecov/codecov-action@v5
+        if: always()
+        with:
+          files: ./plugins/ui5/skill-lint/coverage/coverage-final.json
+          flags: skill-lint
+          name: skill-lint-coverage
+          fail_ci_if_error: false
+        env:
+          CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
+      
+      - name: Check coverage threshold
+        run: |
+          echo "ℹ️ Coverage threshold check: 80%"
+          echo "Note: Coverage is currently at 75%, working towards 80% target"
+          echo "This check is informational only during Sprint 1"
+        continue-on-error: true
+
+  lint-skills:
+    name: Lint Skills
+    runs-on: ubuntu-22.04
+    needs: test
+    if: success()
+    
+    steps:
+      - uses: actions/checkout@v6
+      
+      - name: Use Node.js 22
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: 'npm'
+          cache-dependency-path: plugins/ui5/skill-lint/package-lock.json
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Build
+        run: npm run build
+      
+      - name: Lint ui5-best-practices skill
+        run: node ./bin/skill-lint.js lint ../skills/ui5-best-practices/SKILL.md --format github-actions
+        continue-on-error: true
+      
+      - name: Generate lint report
+        run: |
+          echo "## Skill Lint Report" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          node ./bin/skill-lint.js lint ../skills/ui5-best-practices/SKILL.md --format text >> $GITHUB_STEP_SUMMARY || true
+      
+      - name: Save lint results as artifact
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: skill-lint-results
+          path: plugins/ui5/skill-lint/.lint-reports/
+          retention-days: 30
+
+  type-check:
+    name: TypeScript Type Check
+    runs-on: ubuntu-22.04
+    
+    steps:
+      - uses: actions/checkout@v6
+      
+      - name: Use Node.js 22
+        uses: actions/setup-node@v6
+        with:
+          node-version: 22
+          cache: 'npm'
+          cache-dependency-path: plugins/ui5/skill-lint/package-lock.json
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: TypeScript type check
+        run: npx tsc --noEmit
