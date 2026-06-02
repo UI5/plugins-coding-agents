@@ -21,6 +21,7 @@ description: ALWAYS load before any OPA5 task — implementing, updating, or ver
 ```javascript
 sap.ui.test.qunitPause.pauseRule = "assert,timeout"; // enables pause on assertion failures and timeouts
 ```
+
 ### 3. Isolate the journey under test (all UI5 versions)
 **Purpose:** Avoid waiting for unrelated journeys on each iteration
 **Isolation strategy:** If the setup does not allow to run individual journeys, comment out unrelated journey imports in the test entry point.
