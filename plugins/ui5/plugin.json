@@ -15,9 +15,9 @@
         "openui5",
         "plugin",
         "linter",
-        "api documentation",
-        "development guidelines",
-        "best practices"
+        "api-documentation",
+        "development-guidelines",
+        "best-practices"
     ],
     "skills": ["./skills/"]
 }
