@@ -19,5 +19,7 @@
         "development-guidelines",
         "best-practices"
     ],
-    "skills": ["./skills/"]
+    "skills": [
+        "./skills/"
+    ]
 }
