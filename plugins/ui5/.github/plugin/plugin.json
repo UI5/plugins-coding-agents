@@ -13,11 +13,11 @@
         "ui5",
         "sapui5",
         "openui5",
-        "claude",
         "plugin",
         "linter",
-        "api documentation",
-        "development guidelines",
-        "best practices"
-    ]
+        "api-documentation",
+        "development-guidelines",
+        "best-practices"
+    ],
+    "skills": ["./skills/"]
 }

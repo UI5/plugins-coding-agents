@@ -42,3 +42,27 @@ jobs:
 
     - name: Perform dependency check
       run: npm run knip
+
+    - name: Verify plugin.json copies are in sync
+      run: |
+        set -eu
+        COPIES=(
+          ".github/plugin/plugin.json"
+        )
+        failed=0
+        for root in plugins/*/plugin.json; do
+          dir=$(dirname "$root")
+          for rel in "${COPIES[@]}"; do
+            copy="$dir/$rel"
+            if [ ! -f "$copy" ]; then
+              echo "::error file=$copy::missing copy of $root"
+              failed=1
+              continue
+            fi
+            if ! diff -u "$root" "$copy"; then
+              echo "::error file=$copy::differs from $root"
+              failed=1
+            fi
+          done
+        done
+        exit $failed

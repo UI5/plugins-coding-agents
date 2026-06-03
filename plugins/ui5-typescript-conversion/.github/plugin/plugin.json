@@ -13,9 +13,9 @@
         "ui5",
         "sapui5",
         "openui5",
-        "claude",
         "plugin",
         "typescript",
         "conversion"
-    ]
+    ],
+    "skills": ["./skills/"]
 }
