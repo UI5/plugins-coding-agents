@@ -1,6 +1,6 @@
 # UI5 Plugin for Coding Agents
 
-Complete SAPUI5 / OpenUI5 plugin for coding agents with MCP tools, API documentation access, linting capabilities, and development guidelines.
+Complete SAPUI5 / OpenUI5 plugin for coding agents with MCP tools, API documentation access, linting capabilities, development and integration testing guidelines.
 
 ---
 
@@ -41,6 +41,15 @@ Development guidelines for UI Integration Cards (also known as UI5 Integration C
 - **Analytical cards** - 44 chart types with required UIDs, feeds, and per-type examples
 - **i18n** - Bind all user-facing strings to the i18n model; never hardcode
 - **Actions** - Use the `actions` property for links and interactions; never inline `<a>` tags or hand-roll URL handlers
+
+#### opa5
+
+Guidelines and debugging workflow for OPA5 integration tests:
+
+- **Failure inspection** - Pause-on-failure mode (`sap.ui.test.qunitPause.pauseRule`) keeps the app live at the failure point for browser inspection
+- **TestRecorder tooling** - Temporary `sap.ui.testrecorder.ControlTree` integration to inspect the live control tree and generate reliable OPA5 snippets (UI5 ≥ 1.147)
+- **Page object organization** - Placement of actions and assertions across views
+- **App teardown** - Cleanup patterns in OPA5 journey tests
 
 ---
 
