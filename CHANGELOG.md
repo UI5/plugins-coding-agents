@@ -1,5 +1,18 @@
 # Changelog
 
+## [0.1.3](https://github.com/UI5/plugins-coding-agents/compare/v0.1.2...v0.1.3) (2026-06-03)
+
+
+### Features
+
+* Support GitHub Copilot ([#65](https://github.com/UI5/plugins-coding-agents/issues/65)) ([44a72cd](https://github.com/UI5/plugins-coding-agents/commit/44a72cdaa530cb24fdb39f934e2a2026d5ad6a43))
+
+
+### Bug Fixes
+
+* Make plugin.json prettier-stable after release-please bumps ([d6f3783](https://github.com/UI5/plugins-coding-agents/commit/d6f3783607c7b848feeff6c48db0a1a6d3b907dd))
+* Update release-please extra-files to current plugin.json paths ([afd95cb](https://github.com/UI5/plugins-coding-agents/commit/afd95cb4852181925f68d8c7f2c537e6c911420a))
+
 ## [0.1.2](https://github.com/UI5/plugins-coding-agents/compare/v0.1.1...v0.1.2) (2026-05-27)
 
 
