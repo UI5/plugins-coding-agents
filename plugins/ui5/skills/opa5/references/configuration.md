@@ -1,6 +1,6 @@
-# Initial Setup
+# Configuration
 
-1. **ALWAYS** use this folder layout:
+1. Use this folder layout:
 ```
 test/integration/
 ├── opaTests.qunit.js   ← single entry point
@@ -21,4 +21,6 @@ sap.ui.define(["sap/ui/test/Opa5"], function (Opa5) {
 		autoWait: true,
 		viewNamespace: "com.myorg.myapp.view."
 	});
+	// ...
+});
 ```

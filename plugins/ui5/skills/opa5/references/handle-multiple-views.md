@@ -1,8 +1,8 @@
-# Organization of actions/assertions
+# Page Object Organization Across Multiple Views
 
 **ALWAYS** add the new actions/assertions to the semantically corresponding page object
 
-Example 1  
+Example 1:  
 ❌ Anti-Pattern:  
 Adding selector for a control from `App.view.xml` into the page object for its **nested** view (e.g. into `integration/pages/Detail.js` for `Detail.view.xml`):
 ```javascript
