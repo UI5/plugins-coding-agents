@@ -19,8 +19,5 @@
         "development guidelines",
         "best practices"
     ],
-    "skills": [
-        "./skills/ui5-best-practices",
-        "./skills/ui5-best-practices-integration-cards"
-    ]
+    "skills": ["./skills/"]
 }
