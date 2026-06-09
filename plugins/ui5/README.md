@@ -42,7 +42,7 @@ Development guidelines for UI Integration Cards (also known as UI5 Integration C
 - **i18n** - Bind all user-facing strings to the i18n model; never hardcode
 - **Actions** - Use the `actions` property for links and interactions; never inline `<a>` tags or hand-roll URL handlers
 
-#### opa5
+#### ui5-best-practices-opa5
 
 Guidelines and debugging workflow for OPA5 integration tests:
 
