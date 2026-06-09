@@ -1,5 +1,5 @@
 ---
-name: opa5
+name: ui5-best-practices-opa5
 description: This skill should be used in any OPA5 task - creating, modifying, extending, debugging, fixing or reviewing an integration test. Use when the user asks to "write an OPA5 test", "add an OPA5 journey", "fix the OPA5 test failure" or mentions OPA5 or its components - opaTest, page object, journey, waitFor.
 ---
 
