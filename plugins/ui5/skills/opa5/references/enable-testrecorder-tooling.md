@@ -1,4 +1,4 @@
-# TestRecorder tooling
+# TestRecorder Tooling
 
 The `sap.ui.testrecorder` library provides the module `sap.ui.testrecorder.ControlTree` that allows to:
 - inspect the live control tree in the browser
