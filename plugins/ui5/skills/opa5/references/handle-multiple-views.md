@@ -7,7 +7,7 @@ Example 1:
 Adding selector for a control from `App.view.xml` into the page object for its **nested** view (e.g. into `integration/pages/Detail.js` for `Detail.view.xml`):
 ```javascript
 // integration/pages/Detail.js
-iShouldSeeTheAppInFullScreenMode: function () {
+iShouldSeeTheAppInFullScreenMode() {
 	return this.waitFor({
 		id: "layout",
 		viewName: "App",
