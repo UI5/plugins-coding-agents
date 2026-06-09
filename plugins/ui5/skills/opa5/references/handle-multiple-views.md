@@ -23,7 +23,7 @@ Example 2:
 View-specific page object file containing selector for cross-view navigation:
 ```javascript
 // integration/pages/Detail.js
-iShouldSeeTheHash: function (sExpectedHash) {
+iShouldSeeTheHash(sExpectedHash) {
 	return this.waitFor({
 		success: function () {
 			Opa5.assert.strictEqual(Opa5.getHashChanger().getHash(), sExpectedHash, "The Hash not correct");
