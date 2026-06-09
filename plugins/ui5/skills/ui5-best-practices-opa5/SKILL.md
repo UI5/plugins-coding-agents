@@ -10,7 +10,7 @@ description: This skill should be used in any OPA5 task - creating, modifying, e
 - **If the test-case spans multiple views** → follow `references/handle-multiple-views.md`
 - **Teardown the App** → follow `references/handle-teardown.md`
 
-## Set Up Browser Inspection Tools (follow every time **before running the OPA5 test**)
+## Set Up Browser Inspection Tools (follow **before running the OPA5 test**)
 **Purpose:** Efficient inspection of test failures with minimal steps.
 **Prerequisites:** A tool to load the OPA5 test in the browser and evaluate javascript in the browser window (e.g. MCP Playwright)
 **Instructions:** → follow `references/setup-inspection-tools.md`
