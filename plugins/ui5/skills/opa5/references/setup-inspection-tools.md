@@ -19,6 +19,6 @@ sap.ui.test.qunitPause.pauseRule = "assert,timeout"; // enables pause on asserti
 
 ## Workflow
 1. Enable the inspection tools above and load the test in the browser.
-2. When the test pauses on failure, inspect the app in the browser — verify the full causal chain with no gaps before changing any code. Rule out app-side issues before assuming the test is wrong.
+2. When the test pauses on failure, inspect the app in the browser. Before changing any code, verify the full causal chain with no gaps. Rule out app-side issues before assuming the test is wrong.
 3. Iterate on the test until all journeys pass.
 4. Once all journeys pass, remove the `sap.ui.testrecorder` library from the app and the pause-on-failure rule `sap.ui.test.qunitPause.pauseRule`.
