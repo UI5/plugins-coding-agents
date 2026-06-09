@@ -50,19 +50,16 @@ The `sap.ui.testrecorder` library provides the module `sap.ui.testrecorder.Contr
 ## Example Usage
 
 ```javascript
-sap.ui.require(["sap/ui/testrecorder/ControlTree"], function(ControlTree) {
+sap.ui.require(["sap/ui/testrecorder/ControlTree"], async function (ControlTree) {
     // Navigate to the state where the anchor bar is visible, then:
-    ControlTree.search("anchorBar").then(function(tree) {
-        // Parse: Button nodeId="1_8" text="Methods"
-        return ControlTree.press("1_8");
-    }).then(function(actionSnippet) {
-        // actionSnippet is the OPA5 snippet — save it; UI has now navigated
-        return ControlTree.search("selectedSection");
-    }).then(function(tree) {
-        // Parse: ObjectPageLayout nodeId="2_3"
-        return ControlTree.getControlData("2_3");
-    }).then(function(result) {
-        // result.selectorSnippet + result.associations → build assertion
-    });
+    const tree = await ControlTree.search("anchorBar");
+    // Inspect tree (markdown snapshot) and pick nodeId, e.g. Button nodeId="1_8" text="Methods"
+    const actionSnippet = await ControlTree.press("1_8");
+    // actionSnippet is the OPA5 snippet — save it; UI has now navigated
+
+    const treeAfterPress = await ControlTree.search("selectedSection");
+    // Inspect treeAfterPress and pick nodeId, e.g. ObjectPageLayout nodeId="2_3"
+    const result = await ControlTree.getControlData("2_3");
+    // result.selectorSnippet + result.associations → build assertion
 });
 ```
