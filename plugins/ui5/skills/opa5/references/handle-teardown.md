@@ -1,4 +1,4 @@
-# Teardown the app
+# Teardown the App
 
 QUnit requires assertions to validate tests. Teardown methods are NOT assertions.
 

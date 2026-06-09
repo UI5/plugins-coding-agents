@@ -4,7 +4,7 @@ The `sap.ui.testrecorder` library provides the module `sap.ui.testrecorder.Contr
 - inspect the live control tree in the browser
 - retrieve reliable OPA5 snippets for interacting with any part of the control tree
 
-## Prerequisites to use `sap.ui.testrecorder.ControlTree`
+## Prerequisites to Use `sap.ui.testrecorder.ControlTree`
 
 - **UI5 version ≥ 1.147**
 - Tool to load the OPA5 test in the browser and evaluate javascript in the browser window (e.g. MCP Playwright)

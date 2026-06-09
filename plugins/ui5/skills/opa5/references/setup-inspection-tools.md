@@ -1,14 +1,14 @@
-# Set up browser inspection tools
+# Set Up Browser Inspection Tools
 
 **Prerequisites:** A tool to load the OPA5 test in the browser and evaluate javascript in the browser window (e.g. MCP Playwright)
 
-## 1. Set up TestRecorder tooling (UI5 version ≥ 1.147 only)
+## 1. Set Up TestRecorder Tooling (UI5 version ≥ 1.147 only)
 **Purpose:**
 - Diagnose issues by inspecting the live control tree in the browser, including private/internal controls the test needs to find;
 - Collect reliable OPA5 snippets for non-trivial actions and assertions.
 **Setup:** Follow `enable-testrecorder-tooling.md` for detailed instructions.
 
-## 2. Enable pause-on-failure mode (all UI5 versions)
+## 2. Enable Pause-on-Failure Mode (all UI5 versions)
 **Purpose:** When enabled, execution pauses on the first test failure and the app remains live in the browser exactly as it was at the point of failure — no teardown, no reload happens automatically. The paused state persists until you explicitly navigate away, so you can inspect the actual UI directly (without reloading) in the browser to see why it differs from what the test expected.
 **Setup:** Add the following line to your test entry point (right before `Opa5.extendConfig`):
 ```javascript
