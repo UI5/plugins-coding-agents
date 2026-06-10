@@ -52,14 +52,13 @@ The `sap.ui.testrecorder` library provides the module `sap.ui.testrecorder.Contr
 ```javascript
 sap.ui.require(["sap/ui/testrecorder/ControlTree"], async function (ControlTree) {
     // Navigate to the state where the anchor bar is visible, then:
-    const tree = await ControlTree.search("anchorBar");
-    // Inspect tree (markdown snapshot) and pick nodeId, e.g. Button nodeId="1_8" text="Methods"
-    const actionSnippet = await ControlTree.press("1_8");
-    // actionSnippet is the OPA5 snippet — save it; UI has now navigated
+    await ControlTree.search("anchorBar"); // When resolved, inspect the returned markdown snapshot and pick nodeId, e.g. Button nodeId="1_8" text="Methods"
 
-    const treeAfterPress = await ControlTree.search("selectedSection");
-    // Inspect treeAfterPress and pick nodeId, e.g. ObjectPageLayout nodeId="2_3"
-    const result = await ControlTree.getControlData("2_3");
-    // result.selectorSnippet + result.associations → build assertion
+    // Use the picked nodeId to interact with the corresponding control
+    await ControlTree.press("1_8"); // When resolved, save the returned OPA5 snippet; UI has now navigated
+
+    await ControlTree.search("selectedSection"); // When resolved, parse returned snapshot and pick nodeId, e.g. ObjectPageLayout nodeId="2_3"
+
+    await ControlTree.getControlData("2_3"); // When resolved, save result.selectorSnippet + result.associations → build assertion
 });
 ```
