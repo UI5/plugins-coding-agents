@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.4](https://github.com/UI5/plugins-coding-agents/compare/v0.1.3...v0.1.4) (2026-06-10)
+
+
+### Features
+
+* **ui5:** Add OPA5 guidelines as Skills ([#64](https://github.com/UI5/plugins-coding-agents/issues/64)) ([1ddbcd2](https://github.com/UI5/plugins-coding-agents/commit/1ddbcd2c4d9012d8bb1c69cc4597d47d4ecea444))
+
 ## [0.1.3](https://github.com/UI5/plugins-coding-agents/compare/v0.1.2...v0.1.3) (2026-06-03)
 
 
