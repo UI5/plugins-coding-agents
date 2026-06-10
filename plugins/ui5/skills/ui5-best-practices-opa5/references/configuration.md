@@ -15,7 +15,7 @@ test/integration/
 2. **ALWAYS** enable `autoWait` and define `viewNamespace` globally in `opaTests.qunit.js`.
 ```javascript
 // opaTests.qunit.js
-sap.ui.define(["sap/ui/test/Opa5"], function (Opa5) {
+sap.ui.define(["sap/ui/test/Opa5"], (Opa5) => {
 	"use strict";
     Opa5.extendConfig({
 		autoWait: true,
