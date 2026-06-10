@@ -50,7 +50,7 @@ The `sap.ui.testrecorder` library provides the module `sap.ui.testrecorder.Contr
 ## Example Usage
 
 ```javascript
-sap.ui.require(["sap/ui/testrecorder/ControlTree"], async function (ControlTree) {
+sap.ui.require(["sap/ui/testrecorder/ControlTree"], async (ControlTree) => {
     // Navigate to the state where the anchor bar is visible, then:
     await ControlTree.search("anchorBar"); // When resolved, inspect the returned markdown snapshot and pick nodeId, e.g. Button nodeId="1_8" text="Methods"
 
