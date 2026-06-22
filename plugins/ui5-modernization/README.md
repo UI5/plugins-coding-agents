@@ -4,7 +4,7 @@ A comprehensive plugin providing a complete toolkit for modernizing SAPUI5/OpenU
 
 ## Overview
 
-Modern UI5 removes all deprecated APIs and global namespace access that were present in older versions. This plugin provides:
+Modern UI5 removes all deprecated APIs and instances of global namespace access that were present in older versions. This plugin provides:
 
 - **Autonomous modernization workflow** with end-to-end orchestration in five phases
 - **Specialized fix skills** for every linter rule category
@@ -27,9 +27,9 @@ claude plugin install ui5-modernization@claude-plugins-official
 
 ## How It Works
 
-The goal is to make your app compatible with **modern UI5** — targeting manifest version 2.0.0 with a minimum framework version of 1.136.0. Modern UI5 removes all deprecated APIs and enforces strict module imports, meaning apps that rely on globals or legacy patterns will break at runtime.
+The goal is to make your app compatible with **modern UI5** — targeting Manifest version 2.0.0 with a minimum UI5 framework version of 1.136.0. Modern UI5 removes all deprecated APIs and enforces strict module imports, meaning apps that rely on globals or legacy patterns will break at runtime.
 
-This plugin is built around the [UI5 Linter](https://github.com/SAP/ui5-linter) (`@ui5/linter`) — a static analysis tool that detects deprecated APIs, global namespace access, and other incompatibilities. The linter serves two roles in the modernization workflow:
+This plugin is built around [UI5 linter](https://github.com/SAP/ui5-linter) (`@ui5/linter`) — a static analysis tool that detects deprecated APIs, global namespace access, and other incompatibilities. The linter serves two roles in the modernization workflow:
 
 1. **Detection** — Each skill reads linter output to identify what needs fixing. The linter's rule IDs (e.g., `no-deprecated-api`, `no-globals`) map directly to specific fix skills.
 2. **Verification** — After applying fixes, the linter is re-run to confirm errors are resolved. Zero remaining errors = phase complete.
@@ -38,7 +38,7 @@ A few issues cannot be detected by the linter (runtime-only patterns, cyclic dep
 
 ## Quick Start
 
-### 1. Start with the Modernization Workflow
+### 1. Start With the Modernization Workflow
 
 The main entry point is the orchestrator which runs all five phases:
 
@@ -48,9 +48,9 @@ The main entry point is the orchestrator which runs all five phases:
 
 This will:
 1. Ask which verification mode you want (full autonomous / half autonomous / manual)
-2. Run Phase 1: UI5 Linter autofix + test starter restructure
+2. Run Phase 1: UI5 linter autofix + test starter restructure
 3. Run Phase 2: manifest.json + Component.js foundation
-4. Run Phase 3: module system (globals, pseudo-modules, cyclic deps, blind spots)
+4. Run Phase 3: module system (globals, pseudo modules, cyclic dependencies, blind spots)
 5. Run Phase 4: deprecated API replacements
 6. Run Phase 5: CSP compliance
 7. Generate `MODERNIZATION-REPORT.md` and `MODERNIZATION-ISSUES.md`
@@ -140,7 +140,7 @@ git reset --hard HEAD~3  # undo the last 3 phases
 - **`/fix-library-init`** - Fix Library.init() apiVersion issues and modernize library initialization
 - **`/fix-control-renderer`** - Fix Control renderer issues: missing renderer declaration, string-based renderer, implicit auto-discovery, `apiVersion:2` configuration
 - **`/fix-deprecated-controls`** - Fix deprecated controls, classes, interfaces, and types with modern replacements (e.g., `sap.m.MessagePage` to `IllustratedMessage`)
-- **`/fix-fiori-elements-extensions`** - Handle Fiori Elements V2 controller extensions during modernization (manifest-based `sap.ui.controllerExtensions`)
+- **`/fix-fiori-elements-extensions`** - Handle Fiori elements V2 controller extensions during modernization (manifest-based `sap.ui.controllerExtensions`)
 - **`/fix-partially-deprecated-apis`** - Fix partially deprecated API usage: `Parameters.get`, `JSONModel.loadData`, `Mobile.init`, `ODataModel.v2.createEntry`, `View.create`, `Fragment.load`, `Router` constructor
 - **`/fix-table-row-mode`** - Modernize deprecated Table row properties (`visibleRowCountMode`, `visibleRowCount`, `rowHeight`, etc.) to structured `rowMode` aggregation
 - **`/fix-xml-native-html`** - Fix native HTML and SVG usage in XML views/fragments: replace `html:div`, `html:span`, `html:a` with UI5 controls
@@ -179,7 +179,7 @@ This plugin leverages the [Chrome DevTools MCP](https://www.npmjs.com/package/ch
 - **Automated test execution** — Run QUnit and OPA5 tests in a real browser during full/half autonomous verification modes
 - **Page inspection** — Take accessibility snapshots, capture screenshots, and read console output to verify UI5 app behavior after modernization
 
-The Chrome DevTools MCP is optional — it is only used when running in full or half autonomous verification mode. Manual mode does not require it.
+The Chrome DevTools MCP is optional — it is only used when running in full or half autonomous verification mode. The manual mode does not require it.
 
 ## Troubleshooting
 
