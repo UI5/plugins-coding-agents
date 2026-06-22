@@ -1,0 +1,5 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core">
+    <Dialog core:require="{TableMgr: 'uses_this_member'}">
+        <Text text="{path: 'name', formatter: 'TableMgr.formatTagsText.bind($control)'}" />
+    </Dialog>
+</core:FragmentDefinition>
