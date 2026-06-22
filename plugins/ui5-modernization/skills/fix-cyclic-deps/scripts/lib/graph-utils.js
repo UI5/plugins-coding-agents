@@ -150,7 +150,7 @@ function fallbackAnalysis(filePath, namespace) {
 	const raw = fs.readFileSync(filePath, "utf-8");
 	const stripped = stripComments(raw);
 
-	const nsEscaped = namespace.replace(/\//g, "\\/");
+	const nsEscaped = namespace.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 	const internalRefRe = new RegExp(`["']((?:test-resources\\/)?${nsEscaped}\\/[^"']+)["']`, "g");
 	const allRefs = [];
 	let m;
