@@ -509,7 +509,7 @@ function handlePatternB(html, testBaseDir, namespace) {
             entry.autoWait = autoWaitMatch[1] === "true";
         }
 
-        const nsEscaped = namespace.replace(/\//g, "\\/");
+        const nsEscaped = namespace.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
         const journeyRegex = new RegExp(
             `sap\\.ui\\.require\\(\\s*\\[([^\\]]*${nsEscaped}\\/test\\/opa\\/view\\/[^\\]]+)\\]`,
             "s"
