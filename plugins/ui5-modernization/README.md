@@ -167,10 +167,19 @@ The orchestrator asks once at the start which verification mode to use at every 
 
 Before using this plugin, ensure you have:
 
-1. **Node.js 18+**
+1. **Node.js Version v20.11.0, v22.0.0, or higher**
 2. **UI5 application** with `ui5.yaml` in project root (required for linter)
 3. **Git repository** with clean working directory
 4. **Chrome DevTools MCP** (optional) — only needed for automated test verification in full/half autonomous modes
+
+## Chrome DevTools MCP Integration
+
+This plugin leverages the [Chrome DevTools MCP](https://www.npmjs.com/package/chrome-devtools-mcp) server for browser-based test verification and debugging. The MCP server is configured in `.mcp.json` and provides:
+
+- **Automated test execution** — Run QUnit and OPA5 tests in a real browser during full/half autonomous verification modes
+- **Page inspection** — Take accessibility snapshots, capture screenshots, and read console output to verify UI5 app behavior after modernization
+
+The Chrome DevTools MCP is optional — it is only used when running in full or half autonomous verification mode. Manual mode does not require it.
 
 ## Troubleshooting
 
@@ -188,7 +197,3 @@ npx @ui5/linter --details path/to/file.js
 - [Deprecated Core API](https://ui5.sap.com/#/topic/798dd9abcae24c8194922615191ab3f5)
 - [UI5 MCP Server](https://github.com/UI5/mcp-server) — query deprecated APIs, find modern replacements, get code examples
 - [Commit history](https://github.com/UI5/plugins-coding-agents/commits/main) — changelog
-
-## License
-
-Apache-2.0
