@@ -1,0 +1,5 @@
+{
+    "entry": ["plugins/**/scripts/**/*.js"],
+    "ignoreBinaries": ["commitlint", "husky", "knip", "licensee", "prettier"],
+    "ignoreDependencies": ["@commitlint/cli", "husky", "licensee", "prettier"]
+}
