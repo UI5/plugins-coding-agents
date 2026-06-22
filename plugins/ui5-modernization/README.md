@@ -62,6 +62,13 @@ Each phase creates a git commit and runs the verification gate per your chosen m
 When you encounter specific error patterns, use the targeted skills directly:
 
 ```
+# Test infrastructure (Phase 1)
+/modernize-test-starter           # Test Starter modernization
+
+# Foundation (Phase 2)
+/fix-component-async              # Component.js async issues
+/fix-manifest-json                # manifest.json issues
+
 # Module system issues (Phase 3)
 /fix-js-globals                   # no-globals errors in JS files
 /fix-xml-globals                  # no-globals errors in XML views/fragments
@@ -79,15 +86,8 @@ When you encounter specific error patterns, use the targeted skills directly:
 /fix-table-row-mode               # Deprecated Table row properties
 /fix-xml-native-html              # Native HTML/SVG in XML views
 
-# Foundation (Phase 2)
-/fix-component-async              # Component.js async issues
-/fix-manifest-json                # manifest.json issues
-
 # CSP compliance (Phase 5)
 /fix-csp-compliance               # Unsafe inline scripts
-
-# Test infrastructure (Phase 1)
-/modernize-test-starter           # Test Starter modernization
 
 # FLP sandbox
 /modernize-flp-sandbox            # FLP Sandbox 2.0 modernization
@@ -169,29 +169,8 @@ Before using this plugin, ensure you have:
 
 1. **Node.js 18+**
 2. **UI5 application** with `ui5.yaml` in project root (required for linter)
-3. **UI5 linter installed**: `npm install --save-dev @ui5/linter`
-4. **Git repository** with clean working directory
-5. **Chrome DevTools MCP** (optional) — only needed for automated test verification in full/half autonomous modes
-
-## Success Criteria
-
-For your app to work with modern UI5, you must fix **all linter errors (severity 2)**:
-
-```bash
-npx @ui5/linter
-```
-
-Zero errors = ready for modern UI5. Warnings (severity 1) are non-blocking.
-
-For machine-readable output (CI pipelines):
-
-```bash
-# Count all critical errors (must be 0)
-npx @ui5/linter --format json 2>&1 | jq '[.[] | .messages[]? | select(.severity == 2)] | length'
-
-# Group by rule
-npx @ui5/linter --format json 2>&1 | jq '[.[] | .messages[]? | select(.severity == 2)] | group_by(.ruleId) | map({rule: .[0].ruleId, count: length})'
-```
+3. **Git repository** with clean working directory
+4. **Chrome DevTools MCP** (optional) — only needed for automated test verification in full/half autonomous modes
 
 ## Troubleshooting
 
