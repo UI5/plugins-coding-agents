@@ -7,7 +7,7 @@ A comprehensive plugin providing a complete toolkit for modernizing SAPUI5/OpenU
 This plugin provides:
 
 - **Autonomous modernization workflow** with end-to-end orchestration in five phases
-- **Specialized fix skills** for every linter rule category
+- **Specialized fix skills** for every UI5 linter rule category
 - **Verification gates** at every phase boundary (full autonomous, half autonomous, or manual)
 - **Validation** at every step via UI5 linter integration
 
@@ -27,7 +27,7 @@ claude plugin install ui5-modernization@claude-plugins-official
 
 ## How It Works
 
-The goal is to modernize your UI5 app — targeting manifest version 2.0.0 with a minimum framework version of 1.136.0. This means replacing deprecated APIs with their modern equivalents and enforcing strict module imports, eliminating reliance on globals and legacy patterns.
+The goal is to modernize your OpenUI5/SAPUI5 app — targeting manifest version 2.0.0 with a minimum framework version of 1.136.0. This means replacing deprecated APIs with their modern equivalents and enforcing strict module imports, eliminating reliance on globals and legacy patterns.
 
 This plugin is built around the [UI5 linter](https://github.com/UI5/linter) (`@ui5/linter`) — a static analysis tool that detects deprecated APIs, global namespace access, and other incompatibilities. The linter serves two roles in the modernization workflow:
 
@@ -90,7 +90,7 @@ When you encounter specific error patterns, use the targeted skills directly:
 /fix-csp-compliance               # Unsafe inline scripts
 
 # FLP sandbox
-/modernize-flp-sandbox            # FLP Sandbox 2.0 modernization
+/modernize-flp-sandbox            # Dedicated FLP Sandbox modernization skill
 ```
 
 ## What Gets Changed
@@ -123,7 +123,7 @@ git reset --hard HEAD~3  # undo the last 3 phases
 
 ### Phase 2: Foundation
 
-- **`/fix-manifest-json`** - Fix manifest.json issues: outdated manifest version, legacy UI5 version, deprecated libraries/components, deprecated view/model types, removed properties
+- **`/fix-manifest-json`** - Fix manifest.json issues: outdated manifest version, legacy OpenUI5/SAPUI5 version, deprecated libraries/components, deprecated view/model types, removed properties
 - **`/fix-component-async`** - Fix Component.js async configuration: `IAsyncContentCreation` interface, manifest declaration, redundant async flags
 
 ### Phase 3: Module System & Globals
@@ -149,9 +149,11 @@ git reset --hard HEAD~3  # undo the last 3 phases
 
 - **`/fix-csp-compliance`** - Fix Content Security Policy compliance: extract unsafe inline scripts to external files
 
-### FLP Sandbox Modernization
+### Other Skills
 
-- **`/modernize-flp-sandbox`** - Modernize legacy FLP sandbox HTML files to FLP Sandbox 2.0 format: converts inline `window["sap-ushell-config"]` to declarative JSON
+#### FLP Sandbox Modernization
+
+- **`/modernize-flp-sandbox`** - Modernize legacy FLP sandbox HTML files to new FLP Sandbox format: converts inline `window["sap-ushell-config"]` to declarative JSON. Requires framework version >= 1.147. This is a dedicated skill not part of the `/modernize-ui5-app` workflow and needs to be triggered separately.
 
 ## Verification Modes
 
@@ -168,7 +170,7 @@ The orchestrator asks once at the start which verification mode to use at every 
 Before using this plugin, ensure you have:
 
 1. **Node.js Version v20.11.0, v22.0.0, or higher**
-2. **UI5 application** with `ui5.yaml` in project root (required for linter)
+2. **OpenUI5/SAPUI5 application** with `ui5.yaml` in project root (required for linter)
 3. **Git repository** with clean working directory
 4. **Chrome DevTools MCP** (optional) — only needed for automated test verification in full/half autonomous modes
 
@@ -177,7 +179,7 @@ Before using this plugin, ensure you have:
 This plugin leverages the [Chrome DevTools MCP](https://www.npmjs.com/package/chrome-devtools-mcp) server for browser-based test verification and debugging. The MCP server is configured in `.mcp.json` and provides:
 
 - **Automated test execution** — Run QUnit and OPA5 tests in a real browser during full/half autonomous verification modes
-- **Page inspection** — Take accessibility snapshots, capture screenshots, and read console output to verify UI5 app behavior after modernization
+- **Page inspection** — Take accessibility snapshots, capture screenshots, and read console output to verify OpenUI5/SAPUI5 app behavior after modernization
 
 The Chrome DevTools MCP is optional — it is only used when running in full or half autonomous verification mode. The manual mode does not require it.
 
@@ -193,7 +195,7 @@ npx @ui5/linter --details path/to/file.js
 
 ## Resources
 
-- [UI5 Modernization Guide](https://ui5.sap.com/#/topic/db492368adbe490fa5d4ec7ebd98b187)
-- [Deprecated Core API](https://ui5.sap.com/#/topic/798dd9abcae24c8194922615191ab3f5)
+- [Modernization Guide](https://sdk.openui5.org/#/topic/db492368adbe490fa5d4ec7ebd98b187?q=modern)
+- [Deprecated Core API](https://sdk.openui5.org/#/topic/798dd9abcae24c8194922615191ab3f5?q=Deprecated)
 - [UI5 MCP Server](https://github.com/UI5/mcp-server) — query deprecated APIs, find modern replacements, get code examples
 - [Commit history](https://github.com/UI5/plugins-coding-agents/commits/main) — changelog
