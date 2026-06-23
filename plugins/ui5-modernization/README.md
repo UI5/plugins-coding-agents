@@ -195,7 +195,9 @@ npx @ui5/linter --details path/to/file.js
 
 ## Resources
 
-- [Modernization Guide](https://sdk.openui5.org/#/topic/db492368adbe490fa5d4ec7ebd98b187?q=modern)
-- [Deprecated Core API](https://sdk.openui5.org/#/topic/798dd9abcae24c8194922615191ab3f5?q=Deprecated)
+- [Modernization Guide for OpenUI5](https://sdk.openui5.org/#/topic/db492368adbe490fa5d4ec7ebd98b187?q=modern)
+- [Modernization Guide for SAPUI5](https://ui5.sap.com/#/topic/db492368adbe490fa5d4ec7ebd98b187)
+- [Deprecated Core API for OpenUI5](https://sdk.openui5.org/#/topic/798dd9abcae24c8194922615191ab3f5?q=Deprecated)
+- [Deprecated Core API for SAPUI5](https://ui5.sap.com/#/topic/798dd9abcae24c8194922615191ab3f5?q=Deprecated%20Core)
 - [UI5 MCP Server](https://github.com/UI5/mcp-server) — query deprecated APIs, find modern replacements, get code examples
 - [Commit history](https://github.com/UI5/plugins-coding-agents/commits/main) — changelog
