@@ -25,6 +25,7 @@
 
 ## Plugin Overview
 - [UI5](./plugins/ui5/README.md)
+- [UI5 Modernization](./plugins/ui5-modernization/README.md)
 - [UI5 TypeScript Conversion](./plugins/ui5-typescript-conversion/README.md)
 
 ## Further Information
