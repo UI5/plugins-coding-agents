@@ -4,7 +4,7 @@ A comprehensive plugin providing a complete toolkit for modernizing SAPUI5/OpenU
 
 ## Overview
 
-Modern UI5 removes all deprecated APIs and instances of global namespace access that were present in older versions. This plugin provides:
+This plugin provides:
 
 - **Autonomous modernization workflow** with end-to-end orchestration in five phases
 - **Specialized fix skills** for every linter rule category
@@ -27,9 +27,9 @@ claude plugin install ui5-modernization@claude-plugins-official
 
 ## How It Works
 
-The goal is to make your app compatible with **modern UI5** — targeting Manifest version 2.0.0 with a minimum UI5 framework version of 1.136.0. Modern UI5 removes all deprecated APIs and enforces strict module imports, meaning apps that rely on globals or legacy patterns will break at runtime.
+The goal is to modernize your UI5 app — targeting manifest version 2.0.0 with a minimum framework version of 1.136.0. This means replacing deprecated APIs with their modern equivalents and enforcing strict module imports, eliminating reliance on globals and legacy patterns.
 
-This plugin is built around the [UI5 Linter](https://github.com/UI5/linter) (`@ui5/linter`) — a static analysis tool that detects deprecated APIs, global namespace access, and other incompatibilities. The linter serves two roles in the modernization workflow:
+This plugin is built around the [UI5 linter](https://github.com/UI5/linter) (`@ui5/linter`) — a static analysis tool that detects deprecated APIs, global namespace access, and other incompatibilities. The linter serves two roles in the modernization workflow:
 
 1. **Detection** — Each skill reads linter output to identify what needs fixing. The linter's rule IDs (e.g., `no-deprecated-api`, `no-globals`) map directly to specific fix skills.
 2. **Verification** — After applying fixes, the linter is re-run to confirm errors are resolved. Zero remaining errors = phase complete.
