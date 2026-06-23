@@ -53,7 +53,7 @@ URLs after the server is up:
 - Test bootstrap: `http://localhost:8090/<artifactId>/test-resources/testFLPService.html`
 - Test Starter: `http://localhost:8090/<artifactId>/test-resources/<namespace-path>/Test.qunit.html?testsuite=test-resources/<namespace-path>/testsuite.qunit&test=<entry-key>`
 
-Replace `<artifactId>` with the value from `pom.xml` (e.g., `ui.cloudfnd.analyticsdesigntool.s1`) and `<namespace-path>` with the slash-separated app namespace (e.g., `ui/cloudfnd/analyticsdesigntool/s1`).
+Replace `<artifactId>` with the value from `pom.xml` (e.g., `my.sample.app`) and `<namespace-path>` with the slash-separated app namespace (e.g., `my/sample/app`).
 
 ### §1.2 Failure: `test-resources/` 404s OR `ClassNotFoundException` at boot
 
