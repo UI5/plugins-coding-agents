@@ -3,21 +3,19 @@ name: fix-js-globals
 description: |
   Fix JavaScript `no-globals` errors that UI5 linter reports but cannot auto-fix. Use this skill when linter outputs:
   - `no-globals` rule with message "Access of global variable '...' (...)" in JS files
-  Cases that require this skill (linter CANNOT auto-fix):
+  Cases handled (linter CANNOT auto-fix):
   - Assignments to global namespaces: `sap.myNamespace = {...}`
-  - Global namespace assignment inside sap.ui.define: `my.app.utils.Module = {...}; return my.app.utils.Module;` — replace with local variable
-  - Global namespace read-only reference inside sap.ui.define: `var x = com.example.app.utils.Helper` — replace with proper dependency import
+  - Global namespace assignment/read inside sap.ui.define
   - Delete expressions: `delete sap.something`
-  - sap.ui.core.Core direct access (class vs singleton difference)
-  - jQuery/$ global calls: add `sap/ui/thirdparty/jquery` dependency, replace `$` with dependency variable — do NOT replace jQuery API calls (including static methods like jQuery.each, jQuery.extend, jQuery.proxy)
-  - jQuery.sap.* deprecated utilities (jQuery.sap.log, jQuery.sap.uid, etc.): replace with dedicated replacement modules
-  - Conditional/probing global access: `if (sap.ui.something)`
+  - sap.ui.core.Core direct access (class vs singleton)
+  - jQuery/$ globals: add `sap/ui/thirdparty/jquery` — do NOT replace jQuery API calls
+  - jQuery.sap.* utilities: replace with dedicated modules
+  - Conditional/probing access: `if (sap.ui.something)`
   - Custom namespace definitions that aren't UI5 modules
-  - Global access in binding type strings without imports
-  - sap.ui.controller() factory: define controllers via deprecated global (two-argument form → Controller.extend). Covers legacy files with or without sap.ui.define. Does NOT handle Fiori Elements extensions (use fix-fiori-elements-extensions when manifest has sap.ui.controllerExtensions)
-  - jQuery.sap.declare/require: legacy module definitions without sap.ui.define wrapper
-  Trigger when user mentions: "fix no-globals", "global variable error", "sap.ui.getCore", "window.sap", "jQuery.sap", "global namespace"
-  Automatically converts global namespace access to proper sap.ui.define module imports.
+  - sap.ui.controller() factory → Controller.extend (NOT Fiori Elements extensions)
+  - jQuery.sap.declare/require: legacy modules without sap.ui.define
+  Trigger when: "fix no-globals", "global variable error", "sap.ui.getCore", "jQuery.sap"
+  Converts global namespace access to proper sap.ui.define module imports.
 ---
 
 # Fix JavaScript Global Access (no-globals)

@@ -453,8 +453,7 @@ default (report only).
 ### 6i. QUnit 1.x → 2.x patterns in OPA test code (handoff)
 
 **Layer:** advisory. The actual rewrite lives in the
-`modernize-flp-sandbox-qunit` sub-skill (under
-[`skills/modernize-flp-sandbox-qunit/`](skills/modernize-flp-sandbox-qunit/SKILL.md)).
+`modernize-flp-sandbox-qunit` sub-skill.
 The main skill detects, reports, and offers to invoke the sub-skill
 on consumer request.
 

@@ -2,11 +2,11 @@
 name: fix-control-renderer
 description: |
   Fix Control renderer issues that UI5 linter reports but cannot auto-fix. Use this skill when linter outputs these rules:
-  - `no-deprecated-control-renderer-declaration` - For missing renderer declaration, string-based renderer declaration, implicit renderer auto-discovery (UI5 1.x loads `<Control>Renderer` automatically — removed in modern UI5)
-  - `no-deprecated-api` - For missing apiVersion:2 in control renderer objects, missing IconPool import when using oRm.icon(), deprecated rerender() override. NOTE: For Library.init() apiVersion errors, use fix-library-init instead.
+  - `no-deprecated-control-renderer-declaration` - For missing renderer declaration, string-based renderer declaration, implicit renderer auto-discovery (removed in modern UI5)
+  - `no-deprecated-api` - For missing apiVersion:2 in renderer objects, missing IconPool import when using oRm.icon(), deprecated rerender() override. NOTE: For Library.init() apiVersion errors, use fix-library-init instead.
   - `ui5-class-declaration` - For non-static renderer property in ES6 classes
-  Trigger on error messages about: "missing a renderer declaration", "Deprecated declaration of renderer", "deprecated renderer", "deprecated renderer detected", "apiVersion" (in renderer context, NOT "Deprecated call to ... Lib.init"), "IconPool", "rerender", "renderer must be a static property"
-  Automatically converts legacy renderer patterns to modern apiVersion: 2 format with proper module imports. Handles implicit renderer auto-discovery where UI5 1.x automatically loaded a renderer from the default path (e.g., sap/m/ButtonRenderer for sap/m/Button) — in modern UI5 this must be explicit.
+  Trigger on: "missing a renderer declaration", "Deprecated declaration of renderer", "deprecated renderer", "apiVersion" (in renderer context), "IconPool", "rerender", "renderer must be a static property"
+  Converts legacy renderer patterns to modern apiVersion: 2 format with proper module imports.
 ---
 
 # Fix Control Renderer Issues
