@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.1.5](https://github.com/UI5/plugins-coding-agents/compare/v0.1.4...v0.1.5) (2026-06-24)
+
+
+### Features
+
+* **ui5-modernization:** Add UI5 modernization plugin ([#77](https://github.com/UI5/plugins-coding-agents/issues/77)) ([5d07411](https://github.com/UI5/plugins-coding-agents/commit/5d074117383dc2735a14c8163768fb5aa60f66e4))
+* **ui5:** Add table best practices skill ([#78](https://github.com/UI5/plugins-coding-agents/issues/78)) ([52ac3b5](https://github.com/UI5/plugins-coding-agents/commit/52ac3b5c8a1053b02dd7d46615b8d552c3a4d712))
+
 ## [0.1.4](https://github.com/UI5/plugins-coding-agents/compare/v0.1.3...v0.1.4) (2026-06-10)
 
 
