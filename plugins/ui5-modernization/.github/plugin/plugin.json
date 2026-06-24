@@ -1,0 +1,22 @@
+{
+    "name": "ui5-modernization",
+    "version": "0.1.4",
+    "description": "Complete UI5 modernization toolkit with workflow and specialized fix patterns for modernizing SAPUI5/OpenUI5 applications",
+    "author": {
+        "name": "SAP SE"
+    },
+    "homepage": "https://github.com/UI5/plugins-coding-agents",
+    "repository": "https://github.com/UI5/plugins-coding-agents",
+    "keywords": [
+        "ui5",
+        "sapui5",
+        "openui5",
+        "modernization",
+        "linter",
+        "upgrade"
+    ],
+    "license": "Apache-2.0",
+    "skills": [
+        "./skills/"
+    ]
+}

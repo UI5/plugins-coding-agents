@@ -1,0 +1,14 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core">
+    <Dialog core:require="{
+        TableMgr: 'uses_this_member',
+        Fmt: 'no_this'
+    }">
+        <Text text="{
+            parts: [
+                {path: 'a'},
+                {path: 'b'}
+            ],
+            formatter: 'TableMgr.formatTagsText'
+        }" />
+    </Dialog>
+</core:FragmentDefinition>

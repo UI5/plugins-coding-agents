@@ -1,0 +1,5 @@
+<core:FragmentDefinition xmlns="sap.m" xmlns:core="sap.ui.core">
+    <Dialog core:require="{Fmt: 'no_this'}">
+        <Text text="{path: 'd', formatter: 'Fmt.formatDate'}" />
+    </Dialog>
+</core:FragmentDefinition>
