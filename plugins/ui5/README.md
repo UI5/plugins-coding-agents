@@ -51,6 +51,19 @@ Guidelines and debugging workflow for OPA5 integration tests:
 - **Page object organization** - Placement of actions and assertions across views
 - **App teardown** - Cleanup patterns in OPA5 journey tests
 
+#### ui5-best-practices-tables
+
+Authoritative development guidelines for all UI5 table controls (SAPUI5 1.136+ LTS):
+
+- **Control selection matrix** - When to use `sap.m.Table`, `sap.ui.table.Table`, `TreeTable`, `SmartTable`, or `sap.ui.mdc.Table`
+- **Core rules and prohibitions** - Mandatory patterns and common mistakes to avoid
+- **Common errors** - Symptom/cause/fix table for the most frequent table bugs
+- **Container structures** - Valid and invalid layout containers for tables
+- **Per-control API guidance** - Binding syntax, key properties, minimal examples, and events for each table type
+- **Drag & drop** - Correct `DragDropInfo` and `DragInfo`/`DropInfo` configuration
+- **Personalization** - `sap.m.p13n.Engine` integration
+- **Cell templates & alignment** - Type-based alignment and model type namespace rules
+
 ---
 
 ## Installation
