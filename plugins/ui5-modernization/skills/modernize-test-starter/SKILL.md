@@ -8,13 +8,12 @@ description: |
   - Test JS files use Core.ready(), Core.attachInit(), or jsUnitTestSuite instead of sap.ui.define
   - OPA test HTML files exist with per-test Opa5.extendConfig and manual bootstrapping
   - An AllJourneys.js orchestrator loads OPA journeys dynamically
-  - OPA journeys call `iStartMyUIComponent` (in-window component launcher) instead of `iStartMyAppInAFrame` — skill migrates to a bare-Component iframe in Phase 5b
+  - OPA journeys call `iStartMyUIComponent` instead of `iStartMyAppInAFrame`
   - User asks to modernize tests, modernize test infrastructure, or adopt Test Starter
-  Handles both unit tests (Core.ready removal, sap.ui.define wrapping) and OPA-specific challenges
-  (page-object side-effect imports, Opa5 config, journey orchestration, QUnit 1.x assert modernization,
+  Handles unit tests (Core.ready removal, sap.ui.define wrapping) and OPA challenges
+  (page-object imports, Opa5 config, journey orchestration, QUnit 1.x assert modernization,
   in-window-to-iframe launcher migration).
-  Trigger on: prefer-test-starter linter warnings, test modernization requests, "test runner" modernization,
-  iStartMyUIComponent in-window OPA launchers.
+  Trigger on: prefer-test-starter warnings, test modernization requests, iStartMyUIComponent.
 ---
 
 # Modernize to Test Starter

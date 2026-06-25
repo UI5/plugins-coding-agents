@@ -8,10 +8,9 @@ description: |
   - User mentions "runtime errors after modernization", "test failures after modernization", "global namespace still used"
   - After running fix-js-globals and fix-cyclic-deps, but tests STILL fail
   - User sees "X is not a constructor" or module loading errors in test output
-  The linter only checks sap.* globals in JS. App-specific namespace patterns in JavaScript (e.g., com.example.app.utils.Module)
-  are invisible to it. This skill detects and fixes those patterns across ALL JS files — app source AND test.
-  NOTE: App-namespace globals in XML files ARE reported by the linter (`no-globals` rule) and are handled by
-  `fix-xml-globals` in Phase 3 — NOT by this skill.
+  The linter only checks sap.* globals in JS. App-specific namespace patterns (e.g., com.example.app.utils.Module)
+  are invisible to it. This skill detects and fixes those across ALL JS files — app source AND test.
+  NOTE: App-namespace globals in XML files are handled by `fix-xml-globals` — NOT by this skill.
 ---
 
 # Fix Linter Blind Spots

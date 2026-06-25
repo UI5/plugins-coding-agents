@@ -2,12 +2,12 @@
 name: fix-xml-globals
 description: |
   Fix XML view/fragment issues that UI5 linter reports but cannot auto-fix. Use this skill when linter outputs these rules:
-  - `no-globals` - For ALL global variable access in XML views — sap.*, jQuery.*, AND app-namespace globals (e.g., com.example.app.utils.Handler.onPress, my.app.formatter.method, sap.ui.model.type.Currency)
+  - `no-globals` - For ALL global variable access in XML views — sap.*, jQuery.*, AND app-namespace globals (e.g., com.example.app.utils.Handler.onPress, my.app.formatter.method)
   - `no-ambiguous-event-handler` - For event handlers without dot prefix or local name
   - `no-deprecated-api` - For legacy template:require syntax (space-separated)
   Trigger on XML view/fragment files with errors about global variables, event handlers, formatters, type references in bindings, factory functions, or template:require.
   Automatically adds core:require declarations, fixes event handler prefixes, and handles .bind($control) for functions that use 'this'.
-  IMPORTANT: The linter reports app-namespace globals in XML under `no-globals` — these MUST be fixed by this skill in Phase 3, NOT deferred to fix-linter-blind-spots (Phase 3, Step 3.2).
+  IMPORTANT: The linter reports app-namespace globals in XML under `no-globals` — these MUST be fixed by this skill, NOT deferred to fix-linter-blind-spots.
   For native HTML or SVG in XML views, use the fix-xml-native-html skill instead.
 ---
 
