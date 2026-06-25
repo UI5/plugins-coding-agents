@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.6](https://github.com/UI5/plugins-coding-agents/compare/v0.1.5...v0.1.6) (2026-06-25)
+
+
+### Bug Fixes
+
+* **ui5-modernization:** Resolve skill spec conformance errors ([#83](https://github.com/UI5/plugins-coding-agents/issues/83)) ([8f78e9a](https://github.com/UI5/plugins-coding-agents/commit/8f78e9a3ffd9a8abf3585f846b61021b7b934f2a))
+
 ## [0.1.5](https://github.com/UI5/plugins-coding-agents/compare/v0.1.4...v0.1.5) (2026-06-24)
 
 
