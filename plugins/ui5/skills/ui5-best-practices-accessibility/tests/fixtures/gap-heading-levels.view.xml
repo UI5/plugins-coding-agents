@@ -1,0 +1,18 @@
+<mvc:View
+    controllerName="my.app.controller.Order"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m">
+    <App>
+        <Page title="Order Overview">
+            <content>
+                <!-- GAP: Title has no level property (defaults to Auto) -->
+                <Title text="Order Details"/>
+                <Text text="Review the order information below."/>
+
+                <!-- GAP: jumps from H1 directly to H3, no H2 -->
+                <Title level="H1" text="Annual Report"/>
+                <Title level="H3" text="Revenue Breakdown"/>
+            </content>
+        </Page>
+    </App>
+</mvc:View>

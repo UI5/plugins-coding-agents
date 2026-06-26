@@ -1,0 +1,33 @@
+<mvc:View
+    controllerName="my.app.controller.Products"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m">
+    <App>
+        <Page title="Products">
+            <content>
+                <!-- GAP: Label not connected to Input via labelFor -->
+                <Label text="Product Name"/>
+                <Input id="productName" placeholder="Enter name..."/>
+
+                <!-- GAP: icon-only Button has no tooltip -->
+                <Button icon="sap-icon://save" press=".onSave"/>
+
+                <!-- GAP: Table has no ariaLabelledBy -->
+                <Table id="productsTable">
+                    <columns>
+                        <Column><Text text="Name"/></Column>
+                        <Column><Text text="Price"/></Column>
+                    </columns>
+                    <items>
+                        <ColumnListItem>
+                            <cells>
+                                <Text text="Notebook Basic 15"/>
+                                <Text text="499 EUR"/>
+                            </cells>
+                        </ColumnListItem>
+                    </items>
+                </Table>
+            </content>
+        </Page>
+    </App>
+</mvc:View>

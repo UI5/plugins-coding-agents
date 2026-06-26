@@ -1,0 +1,33 @@
+<mvc:View
+    controllerName="my.app.controller.ProductDetails"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core">
+    <App>
+        <Page title="Product Details">
+            <content>
+                <!--
+                    GAP 1: FlexBox with direction="RowReverse" — controls are visually
+                    reversed (Price appears left, Name appears right) but DOM order is
+                    Name first, Price second. Screen readers announce Name → Price while
+                    sighted users see Price → Name.
+                -->
+                <FlexBox direction="RowReverse">
+                    <items>
+                        <Text id="productName" text="Notebook Basic 15"/>
+                        <Text id="productPrice" text="€ 1,299.00"/>
+                    </items>
+                </FlexBox>
+
+                <!--
+                    GAP 2: ariaDescribedBy points to "lateNote" which appears AFTER
+                    this Input in the DOM — the description text has not yet been
+                    rendered when the Input is announced by screen readers.
+                -->
+                <Input ariaDescribedBy="lateNote" placeholder="Enter quantity"/>
+                <Text text="Some other content"/>
+                <core:InvisibleText id="lateNote" text="Enter a number between 1 and 99"/>
+            </content>
+        </Page>
+    </App>
+</mvc:View>
