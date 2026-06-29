@@ -1,6 +1,9 @@
 # Skill Test Fixtures
 
-Run `/ui5-best-practices-accessibility` against each fixture and verify the output matches expectations below.
+These fixtures are **not** auto-run — there is no test harness, CI job, or assertion
+framework. They are reference cases for manually validating the skill's behaviour:
+invoke `/ui5-best-practices-accessibility` against each file and verify the output
+matches the expectations below.
 
 ## Positive fixtures — skill MUST report these gaps
 
@@ -22,6 +25,13 @@ Run `/ui5-best-practices-accessibility` against each fixture and verify the outp
 |---|---|
 | `Title "Order Details"` missing `level` property | Heading levels |
 | Heading jump: H1 → H3 with no H2 | Heading levels |
+
+### `gap-keyboard.view.xml`
+| Expected finding | Topic |
+|---|---|
+| `VBox#filterRegion` — distinct logical region without `sap-ui-fastnavgroup` CustomData | Focus & keyboard |
+| `Input` with `tabindex="3"` CustomData — value greater than 0 overrides natural reading order | Focus & keyboard |
+| `Dialog#confirmDialog` — multiple focusable elements and no `initialFocus` | Focus & keyboard |
 
 ### `gap-dialog.controller.js`
 | Expected finding | Topic |
@@ -70,9 +80,3 @@ Run `/ui5-best-practices-accessibility` against each fixture and verify the outp
 
 ### `ok-target-size.view.xml`
 - `ObjectIdentifier` (`titleActive`) and `ObjectStatus` (`active`) both have `reactiveAreaMode="Overlay"` → **correct, do not flag**
-
----
-
-## How to run
-
-Run the `ui5-best-practices-accessibility` skill against each fixture file and verify the output matches the expected findings above.
