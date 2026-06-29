@@ -6,7 +6,7 @@ This reference covers every async decision point: rendering, event waiting, fake
 
 ## 1. Rendering  -  nextUIUpdate() vs Core.applyChanges()
 
-**Default:** use `await nextUIUpdate()`. Make the test function `async`.
+**Default:** use `await nextUIUpdate()`. Make the test function `async`. Import from `sap/ui/test/utils/nextUIUpdate`.
 
 ```js
 // Bad
@@ -20,16 +20,58 @@ await nextUIUpdate();
 assert.notOk(oControl.getDomRef(), "not rendered");
 ```
 
+**With fake timers:** pass the sinon clock instance — `nextUIUpdate` will tick it automatically:
+
+```js
+QUnit.module("with fake timers", {
+    beforeEach: function() {
+        this.clock = sinon.useFakeTimers();
+    },
+    afterEach: function() {
+        this.clock.restore();
+    }
+});
+
+QUnit.test("renders after setVisible", async function(assert) {
+    assert.expect(1);
+    oControl.setVisible(true);
+    await nextUIUpdate(this.clock);  // ticks the clock internally
+    assert.ok(oControl.getDomRef(), "rendered");
+});
+```
+
 **Keep `Core.applyChanges()`  -  do NOT replace  -  in these cases:**
 
-| Situation | Why |
-|---|---|
-| Sinon fake timers active (`sinon.useFakeTimers()`, `sinon.config.useFakeTimers = true`, or sinon's QUnit integration) | `await nextUIUpdate()` queues a microtask that never resolves when the clock is frozen  -  the test hangs indefinitely. |
-| `placeAt()` called in `beforeEach` and assertions run immediately after in the test body | `nextUIUpdate()` only resolves if a render is already pending at the moment of the call. |
-| Shared helper functions (`renderObject`, `waitForUIUpdates`) used by many tests | Keep them synchronous so callers can reason about DOM state without async coordination. |
-| Inside a `load` event callback that must flush a subsequent `invalidate()` synchronously | `Core.applyChanges()` must be called inside the callback. |
+| Situation | Preferred fix | Why `Core.applyChanges()` stays |
+|---|---|---|
+| Sinon fake timers active (`sinon.useFakeTimers()`, `sinon.config.useFakeTimers = true`, or sinon's QUnit integration) | Pass the clock: `await nextUIUpdate(this.clock)` | The clock must be ticked to advance past the `setTimeout(0)` used by async rendering. `nextUIUpdate(clock)` does this automatically and is the standard modern approach (widely used across OpenUI5). Only fall back to `Core.applyChanges()` when the render requires more than a single clock tick and `nextUIUpdate(clock)` cannot handle it. |
+| Shared helper functions (`renderObject`, `waitForUIUpdates`) used by many tests | Consider `nextUIUpdate.runSync()` (test-only escape hatch — see below) | Callers need synchronous DOM state without async coordination. |
+| Inside a `load` event callback that must flush a subsequent `invalidate()` synchronously | — | `Core.applyChanges()` must be called inside the callback. |
 
-Note the reason in the commit message when keeping `Core.applyChanges()` so future reviewers do not flag it.
+**`nextUIUpdate.runSync()`  -  synchronous escape hatch for shared helpers (test code only):**
+
+When a shared helper function must remain synchronous (e.g. `renderObject` called by many tests that cannot all be made async), use `nextUIUpdate.runSync()` instead of `Core.applyChanges()`. It flushes pending renders synchronously and is explicitly intended for test code. It logs a warning each call as a reminder to migrate.
+
+```js
+// In a shared helper - synchronous, test code only
+function renderObject(oControl) {
+    oControl.placeAt("qunit-fixture");
+    nextUIUpdate.runSync();  // test-only; logs a warning to encourage migration
+}
+```
+
+Do not use `nextUIUpdate.runSync()` in production code.
+
+**Important:** `Core.applyChanges()` is not available in legacy-free UI5. When keeping it instead of converting, add an inline comment on each occurrence explaining why it cannot be converted:
+
+```js
+// keep Core.applyChanges() - load event callback, must flush invalidate() synchronously
+Core.applyChanges();
+```
+
+Do not rely solely on the commit message  -  20 different places can have 20 different reasons, and mapping between commit message and code is cumbersome.
+
+**Only `sap/ui/test/utils/nextUIUpdate` must be used.** The legacy path `sap/ui/qunit/utils/nextUIUpdate` is a deprecated re-export (since UI5 1.127) that resolves to the same implementation — do not use it in new code.
 
 ---
 

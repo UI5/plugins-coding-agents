@@ -42,6 +42,15 @@ Development guidelines for UI Integration Cards (also known as UI5 Integration C
 - **i18n** - Bind all user-facing strings to the i18n model; never hardcode
 - **Actions** - Use the `actions` property for links and interactions; never inline `<a>` tags or hand-roll URL handlers
 
+#### ui5-best-practices-opa5
+
+Guidelines and debugging workflow for OPA5 integration tests:
+
+- **Failure inspection** - Pause-on-failure mode (`sap.ui.test.qunitPause.pauseRule`) keeps the app live at the failure point for browser inspection
+- **TestRecorder tooling** - Temporary `sap.ui.testrecorder.ControlTree` integration to inspect the live control tree and generate reliable OPA5 snippets (UI5 ≥ 1.147)
+- **Page object organization** - Placement of actions and assertions across views
+- **App teardown** - Cleanup patterns in OPA5 journey tests
+
 #### ui5-best-practices-qunit
 
 Coding standards and modernization patterns for QUnit unit test files in UI5 libraries:
@@ -54,15 +63,6 @@ Coding standards and modernization patterns for QUnit unit test files in UI5 lib
 - **Sinon sandbox** - `sinon.createSandbox()` over deprecated `sinon.sandbox.create()`
 - **Test naming** - Descriptive sentences; no "it should"; unique names per module
 - **File hygiene** - Remove unused imports; ISO 8859-1 compliance; ESLint 0 errors
-
-#### ui5-best-practices-opa5
-
-Guidelines and debugging workflow for OPA5 integration tests:
-
-- **Failure inspection** - Pause-on-failure mode (`sap.ui.test.qunitPause.pauseRule`) keeps the app live at the failure point for browser inspection
-- **TestRecorder tooling** - Temporary `sap.ui.testrecorder.ControlTree` integration to inspect the live control tree and generate reliable OPA5 snippets (UI5 ≥ 1.147)
-- **Page object organization** - Placement of actions and assertions across views
-- **App teardown** - Cleanup patterns in OPA5 journey tests
 
 #### ui5-best-practices-tables
 

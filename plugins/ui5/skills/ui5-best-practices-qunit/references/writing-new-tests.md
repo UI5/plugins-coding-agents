@@ -117,11 +117,19 @@ See [`async-patterns.md`](async-patterns.md) for control-specific helpers (Objec
 
 ## 7. File setup
 
-- Add `/*global QUnit */` as the first line so ESLint recognises the QUnit global without requiring an explicit import.
-- Declare all dependencies in `sap.ui.define`. Only import `sap/ui/core/Core` if `Core.byId`, `Core.getConfiguration`, or similar is used  -  do not import it just for `Core.applyChanges()` when `nextUIUpdate()` is used instead.
-- File must be ISO 8859-1 compliant  -  no non-ASCII characters in comments, strings, or JSDoc. Use plain ASCII hyphens, not em dashes (U+2014).
+- Add `/*global QUnit */` as the first line so ESLint recognises the QUnit global without requiring an explicit import. Note: the Foundation team is working on making this unnecessary (CPOUI5FOUNDATION-1204)  -  once that feature is available, the comment can be removed.
+- **Sinon:** use sinon consistently in one of two ways  -  do not mix them:
+  - **Via the QUnit-sinon bridge (preferred):** configured in the test starter; sinon is not imported as a dependency. Use `this.stub()`, `this.spy()`, `this.clock` from the QUnit context.
+  - **Via explicit dependency:** import sinon as a module dependency and do not configure it via the test starter. Do not use the bridge (`this.stub()` etc.) in this case.
+  - Add `/*global sinon */` only when sinon is used via the bridge (it arrives as a global, not an AMD module).
+- Declare all other dependencies in `sap.ui.define`. Only import `sap/ui/core/Core` if `Core.byId`, `Core.getConfiguration`, or similar is used  -  do not import it just for `Core.applyChanges()` when `nextUIUpdate()` is used instead.
+- Avoid non-ASCII characters in comments, strings, or JSDoc  -  use plain ASCII hyphens, not em dashes (U+2014). UTF-8 is the required encoding, but non-ASCII characters in comments have historically caused encoding issues.
 
-Verify encoding before committing:
+Verify encoding before committing (adapt path to project layout):
 ```bash
-grep -Pn '[^\x00-\x7E]' src/<library>/test/**/*.qunit.js
+# S/4 reuse libraries
+grep -Pn '[^\x00-\x7E]' test/<library>/**/*.qunit.js
+
+# Apps
+grep -Pn '[^\x00-\x7E]' webapp/test/**/*.qunit.js
 ```

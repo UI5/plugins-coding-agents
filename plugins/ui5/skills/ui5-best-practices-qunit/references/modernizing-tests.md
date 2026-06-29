@@ -109,6 +109,13 @@ const oSandbox = sinon.createSandbox();
 
 When the QUnit-sinon integration is already active, `this.stub()`, `this.spy()`, and `this.clock` are available directly on the QUnit context  -  a manual sandbox is not needed at all.
 
+**Do not mix** the QUnit-sinon bridge (`this.stub()`, `this.spy()`) with an explicitly created sandbox in the same test or module. Use one approach consistently:
+
+- **Bridge only:** rely on `this.stub()`, `this.spy()`, `this.clock`  -  the bridge restores everything automatically in `afterEach`.
+- **Sandbox only:** create with `sinon.createSandbox()`, call `oSandbox.restore()` in `afterEach` (or `finally`).
+
+Note: migrating from a manual sandbox to the bridge is straightforward in most cases. The bridge also exposes `this.verifyAndRestore()`. The only scenario where keeping a sandbox is justified is when the sandbox `verify()` method (without restore) is called mid-test  -  `this.verifyAndRestore()` always restores, so it cannot replace a standalone `verify()` call.
+
 ---
 
 ## 6. Add assert.expect(N) to async tests that lack it
@@ -134,13 +141,35 @@ QUnit.test("change event fires", async function(assert) {
 
 ## 7. Remove unused imports
 
-After replacing all `Core.applyChanges()` calls, remove `sap/ui/core/Core` from the `sap.ui.define` array and function parameters  -  unless `Core` is still used elsewhere (e.g. `Core.byId`, `Core.getConfiguration`).
+After replacing all `Core.applyChanges()` calls, remove `sap/ui/core/Core` from the `sap.ui.define` array and function parameters  -  unless the import representing `sap/ui/core/Core` is still used elsewhere.
+
+Check for all uses of the parameter bound to `sap/ui/core/Core`  -  it may be named `Core`, `oCore`, `CoreInstance`, or anything else. Remove it only when no usage of that parameter remains:
+
+- `Core.byId(...)`, `Core.getConfiguration()`, `Core.getModel()`, etc.
+- `sap.ui.getCore()` calls in the same file do **not** count as a usage of the imported parameter and do not prevent removal.
+
+```js
+// Before
+sap.ui.define([
+    "sap/ui/core/Core",
+    "sap/ui/test/utils/nextUIUpdate"
+], function(Core, nextUIUpdate) {
+    // Core.applyChanges() replaced; Core no longer used
+});
+
+// After
+sap.ui.define([
+    "sap/ui/test/utils/nextUIUpdate"
+], function(nextUIUpdate) {
+    // ...
+});
+```
 
 ---
 
 ## 8. Fix non-ASCII characters
 
-Replace em dashes (U+2014) and other non-ASCII characters in comments with plain ASCII hyphens. Files must be ISO 8859-1 compliant.
+Replace em dashes (U+2014) and other non-ASCII characters in comments with plain ASCII hyphens. UTF-8 is the required encoding, but non-ASCII characters  -  especially in comments  -  have historically caused encoding issues (e.g. garbled output when the `<meta charset>` tag is missing). Keep comments and strings ASCII-only.
 
 ```js
 // Bad - em dash U+2014 renders as a garbled character
@@ -150,14 +179,86 @@ Replace em dashes (U+2014) and other non-ASCII characters in comments with plain
 // Exception - keep Core.applyChanges() when...
 ```
 
-Find violations:
+Find violations (adapt the path pattern for your project layout):
 ```bash
-grep -Pn '[^\x00-\x7E]' src/<library>/test/**/*.qunit.js
+# S/4 reuse libraries
+grep -Pn '[^\x00-\x7E]' test/<library>/**/*.qunit.js
+
+# Apps
+grep -Pn '[^\x00-\x7E]' webapp/test/**/*.qunit.js
+# or
+grep -Pn '[^\x00-\x7E]' src/main/webapp/test/**/*.qunit.js
 ```
 
 ---
 
-## 9. What NOT to change
+## 9. QUnit 1 -> QUnit 2 globals migration
+
+QUnit 1 (loaded via `sap/ui/thirdparty/qunit.js` or a test starter with `qunit/version: 1`) exposed `test`, `asyncTest`, `ok`, `equal`, `strictEqual`, and all other assertions as globals. QUnit 2 requires the `QUnit` namespace and passes the `assert` object as a parameter.
+
+**Global functions → namespaced:**
+
+```js
+// Bad - QUnit 1 globals
+test("renders", function() {
+    ok(oControl.getDomRef(), "rendered");
+});
+
+asyncTest("loads data", function() {
+    expect(1);
+    oModel.attachEventOnce("requestCompleted", function() {
+        ok(oModel.getData(), "data loaded");
+        start();
+    });
+});
+
+// Good - QUnit 2
+QUnit.test("renders", function(assert) {
+    assert.ok(oControl.getDomRef(), "rendered");
+});
+
+QUnit.test("loads data", async function(assert) {
+    assert.expect(1);
+    await new Promise((resolve) => {
+        oModel.attachEventOnce("requestCompleted", () => {
+            assert.ok(oModel.getData(), "data loaded");
+            resolve();
+        });
+    });
+});
+```
+
+**Expected assertion count:**
+
+QUnit 1 accepted the count as the second argument to `test()`. QUnit 2 uses `assert.expect(N)` as the first line of the test body:
+
+```js
+// Bad - QUnit 1 style
+test("fires event", 1, function() { ... });
+
+// Good - QUnit 2 style
+QUnit.test("fires event", function(assert) {
+    assert.expect(1);
+    ...
+});
+```
+
+**`stop()` / `start()` → async/await:**
+
+Replace `stop()` / `start()` pairs with `async/await` following the pattern in section 3 above.
+
+| QUnit 1 | QUnit 2 |
+|---|---|
+| `asyncTest(...)` | `QUnit.test("...", async function(assert) { ... })` |
+| `expect(N)` (global) | `assert.expect(N)` |
+| `stop()` / `start()` | `await new Promise(...)` |
+| `ok(...)` | `assert.ok(...)` |
+| `equal(...)` | `assert.equal(...)` |
+| `strictEqual(...)` | `assert.strictEqual(...)` |
+
+---
+
+## 10. What NOT to change
 
 | Pattern | Leave it |
 |---|---|
