@@ -1,0 +1,18 @@
+<mvc:View
+    controllerName="my.app.controller.Main"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m">
+    <App>
+        <!-- GAP: Page has no landmarkInfo at all -->
+        <Page title="Product Details" id="mainPage">
+            <content>
+                <!-- GAP: Panel has no accessibleRole -->
+                <Panel headerText="Order Summary" id="orderPanel">
+                    <content>
+                        <Text text="Order #12345"/>
+                    </content>
+                </Panel>
+            </content>
+        </Page>
+    </App>
+</mvc:View>

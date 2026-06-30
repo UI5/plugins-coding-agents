@@ -64,6 +64,19 @@ Authoritative development guidelines for all UI5 table controls (SAPUI5 1.136+ L
 - **Personalization** - `sap.m.p13n.Engine` integration
 - **Cell templates & alignment** - Type-based alignment and model type namespace rules
 
+#### ui5-best-practices-accessibility
+
+Accessibility guidelines and review checklist for UI5 views, fragments, and controllers:
+
+- **Landmarks** - `landmarkInfo` and `accessibleRole` for `DynamicPage`, `Page`, `Panel`, `ObjectPage`, `FlexibleColumnLayout`
+- **Labeling** - `<Label labelFor>` for inputs, `ariaLabelledBy` for tables, tooltips for icon-only buttons, `alt` for standalone icons and images
+- **Heading levels** - Explicit `level` on `<Title>`, no heading level jumps within a view
+- **Focus handling** - `initialFocus` on `Dialog`/`Popover`, fast navigation groups, no `tabindex > 0`
+- **Keyboard shortcuts** - `CommandExecution` for action buttons that should support keyboard shortcuts
+- **Invisible messaging** - `InvisibleMessage.announce()` for dynamic state changes visible to sighted users only
+- **Reading order** - Controls not visually reordered out of DOM sequence; `ariaDescribedBy` pointing to correct DOM order
+- **Target size** - `reactiveAreaMode` for interactive controls in dense layouts
+
 ---
 
 ## Installation

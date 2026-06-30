@@ -1,0 +1,42 @@
+<mvc:View
+    controllerName="my.app.controller.Main"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns:core="sap.ui.core"
+    xmlns="sap.m">
+    <App>
+        <Page title="Order Details" id="mainPage">
+            <content>
+                <!-- GAP: distinct logical region (toolbar + filter strip) without sap-ui-fastnavgroup CustomData, so F6 users cannot jump to it as its own group -->
+                <VBox id="filterRegion">
+                    <Toolbar>
+                        <Title text="Filters" level="H2"/>
+                        <ToolbarSpacer/>
+                        <Button icon="sap-icon://filter" tooltip="Apply filter"/>
+                    </Toolbar>
+                    <HBox>
+                        <Input placeholder="Customer"/>
+                        <!-- GAP: tabindex greater than 0 overrides the natural reading order -->
+                        <Input placeholder="Order number">
+                            <customData>
+                                <core:CustomData key="tabindex" value="3" writeToDom="true"/>
+                            </customData>
+                        </Input>
+                    </HBox>
+                </VBox>
+
+                <!-- GAP: Dialog has multiple focusable elements but no initialFocus, so focus lands on the first focusable element (the close button) instead of the primary action -->
+                <Dialog id="confirmDialog" title="Confirm deletion">
+                    <content>
+                        <Text text="Delete the selected order? This cannot be undone."/>
+                    </content>
+                    <beginButton>
+                        <Button id="confirmDeleteBtn" text="Delete" type="Reject" press=".onConfirmDelete"/>
+                    </beginButton>
+                    <endButton>
+                        <Button id="cancelBtn" text="Cancel" press=".onCancel"/>
+                    </endButton>
+                </Dialog>
+            </content>
+        </Page>
+    </App>
+</mvc:View>
