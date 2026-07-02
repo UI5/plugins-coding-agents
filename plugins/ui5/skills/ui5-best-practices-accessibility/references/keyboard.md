@@ -6,17 +6,20 @@ When a Dialog or Popover opens, set which element receives focus. Without this, 
 on the first focusable element, which may not be the right starting point for the task.
 
 ```xml
-<Popover title="Product Details" initialFocus="firstActionBtn">
+<Popover title="{i18n>productDetailsTitle}" initialFocus="firstActionBtn">
   <content>
     <VBox>
-      <Text text="Notebook Basic 15"/>
-      <Button id="firstActionBtn" text="Add to Cart"/>
+      <Text text="{i18n>notebookProductName}"/>
+      <Button id="firstActionBtn" text="{i18n>addToCartButton}"/>
     </VBox>
   </content>
 </Popover>
 ```
 
 Same attribute on `<Dialog initialFocus="elementId">`.
+
+All user-facing strings above are bound via `{i18n>...}` — bind every UI text to the
+resource model, never hard-code English literals in the view.
 
 ## F6 fast navigation
 

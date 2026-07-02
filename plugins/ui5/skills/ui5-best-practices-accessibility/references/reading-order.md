@@ -4,6 +4,9 @@ Screen readers follow DOM order, not visual order. When the two differ — due t
 FlexBox reordering, or absolute positioning — AT users experience a broken sequence
 that does not match what sighted users see.
 
+All user-facing strings in the snippets below use `{i18n>...}` bindings — bind every
+UI text to the resource model, never hard-code English literals in the view.
+
 ## DOM order = reading order
 
 Structure XML so controls appear in logical reading sequence. A label or title must
@@ -11,15 +14,15 @@ appear before the control it describes.
 
 **Wrong:** description placed after the button it belongs to
 ```xml
-<Button text="Submit Order"/>
-<Text id="submitHint" text="This will place a binding order."/>
+<Button text="{i18n>submitOrderButton}"/>
+<Text id="submitHint" text="{i18n>submitOrderHint}"/>
 <!-- ariaDescribedBy="submitHint" would point forward in the DOM -->
 ```
 
 **Correct:**
 ```xml
-<core:InvisibleText id="submitHint" text="This will place a binding order."/>
-<Button text="Submit Order" ariaDescribedBy="submitHint"/>
+<core:InvisibleText id="submitHint" text="{i18n>submitOrderHint}"/>
+<Button text="{i18n>submitOrderButton}" ariaDescribedBy="submitHint"/>
 ```
 
 ## `ariaDescribedBy` / `ariaLabelledBy` forward references

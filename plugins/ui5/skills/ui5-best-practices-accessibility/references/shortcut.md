@@ -31,12 +31,16 @@ Add to the `dependents` aggregation of the view root or `Page`:
 ## Step 3 — Wire buttons with the `cmd:` prefix
 
 ```xml
-<Button text="Save"   press="cmd:Save"   tooltip="Save (Ctrl+S)"/>
-<Button text="Delete" press="cmd:Delete" tooltip="Delete (Ctrl+D)"/>
+<Button text="{i18n>saveButton}"   press="cmd:Save"   tooltip="{i18n>saveButtonTooltip}"/>
+<Button text="{i18n>deleteButton}" press="cmd:Delete" tooltip="{i18n>deleteButtonTooltip}"/>
 ```
 
 `press="cmd:Save"` routes through `CommandExecution` to `.onSave`. Both the keyboard
 shortcut and the button click call the same handler — no duplicate logic needed.
+
+Bind `text` and `tooltip` to `{i18n>...}` keys as shown — the tooltip strings should
+include the shortcut hint (e.g. `saveButtonTooltip = "Save (Ctrl+S)"`) so keyboard
+users discover the shortcut. Never hard-code the English literals in the view.
 
 ## Common predefined shortcuts
 

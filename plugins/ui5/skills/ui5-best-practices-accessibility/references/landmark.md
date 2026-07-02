@@ -17,19 +17,22 @@ Examples:
 **Key rule:** A landmark role without a label is also a violation — the AT
 announces "region" but cannot distinguish it from other regions on the same page.
 
+All `*Label` properties in the snippets below are bound via `{i18n>...}` — bind every
+UI text to the resource model, never hard-code English literals in the view.
+
 ## sap.f.DynamicPage
 
 ```xml
 <landmarkInfo>
   <DynamicPageAccessibleLandmarkInfo
     rootRole="Region"
-    rootLabel="Product Details"
+    rootLabel="{i18n>productDetailsLandmark}"
     contentRole="Main"
-    contentLabel="Product Description"
+    contentLabel="{i18n>productDescriptionLandmark}"
     headerRole="Region"
-    headerLabel="Product Header"
+    headerLabel="{i18n>productHeaderLandmark}"
     footerRole="Region"
-    footerLabel="Product Footer"/>
+    footerLabel="{i18n>productFooterLandmark}"/>
 </landmarkInfo>
 ```
 
@@ -39,15 +42,15 @@ announces "region" but cannot distinguish it from other regions on the same page
 <landmarkInfo>
   <PageAccessibleLandmarkInfo
     rootRole="Region"
-    rootLabel="Product Details"
+    rootLabel="{i18n>productDetailsLandmark}"
     contentRole="Main"
-    contentLabel="Product Description"
+    contentLabel="{i18n>productDescriptionLandmark}"
     headerRole="Region"
-    headerLabel="Product Header"
+    headerLabel="{i18n>productHeaderLandmark}"
     subHeaderRole="Region"
-    subHeaderLabel="Category Description"
+    subHeaderLabel="{i18n>categoryDescriptionLandmark}"
     footerRole="Region"
-    footerLabel="Product Footer"/>
+    footerLabel="{i18n>productFooterLandmark}"/>
 </landmarkInfo>
 ```
 
@@ -56,7 +59,7 @@ announces "region" but cannot distinguish it from other regions on the same page
 Use the `accessibleRole` property. The `headerText` serves as the accessible label:
 
 ```xml
-<Panel accessibleRole="Region" headerText="Order Summary">
+<Panel accessibleRole="Region" headerText="{i18n>orderSummaryHeader}">
   ...
 </Panel>
 ```
@@ -67,15 +70,15 @@ Use the `accessibleRole` property. The `headerText` serves as the accessible lab
 <landmarkInfo>
   <ObjectPageAccessibleLandmarkInfo
     rootRole="Region"
-    rootLabel="Order Information"
+    rootLabel="{i18n>orderInformationLandmark}"
     contentRole="Main"
-    contentLabel="Order Details"
+    contentLabel="{i18n>orderDetailsLandmark}"
     headerRole="Region"
-    headerLabel="Order Header"
+    headerLabel="{i18n>orderHeaderLandmark}"
     footerRole="Region"
-    footerLabel="Order Footer"
+    footerLabel="{i18n>orderFooterLandmark}"
     navigationRole="Navigation"
-    navigationLabel="Order navigation"/>
+    navigationLabel="{i18n>orderNavigationLandmark}"/>
 </landmarkInfo>
 ```
 
@@ -85,9 +88,9 @@ Use the `accessibleRole` property. The `headerText` serves as the accessible lab
 <f:FlexibleColumnLayout>
   <f:landmarkInfo>
     <f:FlexibleColumnLayoutAccessibleLandmarkInfo
-      firstColumnLabel="Master list"
-      middleColumnLabel="Item details"
-      lastColumnLabel="Item sub-details"/>
+      firstColumnLabel="{i18n>masterListLandmark}"
+      middleColumnLabel="{i18n>itemDetailsLandmark}"
+      lastColumnLabel="{i18n>itemSubDetailsLandmark}"/>
   </f:landmarkInfo>
 </f:FlexibleColumnLayout>
 ```

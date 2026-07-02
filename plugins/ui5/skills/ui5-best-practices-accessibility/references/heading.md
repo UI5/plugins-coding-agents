@@ -7,14 +7,14 @@ sections. Missing or skipped heading levels break this navigation.
 
 **Wrong:**
 ```xml
-<Title text="Order Details"/>
+<Title text="{i18n>orderDetailsTitle}"/>
 ```
 
 **Correct:**
 ```xml
-<Title level="H1" text="Order Details"/>    <!-- page title -->
-<Title level="H2" text="Line Items"/>       <!-- section header -->
-<Title level="H3" text="Item Notes"/>       <!-- subsection -->
+<Title level="H1" text="{i18n>orderDetailsTitle}"/>    <!-- page title -->
+<Title level="H2" text="{i18n>lineItemsTitle}"/>       <!-- section header -->
+<Title level="H3" text="{i18n>itemNotesTitle}"/>       <!-- subsection -->
 ```
 
 ## Heading hierarchy rules
@@ -33,7 +33,7 @@ When using the `title` property, the framework renders it as `<h1>` automaticall
 <Dialog>
   <customHeader>
     <Toolbar>
-      <Title id="dlgTitle" text="Confirm Deletion"/>
+      <Title id="dlgTitle" text="{i18n>confirmDeletionTitle}"/>
     </Toolbar>
   </customHeader>
 </Dialog>
@@ -44,7 +44,7 @@ When using the `title` property, the framework renders it as `<h1>` automaticall
 <Dialog ariaLabelledBy="dlgTitle">
   <customHeader>
     <Toolbar>
-      <Title id="dlgTitle" text="Confirm Deletion" level="H1"/>
+      <Title id="dlgTitle" text="{i18n>confirmDeletionTitle}" level="H1"/>
     </Toolbar>
   </customHeader>
 </Dialog>
@@ -60,7 +60,7 @@ containing a `Title` with an explicit `level`:
 <Panel accessibleRole="Region">
   <headerToolbar>
     <Toolbar>
-      <Title level="H3" text="Shipping Details"/>
+      <Title level="H3" text="{i18n>shippingDetailsTitle}"/>
     </Toolbar>
   </headerToolbar>
   ...
@@ -70,3 +70,8 @@ containing a `Title` with an explicit `level`:
 ## Available values
 
 `H1` · `H2` · `H3` · `H4` · `H5` · `H6` · `Auto` (avoid — use explicit levels)
+
+## i18n bindings
+
+All snippets above use `{i18n>...}` for user-facing strings — bind every UI text to
+the resource model, never hard-code English literals in the view.

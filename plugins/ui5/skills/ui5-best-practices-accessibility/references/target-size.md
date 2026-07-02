@@ -5,6 +5,9 @@ controls can display as links and may need attention depending on the context th
 are used in: `sap.m.Link`, `sap.m.ObjectStatus`, `sap.m.ObjectNumber`,
 `sap.m.ObjectIdentifier`, `sap.m.ObjectMarker`, `sap.m.ObjectAttribute`.
 
+All user-facing strings in the snippets below use `{i18n>...}` bindings — bind every
+UI text to the resource model, never hard-code English literals in the view.
+
 ## Inline display — no action needed
 
 When a link is part of a sentence or constrained by the surrounding line-height
@@ -19,10 +22,10 @@ link without changing its visual appearance:
 <List mode="SingleSelect" includeItemInSelection="true">
   <CustomListItem>
     <l:VerticalLayout class="sapUiSmallMargin">
-      <Text text="Notebook Basic 15"/>
+      <Text text="{i18n>notebookProductName}"/>
       <ObjectIdentifier
         reactiveAreaMode="Overlay"
-        title="HH-1000"
+        title="{product>/code}"
         titleActive="true"
         titlePress=".onIdentifierPress"/>
     </l:VerticalLayout>
@@ -40,23 +43,23 @@ When link-like controls appear in a toolbar or other dense layout, add
   <ObjectIdentifier
     class="sapUiTinyMarginBeginEnd"
     titleActive="true"
-    title="HT-2001"
+    title="{product>/code}"
     titlePress=".onIdentifierPress"/>
   <Link
     class="sapUiTinyMarginBeginEnd"
-    text="10 Portable DVD player"
+    text="{product>/name}"
     press=".onLinkPress"/>
   <ObjectStatus
     class="sapUiTinyMarginBeginEnd"
     active="true"
     state="Success"
-    text="Product Shipped"
+    text="{i18n>productShippedStatus}"
     press=".onStatusPress"/>
   <ObjectNumber
     class="sapUiTinyMarginBeginEnd"
     active="true"
-    number="150"
-    unit="EUR"
+    number="{product>/price}"
+    unit="{product>/currency}"
     press=".onNumberPress"/>
 </OverflowToolbar>
 ```
