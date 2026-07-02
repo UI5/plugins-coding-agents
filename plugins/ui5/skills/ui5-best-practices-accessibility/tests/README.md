@@ -1,8 +1,8 @@
 # Skill Test Fixtures
 
 These fixtures are **not** auto-run — there is no test harness, CI job, or assertion
-framework. They are reference cases for manually validating the skill's behaviour:
-invoke `/ui5-best-practices-accessibility` against each file and verify the output
+framework. They are reference cases for manually validating the skill's behavior.
+Invoke `/ui5-best-practices-accessibility` against each file and verify the output
 matches the expectations below.
 
 ## Positive fixtures — skill MUST report these gaps

@@ -7,7 +7,7 @@ loading indicators, filter results).
 ## When not to use
 
 - Do not provide information exclusively for AT users — screen reader users should not receive content that sighted users cannot access
-- Do not use it to hide long texts — if the information matters, show it visibly
+- Do not use it to hide long texts — if the information matters, show it
 
 ## Dynamic announcements — `InvisibleMessage`
 
