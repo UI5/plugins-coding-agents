@@ -1,0 +1,377 @@
+{
+  "version": "1.0",
+  "skill": "ui5-best-practices-accessibility",
+  "skill_prompt_file": "../SKILL.md",
+  "topics": [
+    "Landmarks",
+    "Labeling",
+    "Heading levels",
+    "Focus & keyboard",
+    "Keyboard shortcuts",
+    "Invisible messaging",
+    "Reading order",
+    "Target size"
+  ],
+  "assertion_types": {
+    "report_finding": "Step-3 report contains a finding grouped under `topic` whose body mentions at least one string from `must_mention_any` AND at least one from `must_anchor_on`. All matching is case-insensitive substring.",
+    "report_empty": "Skill output is the negative response (e.g. 'No accessibility gaps found') with zero gap entries.",
+    "finding_count_max": "Total findings under `topic` (or globally if `topic` omitted) is ≤ `max`. Catches over-flagging.",
+    "must_not_mention": "None of the strings in `strings` appear anywhere in the report. Used to assert framework exceptions."
+  },
+  "test_cases": [
+    {
+      "id": "tc-001",
+      "fixture": "fixtures/gap-landmarks.view.xml",
+      "assertions": [
+        {
+          "id": "a1",
+          "type": "report_finding",
+          "topic": "Landmarks",
+          "must_mention_any": ["landmarkInfo", "PageAccessibleLandmarkInfo"],
+          "must_anchor_on": ["Page"],
+          "description": "Page missing landmarkInfo"
+        },
+        {
+          "id": "a2",
+          "type": "report_finding",
+          "topic": "Landmarks",
+          "must_mention_any": ["accessibleRole"],
+          "must_anchor_on": ["Panel"],
+          "description": "Panel missing accessibleRole"
+        },
+        {
+          "id": "a3",
+          "type": "finding_count_max",
+          "topic": "Landmarks",
+          "max": 2,
+          "description": "No more than 2 Landmark findings (no false positives)"
+        }
+      ]
+    },
+    {
+      "id": "tc-002",
+      "fixture": "fixtures/gap-labeling.view.xml",
+      "assertions": [
+        {
+          "id": "a1",
+          "type": "report_finding",
+          "topic": "Labeling",
+          "must_mention_any": ["labelFor"],
+          "must_anchor_on": ["Input", "Label", "productName"],
+          "description": "Input/Label pair missing labelFor association"
+        },
+        {
+          "id": "a2",
+          "type": "report_finding",
+          "topic": "Labeling",
+          "must_mention_any": ["tooltip"],
+          "must_anchor_on": ["Button", "icon"],
+          "description": "Icon-only Button missing tooltip"
+        },
+        {
+          "id": "a3",
+          "type": "report_finding",
+          "topic": "Labeling",
+          "must_mention_any": ["ariaLabelledBy"],
+          "must_anchor_on": ["Table"],
+          "description": "Table missing ariaLabelledBy"
+        },
+        {
+          "id": "a4",
+          "type": "finding_count_max",
+          "topic": "Labeling",
+          "max": 3,
+          "description": "No more than 3 Labeling findings"
+        }
+      ]
+    },
+    {
+      "id": "tc-003",
+      "fixture": "fixtures/gap-heading-levels.view.xml",
+      "assertions": [
+        {
+          "id": "a1",
+          "type": "report_finding",
+          "topic": "Heading levels",
+          "must_mention_any": ["level", "explicit"],
+          "must_anchor_on": ["Title", "Order Details"],
+          "description": "First Title missing explicit level"
+        },
+        {
+          "id": "a2",
+          "type": "report_finding",
+          "topic": "Heading levels",
+          "must_mention_any": ["H1", "H2", "H3", "skip", "jump"],
+          "must_anchor_on": ["heading", "level", "Title"],
+          "description": "Heading hierarchy jumps H1 → H3"
+        },
+        {
+          "id": "a3",
+          "type": "finding_count_max",
+          "topic": "Heading levels",
+          "max": 2,
+          "description": "No more than 2 Heading-level findings"
+        }
+      ]
+    },
+    {
+      "id": "tc-004",
+      "fixture": "fixtures/gap-keyboard.view.xml",
+      "assertions": [
+        {
+          "id": "a1",
+          "type": "report_finding",
+          "topic": "Focus & keyboard",
+          "must_mention_any": ["sap-ui-fastnavgroup", "fastnavgroup", "fast nav"],
+          "must_anchor_on": ["VBox", "filterRegion"],
+          "description": "VBox region missing fastnavgroup CustomData"
+        },
+        {
+          "id": "a2",
+          "type": "report_finding",
+          "topic": "Focus & keyboard",
+          "must_mention_any": ["tabindex"],
+          "must_anchor_on": ["Input", "3", "positive", "greater than 0"],
+          "description": "Input has positive tabindex value"
+        },
+        {
+          "id": "a3",
+          "type": "report_finding",
+          "topic": "Focus & keyboard",
+          "must_mention_any": ["initialFocus"],
+          "must_anchor_on": ["Dialog", "confirmDialog"],
+          "description": "Dialog missing initialFocus"
+        },
+        {
+          "id": "a4",
+          "type": "finding_count_max",
+          "topic": "Focus & keyboard",
+          "max": 3,
+          "description": "No more than 3 Focus & keyboard findings"
+        }
+      ]
+    },
+    {
+      "id": "tc-005",
+      "fixture": "fixtures/gap-dialog.controller.js",
+      "assertions": [
+        {
+          "id": "a1",
+          "type": "report_finding",
+          "topic": "Labeling",
+          "must_mention_any": ["ariaLabelledBy"],
+          "must_anchor_on": ["Dialog", "showHeader"],
+          "description": "Dialog with showHeader:false missing ariaLabelledBy"
+        },
+        {
+          "id": "a2",
+          "type": "finding_count_max",
+          "topic": "Labeling",
+          "max": 1,
+          "description": "No more than 1 Labeling finding"
+        }
+      ]
+    },
+    {
+      "id": "tc-006",
+      "fixture": "fixtures/gap-shortcut.view.xml",
+      "assertions": [
+        {
+          "id": "a1",
+          "type": "report_finding",
+          "topic": "Keyboard shortcuts",
+          "must_mention_any": ["CommandExecution", "cmd:"],
+          "must_anchor_on": ["Save"],
+          "description": "Save button missing CommandExecution / cmd: prefix"
+        },
+        {
+          "id": "a2",
+          "type": "report_finding",
+          "topic": "Keyboard shortcuts",
+          "must_mention_any": ["CommandExecution", "cmd:"],
+          "must_anchor_on": ["Delete"],
+          "description": "Delete button missing CommandExecution / cmd: prefix"
+        },
+        {
+          "id": "a3",
+          "type": "finding_count_max",
+          "topic": "Keyboard shortcuts",
+          "max": 2,
+          "description": "No more than 2 Keyboard shortcut findings"
+        }
+      ]
+    },
+    {
+      "id": "tc-007",
+      "fixture": "fixtures/gap-invisible-message.controller.js",
+      "assertions": [
+        {
+          "id": "a1",
+          "type": "report_finding",
+          "topic": "Invisible messaging",
+          "must_mention_any": ["InvisibleMessage", "announce"],
+          "must_anchor_on": ["onSaveSuccess", "save"],
+          "description": "Save-success handler missing InvisibleMessage.announce()"
+        },
+        {
+          "id": "a2",
+          "type": "report_finding",
+          "topic": "Invisible messaging",
+          "must_mention_any": ["InvisibleMessage", "announce", "assertive"],
+          "must_anchor_on": ["onSubmitError", "error", "submit"],
+          "description": "Submit-error handler missing assertive announcement"
+        },
+        {
+          "id": "a3",
+          "type": "finding_count_max",
+          "topic": "Invisible messaging",
+          "max": 2,
+          "description": "No more than 2 Invisible-messaging findings"
+        }
+      ]
+    },
+    {
+      "id": "tc-008",
+      "fixture": "fixtures/gap-reading-order.view.xml",
+      "assertions": [
+        {
+          "id": "a1",
+          "type": "report_finding",
+          "topic": "Reading order",
+          "must_mention_any": ["RowReverse", "direction", "DOM order", "visual order"],
+          "must_anchor_on": ["FlexBox"],
+          "description": "FlexBox RowReverse breaks DOM/visual order alignment"
+        },
+        {
+          "id": "a2",
+          "type": "report_finding",
+          "topic": "Reading order",
+          "must_mention_any": ["ariaDescribedBy", "lateNote", "later in DOM", "after"],
+          "must_anchor_on": ["Input"],
+          "description": "Input's ariaDescribedBy references an ID rendered after it"
+        },
+        {
+          "id": "a3",
+          "type": "finding_count_max",
+          "topic": "Reading order",
+          "max": 2,
+          "description": "No more than 2 Reading-order findings"
+        }
+      ]
+    },
+    {
+      "id": "tc-009",
+      "fixture": "fixtures/gap-target-size.view.xml",
+      "assertions": [
+        {
+          "id": "a1",
+          "type": "report_finding",
+          "topic": "Target size",
+          "must_mention_any": ["reactiveAreaMode"],
+          "must_anchor_on": ["ObjectIdentifier"],
+          "description": "ObjectIdentifier inside ColumnListItem missing reactiveAreaMode"
+        },
+        {
+          "id": "a2",
+          "type": "report_finding",
+          "topic": "Target size",
+          "must_mention_any": ["reactiveAreaMode"],
+          "must_anchor_on": ["ObjectStatus"],
+          "description": "ObjectStatus inside ColumnListItem missing reactiveAreaMode"
+        },
+        {
+          "id": "a3",
+          "type": "finding_count_max",
+          "topic": "Target size",
+          "max": 2,
+          "description": "No more than 2 Target-size findings"
+        },
+        {
+          "id": "a4",
+          "type": "must_not_mention",
+          "strings": ["ObjectNumber"],
+          "description": "ObjectNumber is non-interactive (no active/press), must not be flagged"
+        }
+      ]
+    },
+    {
+      "id": "tc-010",
+      "fixture": "fixtures/ok-all-correct.view.xml",
+      "assertions": [
+        {
+          "id": "a1",
+          "type": "report_empty",
+          "description": "Correctly implemented view — skill must return no gaps"
+        }
+      ]
+    },
+    {
+      "id": "tc-011",
+      "fixture": "fixtures/ok-simpleform.view.xml",
+      "assertions": [
+        {
+          "id": "a1",
+          "type": "report_empty",
+          "description": "Correctly implemented view — skill must return no gaps"
+        },
+        {
+          "id": "a2",
+          "type": "must_not_mention",
+          "strings": ["labelFor"],
+          "description": "SimpleForm exception — Label+Input without labelFor must not be flagged"
+        }
+      ]
+    },
+    {
+      "id": "tc-012",
+      "fixture": "fixtures/ok-dialog.controller.js",
+      "assertions": [
+        {
+          "id": "a1",
+          "type": "report_empty",
+          "description": "Correctly implemented controller — skill must return no gaps"
+        },
+        {
+          "id": "a2",
+          "type": "must_not_mention",
+          "strings": ["ariaLabelledBy"],
+          "description": "customHeader+Title auto-link — explicit ariaLabelledBy not required"
+        }
+      ]
+    },
+    {
+      "id": "tc-013",
+      "fixture": "fixtures/ok-invisible-message.controller.js",
+      "assertions": [
+        {
+          "id": "a1",
+          "type": "report_empty",
+          "description": "Correctly implemented controller — skill must return no gaps"
+        },
+        {
+          "id": "a2",
+          "type": "must_not_mention",
+          "strings": ["missing", "no announcement", "not announced"],
+          "description": "Both handlers already announce via InvisibleMessage — no missing-announcement finding"
+        }
+      ]
+    },
+    {
+      "id": "tc-014",
+      "fixture": "fixtures/ok-target-size.view.xml",
+      "assertions": [
+        {
+          "id": "a1",
+          "type": "report_empty",
+          "description": "Correctly implemented view — skill must return no gaps"
+        },
+        {
+          "id": "a2",
+          "type": "must_not_mention",
+          "strings": ["missing reactiveAreaMode", "without reactiveAreaMode", "no reactiveAreaMode"],
+          "description": "ObjectIdentifier and ObjectStatus already have reactiveAreaMode set"
+        }
+      ]
+    }
+  ]
+}

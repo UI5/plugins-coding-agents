@@ -1,0 +1,41 @@
+<mvc:View
+    controllerName="my.app.controller.ProductList"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m">
+    <App>
+        <Page title="Products">
+            <content>
+                <Title id="productsTitle" level="H1" text="Products"/>
+                <!--
+                    CORRECT: reactiveAreaMode set on ObjectIdentifier and ObjectStatus
+                    ensures the touch target meets the minimum 3rem requirement even
+                    in a dense table layout.
+                -->
+                <Table ariaLabelledBy="productsTitle">
+                    <columns>
+                        <Column><Text text="Product"/></Column>
+                        <Column><Text text="Status"/></Column>
+                        <Column><Text text="Price"/></Column>
+                    </columns>
+                    <items>
+                        <ColumnListItem type="Navigation">
+                            <cells>
+                                <ObjectIdentifier
+                                    title="Notebook Basic 15"
+                                    text="HT-1000"
+                                    titleActive="true"
+                                    reactiveAreaMode="Overlay"/>
+                                <ObjectStatus
+                                    text="Available"
+                                    state="Success"
+                                    active="true"
+                                    reactiveAreaMode="Overlay"/>
+                                <ObjectNumber number="1,299" unit="EUR"/>
+                            </cells>
+                        </ColumnListItem>
+                    </items>
+                </Table>
+            </content>
+        </Page>
+    </App>
+</mvc:View>

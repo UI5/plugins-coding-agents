@@ -28,6 +28,19 @@ Development guidelines and coding standards derived from official SAP UI5 guidel
 
 **Note**: For TypeScript conversion specifically, use the separate [`ui5-typescript-conversion`](https://github.com/UI5/plugins-coding-agents/tree/main/plugins/ui5-typescript-conversion) plugin.
 
+#### ui5-best-practices-accessibility
+
+Accessibility guidelines and review checklist for UI5 views, fragments, and controllers:
+
+- **Landmarks** - `landmarkInfo` and `accessibleRole` for `DynamicPage`, `Page`, `Panel`, `ObjectPage`, `FlexibleColumnLayout`
+- **Labeling** - `<Label labelFor>` for inputs, `ariaLabelledBy` for tables, tooltips for icon-only buttons, `alt` for standalone icons and images
+- **Heading levels** - Explicit `level` on `<Title>`, no heading level jumps within a view
+- **Focus handling** - `initialFocus` on `Dialog`/`Popover`, fast navigation groups, no `tabindex > 0`
+- **Keyboard shortcuts** - `CommandExecution` for action buttons that should support keyboard shortcuts
+- **Invisible messaging** - `InvisibleMessage.announce()` for dynamic state changes visible to sighted users only
+- **Reading order** - Controls not visually reordered out of DOM sequence; `ariaDescribedBy` pointing to correct DOM order
+- **Target size** - `reactiveAreaMode` for interactive controls in dense layouts
+
 #### ui5-best-practices-integration-cards
 
 Development guidelines for UI Integration Cards (also known as UI5 Integration Cards):

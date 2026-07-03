@@ -1,0 +1,72 @@
+<mvc:View
+    controllerName="my.app.controller.ProductDetails"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core"
+    xmlns:form="sap.ui.layout.form">
+    <App>
+        <!--
+            GOLDEN FIXTURE — everything correctly implemented.
+            Running acc-guide against this file should return "No accessibility gaps found."
+
+            Covers:
+            - Page with full landmarkInfo (roles + labels)
+            - Title with explicit level
+            - SimpleForm (no labelFor needed)
+            - Table with ariaLabelledBy
+            - Icon-only Button with tooltip
+            - CommandExecution for keyboard shortcuts
+        -->
+        <Page title="Product Details" id="mainPage">
+            <dependents>
+                <core:CommandExecution command="Save"   enabled="true" execute=".onSave"/>
+                <core:CommandExecution command="Delete" enabled="true" execute=".onDelete"/>
+            </dependents>
+            <landmarkInfo>
+                <PageAccessibleLandmarkInfo
+                    rootRole="Region"
+                    rootLabel="Product Details"
+                    contentRole="Main"
+                    contentLabel="Product Information"
+                    headerRole="Region"
+                    headerLabel="Product Header"
+                    footerRole="Region"
+                    footerLabel="Product Actions"/>
+            </landmarkInfo>
+            <content>
+                <Title level="H2" text="General Information"/>
+
+                <form:SimpleForm editable="true">
+                    <Label text="Product Name"/>
+                    <Input id="productName" placeholder="Enter product name..."/>
+                    <Label text="Category"/>
+                    <Input id="category" placeholder="Enter category..."/>
+                </form:SimpleForm>
+
+                <Title id="specTitle" level="H2" text="Specifications"/>
+                <Table ariaLabelledBy="specTitle">
+                    <columns>
+                        <Column><Text text="Property"/></Column>
+                        <Column><Text text="Value"/></Column>
+                    </columns>
+                    <items>
+                        <ColumnListItem>
+                            <cells>
+                                <Text text="Weight"/>
+                                <Text text="1.5 kg"/>
+                            </cells>
+                        </ColumnListItem>
+                    </items>
+                </Table>
+            </content>
+            <footer>
+                <OverflowToolbar>
+                    <ToolbarSpacer/>
+                    <Button text="Save"   press="cmd:Save"   tooltip="Save (Ctrl+S)"/>
+                    <Button text="Delete" press="cmd:Delete" tooltip="Delete (Ctrl+D)"/>
+                    <Button icon="sap-icon://action-settings" tooltip="More Options"/>
+                </OverflowToolbar>
+            </footer>
+        </Page>
+    </App>
+</mvc:View>
