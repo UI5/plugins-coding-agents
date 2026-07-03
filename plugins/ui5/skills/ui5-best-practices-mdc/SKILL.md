@@ -12,8 +12,6 @@ Apply these guidelines whenever generating, reviewing, or troubleshooting MDC co
 
 **UI5 version baseline:** SAPUI5 1.136+ LTS. All features mentioned are available from this version unless noted.
 
-This skill complements `ui5-best-practices`. General rules (module loading, data binding types, CSP, TypeScript events) apply alongside these control-specific guidelines.
-
 ## When to load each reference
 
 | Trigger                                               | Load                                                                                                                     |
