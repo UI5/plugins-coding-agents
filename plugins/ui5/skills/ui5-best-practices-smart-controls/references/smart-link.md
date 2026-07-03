@@ -1,6 +1,6 @@
 # sap.ui.comp.navpopover.SmartLink
 
-API: https://ui5.sap.com/1.136.0/api/sap.ui.comp.navpopover.SmartLink
+API: https://ui5.sap.com/#/api/sap.ui.comp.navpopover.SmartLink
 
 ## Key annotations
 

@@ -1,6 +1,6 @@
 # sap.ui.mdc.Link
 
-API: https://ui5.sap.com/1.136.0/api/sap.ui.mdc.Link
+API: https://ui5.sap.com/#/api/sap.ui.mdc.Link
 
 ## Overview
 
