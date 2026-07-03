@@ -55,6 +55,15 @@ Development guidelines for UI Integration Cards (also known as UI5 Integration C
 - **i18n** - Bind all user-facing strings to the i18n model; never hardcode
 - **Actions** - Use the `actions` property for links and interactions; never inline `<a>` tags or hand-roll URL handlers
 
+#### ui5-best-practices-mdc
+
+Development guidelines for `sap.ui.mdc` model-driven controls with OData V4 and JSON models (SAPUI5 1.136+ LTS):
+
+- **Delegate pattern** - Base delegates, `fetchProperties`, `updateBindingInfo`, PropertyInfo structure
+- **Per-control references** - FilterBar, Chart, Field, FilterField, ValueHelp, Link, MultiValueField
+- **JSON model support** - Custom delegates, TypeMap registration, manual PropertyInfo
+- **Core rules** - Delegate configuration, `p13nMode`, condition handling, type namespaces
+
 #### ui5-best-practices-opa5
 
 Guidelines and debugging workflow for OPA5 integration tests:
@@ -63,6 +72,15 @@ Guidelines and debugging workflow for OPA5 integration tests:
 - **TestRecorder tooling** - Temporary `sap.ui.testrecorder.ControlTree` integration to inspect the live control tree and generate reliable OPA5 snippets (UI5 ≥ 1.147)
 - **Page object organization** - Placement of actions and assertions across views
 - **App teardown** - Cleanup patterns in OPA5 journey tests
+
+#### ui5-best-practices-smart-controls
+
+Development guidelines for `sap.ui.comp` annotation-driven smart controls with OData V2 (SAPUI5 1.136+ LTS):
+
+- **Per-control references** - SmartField, SmartForm, SmartFilterBar, SmartChart, SmartLink, SmartMultiInput, FilterBar, ValueHelpDialog
+- **Core rules** - Annotation requirements, `entitySet` binding, `initialise` event, SmartForm hierarchy
+- **Selection matrix** - When to use each smart control vs. alternatives
+- **Common errors** - Annotation mistakes, rendering issues, binding problems
 
 #### ui5-best-practices-tables
 
