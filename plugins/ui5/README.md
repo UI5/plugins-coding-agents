@@ -28,6 +28,19 @@ Development guidelines and coding standards derived from official SAP UI5 guidel
 
 **Note**: For TypeScript conversion specifically, use the separate [`ui5-typescript-conversion`](https://github.com/UI5/plugins-coding-agents/tree/main/plugins/ui5-typescript-conversion) plugin.
 
+#### ui5-best-practices-accessibility
+
+Accessibility guidelines and review checklist for UI5 views, fragments, and controllers:
+
+- **Landmarks** - `landmarkInfo` and `accessibleRole` for `DynamicPage`, `Page`, `Panel`, `ObjectPage`, `FlexibleColumnLayout`
+- **Labeling** - `<Label labelFor>` for inputs, `ariaLabelledBy` for tables, tooltips for icon-only buttons, `alt` for standalone icons and images
+- **Heading levels** - Explicit `level` on `<Title>`, no heading level jumps within a view
+- **Focus handling** - `initialFocus` on `Dialog`/`Popover`, fast navigation groups, no `tabindex > 0`
+- **Keyboard shortcuts** - `CommandExecution` for action buttons that should support keyboard shortcuts
+- **Invisible messaging** - `InvisibleMessage.announce()` for dynamic state changes visible to sighted users only
+- **Reading order** - Controls not visually reordered out of DOM sequence; `ariaDescribedBy` pointing to correct DOM order
+- **Target size** - `reactiveAreaMode` for interactive controls in dense layouts
+
 #### ui5-best-practices-integration-cards
 
 Development guidelines for UI Integration Cards (also known as UI5 Integration Cards):
@@ -41,6 +54,15 @@ Development guidelines for UI Integration Cards (also known as UI5 Integration C
 - **Analytical cards** - 44 chart types with required UIDs, feeds, and per-type examples
 - **i18n** - Bind all user-facing strings to the i18n model; never hardcode
 - **Actions** - Use the `actions` property for links and interactions; never inline `<a>` tags or hand-roll URL handlers
+
+#### ui5-best-practices-mdc
+
+Development guidelines for `sap.ui.mdc` model-driven controls with OData V4 and JSON models (SAPUI5 1.136+ LTS):
+
+- **Delegate pattern** - Base delegates, `fetchProperties`, `updateBindingInfo`, PropertyInfo structure
+- **Per-control references** - FilterBar, Chart, Field, FilterField, ValueHelp, Link, MultiValueField
+- **JSON model support** - Custom delegates, TypeMap registration, manual PropertyInfo
+- **Core rules** - Delegate configuration, `p13nMode`, condition handling, type namespaces
 
 #### ui5-best-practices-opa5
 
@@ -63,6 +85,15 @@ Coding standards and modernization patterns for QUnit unit test files in UI5 lib
 - **Sinon sandbox** - `sinon.createSandbox()` over deprecated `sinon.sandbox.create()`
 - **Test naming** - Descriptive sentences; no "it should"; unique names per module
 - **File hygiene** - Remove unused imports; ISO 8859-1 compliance; ESLint 0 errors
+
+#### ui5-best-practices-smart-controls
+
+Development guidelines for `sap.ui.comp` annotation-driven smart controls with OData V2 (SAPUI5 1.136+ LTS):
+
+- **Per-control references** - SmartField, SmartForm, SmartFilterBar, SmartChart, SmartLink, SmartMultiInput, FilterBar, ValueHelpDialog
+- **Core rules** - Annotation requirements, `entitySet` binding, `initialise` event, SmartForm hierarchy
+- **Selection matrix** - When to use each smart control vs. alternatives
+- **Common errors** - Annotation mistakes, rendering issues, binding problems
 
 #### ui5-best-practices-tables
 

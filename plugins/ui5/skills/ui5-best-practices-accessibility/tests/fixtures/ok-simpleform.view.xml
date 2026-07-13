@@ -1,0 +1,28 @@
+<mvc:View
+    controllerName="my.app.controller.NewOrder"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:form="sap.ui.layout.form">
+    <App>
+        <Page title="New Order">
+            <landmarkInfo>
+                <PageAccessibleLandmarkInfo
+                    rootRole="Region"
+                    rootLabel="New Order Form"
+                    contentRole="Main"
+                    contentLabel="Order Details"/>
+            </landmarkInfo>
+            <content>
+                <form:SimpleForm editable="true">
+                    <!-- CORRECT: inside SimpleForm, labelFor is not needed -->
+                    <!-- The framework connects Label and Input automatically by position -->
+                    <Label text="Product Name"/>
+                    <Input id="productName" placeholder="Enter product name..."/>
+
+                    <Label text="Quantity"/>
+                    <Input id="quantity" placeholder="Enter quantity..."/>
+                </form:SimpleForm>
+            </content>
+        </Page>
+    </App>
+</mvc:View>

@@ -1,0 +1,21 @@
+<mvc:View
+    controllerName="my.app.controller.OrderActions"
+    xmlns:mvc="sap.ui.core.mvc"
+    xmlns="sap.m"
+    xmlns:core="sap.ui.core">
+    <App>
+        <Page title="Order Actions">
+            <dependents>
+                <!-- GAP: Save and Delete buttons have keyboard shortcuts implied by their
+                     names, but no CommandExecution is declared and no cmd: prefix is used.
+                     Users cannot trigger these actions via Ctrl+S / Ctrl+D. -->
+            </dependents>
+            <content>
+                <VBox class="sapUiSmallMargin">
+                    <Button text="Save" press=".onSave" tooltip="Save"/>
+                    <Button text="Delete" press=".onDelete" tooltip="Delete"/>
+                </VBox>
+            </content>
+        </Page>
+    </App>
+</mvc:View>
