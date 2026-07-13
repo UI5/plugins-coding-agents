@@ -146,7 +146,8 @@ After replacing all `Core.applyChanges()` calls, remove `sap/ui/core/Core` from 
 Check for all uses of the parameter bound to `sap/ui/core/Core`  -  it may be named `Core`, `oCore`, `CoreInstance`, or anything else. Remove it only when no usage of that parameter remains:
 
 - `Core.byId(...)`, `Core.getConfiguration()`, `Core.getModel()`, etc.
-- `sap.ui.getCore()` calls in the same file do **not** count as a usage of the imported parameter and do not prevent removal.
+- `sap.ui.getCore()` calls anywhere in the file **do** count  -  they are a hidden dependency on `sap/ui/core/Core` and prevent removal. Prefer replacing `sap.ui.getCore().someMethod()` with the imported `Core` parameter instead.
+- Exception: top-level bootstrap calls like `sap.ui.getCore().attachInit(...)` or `.ready(...)` are harder to replace and are out of scope for this skill  -  keep the import when they are present.
 
 ```js
 // Before
@@ -169,7 +170,7 @@ sap.ui.define([
 
 ## 8. Fix non-ASCII characters
 
-Replace em dashes (U+2014) and other non-ASCII characters in comments with plain ASCII hyphens. UTF-8 is the required encoding, but non-ASCII characters  -  especially in comments  -  have historically caused encoding issues (e.g. garbled output when the `<meta charset>` tag is missing). Keep comments and strings ASCII-only.
+Replace non-ASCII characters in comments and strings with plain ASCII alternatives. UTF-8 is the required encoding, but non-ASCII characters  -  especially in comments  -  have historically caused encoding issues (e.g. garbled output when the `<meta charset>` tag is missing). When a non-ASCII character is semantically meaningful and cannot be replaced with an ASCII equivalent, use a Unicode escape instead (e.g. `\u00a0` for a non-breaking space).
 
 ```js
 // Bad - em dash U+2014 renders as a garbled character
@@ -177,6 +178,9 @@ Replace em dashes (U+2014) and other non-ASCII characters in comments with plain
 
 // Good - plain ASCII hyphen
 // Exception - keep Core.applyChanges() when...
+
+// Good - Unicode escape when the character is meaningful
+const nbsp = "\u00a0";
 ```
 
 Find violations (adapt the path pattern for your project layout):
@@ -196,7 +200,7 @@ grep -Pn '[^\x00-\x7E]' src/main/webapp/test/**/*.qunit.js
 
 QUnit 1 (loaded via `sap/ui/thirdparty/qunit.js` or a test starter with `qunit/version: 1`) exposed `test`, `asyncTest`, `ok`, `equal`, `strictEqual`, and all other assertions as globals. QUnit 2 requires the `QUnit` namespace and passes the `assert` object as a parameter.
 
-**Global functions → namespaced:**
+**Global functions -> namespaced:**
 
 ```js
 // Bad - QUnit 1 globals
@@ -243,7 +247,7 @@ QUnit.test("fires event", function(assert) {
 });
 ```
 
-**`stop()` / `start()` → async/await:**
+**`stop()` / `start()` -> async/await:**
 
 Replace `stop()` / `start()` pairs with `async/await` following the pattern in section 3 above.
 
