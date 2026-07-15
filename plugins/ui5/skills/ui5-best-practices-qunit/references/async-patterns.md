@@ -20,7 +20,7 @@ await nextUIUpdate();
 assert.notOk(oControl.getDomRef(), "not rendered");
 ```
 
-**With fake timers:** pass the sinon clock instance — `nextUIUpdate` will tick it automatically:
+**With fake timers:** pass the sinon clock instance  -  `nextUIUpdate` will tick it automatically:
 
 ```js
 QUnit.module("with fake timers", {
@@ -45,8 +45,8 @@ QUnit.test("renders after setVisible", async function(assert) {
 | Situation | Preferred fix | Why `Core.applyChanges()` stays |
 |---|---|---|
 | Sinon fake timers active (`sinon.useFakeTimers()`, `sinon.config.useFakeTimers = true`, or sinon's QUnit integration) | Pass the clock: `await nextUIUpdate(this.clock)` | The clock must be ticked to advance past the `setTimeout(0)` used by async rendering. `nextUIUpdate(clock)` does this automatically and is the standard modern approach (widely used across OpenUI5). Only fall back to `Core.applyChanges()` when the render requires more than a single clock tick and `nextUIUpdate(clock)` cannot handle it. |
-| Shared helper functions (`renderObject`, `waitForUIUpdates`) used by many tests | Consider `nextUIUpdate.runSync()` (test-only escape hatch — see below) | Callers need synchronous DOM state without async coordination. |
-| Inside a `load` event callback that must flush a subsequent `invalidate()` synchronously | — | `Core.applyChanges()` must be called inside the callback. |
+| Shared helper functions (`renderObject`, `waitForUIUpdates`) used by many tests | Consider `nextUIUpdate.runSync()` (test-only escape hatch  -  see below) | Callers need synchronous DOM state without async coordination. |
+| Inside a `load` event callback that must flush a subsequent `invalidate()` synchronously |  -  | `Core.applyChanges()` must be called inside the callback. |
 
 **`nextUIUpdate.runSync()`  -  synchronous escape hatch for shared helpers (test code only):**
 
@@ -71,7 +71,7 @@ Core.applyChanges();
 
 Do not rely solely on the commit message  -  20 different places can have 20 different reasons, and mapping between commit message and code is cumbersome.
 
-**Only `sap/ui/test/utils/nextUIUpdate` must be used.** The legacy path `sap/ui/qunit/utils/nextUIUpdate` is a deprecated re-export (since UI5 1.127) that resolves to the same implementation — do not use it in new code.
+**Only `sap/ui/test/utils/nextUIUpdate` must be used.** The legacy path `sap/ui/qunit/utils/nextUIUpdate` is a deprecated re-export (since UI5 1.127) that resolves to the same implementation  -  do not use it in new code.
 
 ---
 

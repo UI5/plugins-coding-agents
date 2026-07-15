@@ -22,7 +22,7 @@ QUnit.module("My Feature", {
 });
 ```
 
-**Exception:** If tests attach event handlers before the initial render fires, use synchronous `placeAt` without `await nextUIUpdate()` in `beforeEach`  -  otherwise the initial event fires before the test can attach its handler.
+**Exception:** If a test must attach an event handler before the initial render fires, do the `attachEvent`, `placeAt`, and `await nextUIUpdate()` inside the test itself rather than in `beforeEach`. QUnit's internal scheduling can insert a `setTimeout` between `beforeEach` and the test body, which may trigger a rendering in between  -  rare, but enough to make the test flaky.
 
 ---
 
