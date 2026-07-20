@@ -73,13 +73,14 @@ QUnit.test("event fires", function(assert) {
 // Good
 QUnit.test("event fires", async function(assert) {
     assert.expect(1);
-    await new Promise((resolve) => {
+    const oOpened = new Promise((resolve) => {
         oControl.attachEventOnce("afterOpen", () => {
             assert.ok(true, "afterOpen fired");
             resolve();
         });
     });
-    oControl.open();
+    oControl.open();  // must come after setting up the listener, before awaiting
+    await oOpened;
 });
 ```
 
@@ -107,14 +108,14 @@ const oSandbox = sinon.sandbox.create();
 const oSandbox = sinon.createSandbox();
 ```
 
-When the QUnit-sinon integration is already active, `this.stub()`, `this.spy()`, and `this.clock` are available directly on the QUnit context  -  a manual sandbox is not needed at all.
+When the QUnit-sinon bridge is configured via the test starter, `this.stub()`, `this.spy()`, and `this.mock()` are available directly on the QUnit context from a per-test sandbox (`this._oSandbox`) that the bridge calls `verifyAndRestore()` on automatically in `afterEach`  -  a manual sandbox is not needed. `this.clock` is only injected when `sinon.config.useFakeTimers` is truthy in the test starter or file preamble; otherwise it is `undefined`.
 
-**Do not mix** the QUnit-sinon bridge (`this.stub()`, `this.spy()`) with an explicitly created sandbox in the same test or module. Use one approach consistently:
+**Do not mix** the QUnit-sinon bridge (`this.stub()`, `this.spy()`, `this.mock()`) with an explicitly created sandbox in the same test or module. Use one approach consistently:
 
-- **Bridge only:** rely on `this.stub()`, `this.spy()`, `this.clock`  -  the bridge restores everything automatically in `afterEach`.
+- **Bridge only:** rely on `this.stub()`, `this.spy()`, `this.mock()` (and `this.clock` when fake timers are enabled)  -  the bridge restores everything automatically in `afterEach`.
 - **Sandbox only:** create with `sinon.createSandbox()`, call `oSandbox.restore()` in `afterEach` (or `finally`).
 
-Note: migrating from a manual sandbox to the bridge is straightforward in most cases. The bridge also exposes `this.verifyAndRestore()`. The only scenario where keeping a sandbox is justified is when the sandbox `verify()` method (without restore) is called mid-test  -  `this.verifyAndRestore()` always restores, so it cannot replace a standalone `verify()` call.
+Note: the bridge exposes the underlying sandbox as `this._oSandbox` (documented in `sinon-qunit-bridge.js` line 10). The only scenario where keeping a standalone sandbox is justified is when `sandbox.verify()` (without restore) must be called mid-test  -  the bridge's automatic `verifyAndRestore()` in `afterEach` cannot substitute for a standalone mid-test `verify()`.
 
 ---
 
@@ -253,12 +254,17 @@ Replace `stop()` / `start()` pairs with `async/await` following the pattern in s
 
 | QUnit 1 | QUnit 2 |
 |---|---|
+| bare `test(name, fn)` (global) | `QUnit.test(name, function(assert) { ... })` |
+| bare `module(name, hooks)` (global) | `QUnit.module(name, hooks)` |
 | `asyncTest(...)` | `QUnit.test("...", async function(assert) { ... })` |
+| `test(name, N, fn)` (middle-arg expected count) | `QUnit.test(name, function(assert) { assert.expect(N); ... })` |
 | `expect(N)` (global) | `assert.expect(N)` |
 | `stop()` / `start()` | `await new Promise(...)` |
 | `ok(...)` | `assert.ok(...)` |
 | `equal(...)` | `assert.equal(...)` |
 | `strictEqual(...)` | `assert.strictEqual(...)` |
+| `notEqual(...)` / `notStrictEqual(...)` / `deepEqual(...)` | `assert.notEqual(...)` / `assert.notStrictEqual(...)` / `assert.deepEqual(...)` |
+| `raises(fn)` | `assert.throws(fn)` (renamed; `raises` removed) |
 
 ---
 

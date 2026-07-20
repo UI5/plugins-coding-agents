@@ -40,23 +40,25 @@ QUnit.test("renders after setVisible", async function(assert) {
 });
 ```
 
+Note: when using the sinon-QUnit bridge, `this.clock` is only injected when `sinon.config.useFakeTimers` is truthy in the test starter or file preamble (`sinon-qunit-bridge.js:73-77`). When setting up fake timers yourself (as above), `this.clock` comes from `sinon.useFakeTimers()` directly.
+
 **Keep `Core.applyChanges()`  -  do NOT replace  -  in these cases:**
 
 | Situation | Preferred fix | Why `Core.applyChanges()` stays |
 |---|---|---|
 | Sinon fake timers active (`sinon.useFakeTimers()`, `sinon.config.useFakeTimers = true`, or sinon's QUnit integration) | Pass the clock: `await nextUIUpdate(this.clock)` | The clock must be ticked to advance past the `setTimeout(0)` used by async rendering. `nextUIUpdate(clock)` does this automatically and is the standard modern approach (widely used across OpenUI5). Only fall back to `Core.applyChanges()` when the render requires more than a single clock tick and `nextUIUpdate(clock)` cannot handle it. |
-| Shared helper functions (`renderObject`, `waitForUIUpdates`) used by many tests | Consider `nextUIUpdate.runSync()` (test-only escape hatch  -  see below) | Callers need synchronous DOM state without async coordination. |
+| Shared helper functions (`renderObject`, `waitForUIUpdates`) used by many tests | First choice: convert the helper to `async` and `await nextUIUpdate()` at all call sites. Only if that migration is genuinely infeasible: `nextUIUpdate.runSync()` (see caveat below). | Callers need synchronous DOM state without async coordination. |
 | Inside a `load` event callback that must flush a subsequent `invalidate()` synchronously |  -  | `Core.applyChanges()` must be called inside the callback. |
 
-**`nextUIUpdate.runSync()`  -  synchronous escape hatch for shared helpers (test code only):**
+**`nextUIUpdate.runSync()`  -  escape hatch of last resort, not a canonical replacement:**
 
-When a shared helper function must remain synchronous (e.g. `renderObject` called by many tests that cannot all be made async), use `nextUIUpdate.runSync()` instead of `Core.applyChanges()`. It flushes pending renders synchronously and is explicitly intended for test code. It logs a warning each call as a reminder to migrate.
+`nextUIUpdate.runSync()` is marked `@private @deprecated as of 1.127` in its JSDoc and logs *"Synchronous rendering forced: Please migrate to asynchronous rendering"* on every call. It will be removed in a future release. Use it only when converting a shared helper to `async` is genuinely infeasible, and treat every call as tech debt. New tests must not adopt it.
 
 ```js
-// In a shared helper - synchronous, test code only
+// Escape hatch only - @private @deprecated as of 1.127, will be removed
 function renderObject(oControl) {
     oControl.placeAt("qunit-fixture");
-    nextUIUpdate.runSync();  // test-only; logs a warning to encourage migration
+    nextUIUpdate.runSync();  // logs "Synchronous rendering forced: Please migrate..."
 }
 ```
 

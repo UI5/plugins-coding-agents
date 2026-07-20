@@ -59,7 +59,7 @@ Test names must read as sentences describing the verified behavior.
 | `"it should render correctly"` | `"header is expanded after initial render"` |
 
 - Never start with "it should"
-- Every name within a module must be unique  -  duplicates cause QUnit to append number suffixes (`"getSelectedItem() 2"`), making failure reports ambiguous
+- Every name within a module must be unique  -  QUnit appends a trailing space per collision (not a number suffix), so `"myTest"` becomes `"myTest "`, then `"myTest  "`. Trailing spaces are invisible in most reporters, making failure output ambiguous
 
 ---
 
@@ -118,10 +118,11 @@ See [`async-patterns.md`](async-patterns.md) for control-specific helpers (Objec
 ## 7. File setup
 
 - Add `/*global QUnit */` as the first line so ESLint recognises the QUnit global without requiring an explicit import. Note: the Foundation team is working on making this unnecessary (CPOUI5FOUNDATION-1204)  -  once that feature is available, the comment can be removed.
-- **Sinon:** use sinon consistently in one of two ways  -  do not mix them:
-  - **Via the QUnit-sinon bridge (preferred):** configured in the test starter; sinon is not imported as a dependency. Use `this.stub()`, `this.spy()`, `this.clock` from the QUnit context.
-  - **Via explicit dependency:** import sinon as a module dependency and do not configure it via the test starter. Do not use the bridge (`this.stub()` etc.) in this case.
-  - Add `/*global sinon */` only when sinon is used via the bridge (it arrives as a global, not an AMD module).
+- **Sinon:** sinon is configured via the test starter. Use it consistently in one of these ways  -  do not mix them:
+  - **Via the QUnit-sinon bridge:** the bridge injects `this.stub()`, `this.spy()`, and `this.mock()` from a per-test sandbox that is automatically restored in `afterEach`. `this.clock` is only available when `sinon.config.useFakeTimers` is truthy. Do not import sinon as an AMD dependency in this case.
+  - **Via the sinon global directly:** sinon is configured in the test starter and available as a global (`/*global sinon */`), but used as `sinon.stub(...)`, `sinon.spy(...)` etc. directly rather than via `this`. This is the most common pattern in existing UI5 tests. You are responsible for cleanup in `afterEach`.
+  - **Via explicit AMD dependency:** import sinon as a module dependency and do not configure it via the test starter. Do not use the bridge or sinon global in this case.
+  - Add `/*global sinon */` when sinon arrives as a global (bridge or direct-global variant).
 - Declare all other dependencies in `sap.ui.define`. Do not import `sap/ui/core/Core` just for `Core.applyChanges()`  -  use `nextUIUpdate()` instead. Do not use deprecated Core APIs in new tests: replace `Core.byId(id)` with `Element.getElementById(id)` (`sap/ui/core/Element`), `Core.getConfiguration().getAnimationMode()` with `ControlBehavior.getAnimationMode()` (`sap/ui/core/ControlBehavior`), `Core.getConfiguration().getLanguage()` with `Localization.getLanguage()` (`sap/base/i18n/Localization`), and other deprecated configuration getters with their successor module, and other deprecated methods with their documented modern alternatives.
 - Avoid non-ASCII characters in comments, strings, or JSDoc  -  use plain ASCII hyphens, not em dashes (U+2014). UTF-8 is the required encoding, but non-ASCII characters in comments have historically caused encoding issues.
 

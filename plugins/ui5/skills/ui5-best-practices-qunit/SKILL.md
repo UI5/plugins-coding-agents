@@ -26,7 +26,7 @@ Load the reference before producing any output. Do not work from memory.
 | No `var` | Use `const` or `let`. One declaration per line  -  no comma chains. |
 | No `.bind(this)` | Use arrow functions for callbacks that do not need their own `this`. |
 | `assert.expect(N)` in every `async` test | Guards against silent passes when async callbacks never fire. Not required for sync tests. |
-| `sinon.createSandbox()` | `sinon.sandbox.create()` is deprecated  -  never use it. Alternatively use the QUnit-sinon bridge (`this.stub()`, `this.spy()`). Do not mix both approaches in the same module. |
+| `sinon.createSandbox()` | `sinon.sandbox.create()` emits a runtime deprecation warning in Sinon 5+  -  prefer `sinon.createSandbox()`. Alternatively use the QUnit-sinon bridge (`this.stub()`, `this.spy()`, `this.mock()`; `this.clock` only when `sinon.config.useFakeTimers` is truthy). Do not mix both approaches in the same module. |
 | Descriptive test names | Sentence describing behavior. Never start with "it should". Unique within each module. |
 | `beforeEach` / `afterEach` in every module | Create all controls in `beforeEach`, destroy them in `afterEach`. No shared mutable state between tests. |
 | `try/finally` in helper-created controls | Helpers that create a control must destroy it in `finally` so it is cleaned up even when assertions throw. |
@@ -43,7 +43,7 @@ Use when authoring or reviewing a QUnit test file:
 - [ ] No `.bind(this)`  -  use arrow functions for callbacks that do not need their own `this`
 - [ ] No `assert.async()` in simple cases  -  use `async function` + `await new Promise(...)`
 - [ ] Every `async` test has `assert.expect(N)`
-- [ ] No `sinon.sandbox.create()`  -  use `sinon.createSandbox()` or use the bridge (`this.stub()`, `this.spy()`)
+- [ ] No `sinon.sandbox.create()` in new code  -  use `sinon.createSandbox()` or the bridge (`this.stub()`, `this.spy()`, `this.mock()`); `this.clock` only when fake timers are enabled
 - [ ] No `"it should..."` test titles  -  use descriptive sentences
 - [ ] Every `QUnit.module` has `beforeEach` / `afterEach` that create and destroy all controls
 - [ ] With fake timers: prefer `await nextUIUpdate(this.clock)` over `Core.applyChanges()`; only keep `Core.applyChanges()` when `nextUIUpdate(clock)` cannot handle the case
