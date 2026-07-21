@@ -73,6 +73,19 @@ Guidelines and debugging workflow for OPA5 integration tests:
 - **Page object organization** - Placement of actions and assertions across views
 - **App teardown** - Cleanup patterns in OPA5 journey tests
 
+#### ui5-best-practices-qunit
+
+Coding standards and modernization patterns for QUnit unit test files in UI5 libraries:
+
+- **Variable declarations** - `const`/`let` over `var`; one declaration per line
+- **Async patterns** - `await nextUIUpdate()` over `Core.applyChanges()`; `async/await` over `assert.async()`; `waitForEvent` helper pattern
+- **Fake timer safety** - When to keep `Core.applyChanges()` instead of converting (fake timers, shared helpers, load callbacks)
+- **assert.expect(N)** - Required in every async test to guard against silent passes
+- **Module isolation** - `beforeEach`/`afterEach` lifecycle; `try/finally` teardown in helpers
+- **Sinon sandbox** - `sinon.createSandbox()` over deprecated `sinon.sandbox.create()`
+- **Test naming** - Descriptive sentences; no "it should"; unique names per module
+- **File hygiene** - Remove unused imports; ISO 8859-1 compliance; ESLint 0 errors
+
 #### ui5-best-practices-smart-controls
 
 Development guidelines for `sap.ui.comp` annotation-driven smart controls with OData V2 (SAPUI5 1.136+ LTS):
