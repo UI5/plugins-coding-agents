@@ -31,11 +31,13 @@
     "prettier": "prettier **/.mcp.json **/plugin.json",
     "prettier:write": "npm run prettier -- --write",
     "prettier:check": "npm run prettier -- --check",
-    "test": "npm run prettier:check && npm run knip && npm run check-licenses"
+    "test": "npm run prettier:check && npm run knip && npm run check-licenses && npm run vally",
+    "vally": "vally lint --strict"
   },
   "devDependencies": {
     "@commitlint/cli": "^21.0.2",
     "@commitlint/config-conventional": "^21.1.0",
+    "@microsoft/vally-cli": "^0.10.0",
     "husky": "^9.1.7",
     "knip": "^6.26.0",
     "licensee": "^12.0.1",
