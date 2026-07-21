@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.1.7](https://github.com/UI5/plugins-coding-agents/compare/v0.1.6...v0.1.7) (2026-07-21)
+
+
+### Features
+
+* **ui5:** Add accessibility best practices skill ([#85](https://github.com/UI5/plugins-coding-agents/issues/85)) ([7cf7363](https://github.com/UI5/plugins-coding-agents/commit/7cf7363d19640be2d4dfd8eef18ceef0383feb8e))
+* **ui5:** Add QUnit best-practices skill ([#80](https://github.com/UI5/plugins-coding-agents/issues/80)) ([c2b4dc2](https://github.com/UI5/plugins-coding-agents/commit/c2b4dc20af405b56c278d617c1c04778522d1630))
+* **ui5:** Add Smart & MDC Controls best practices skill ([#91](https://github.com/UI5/plugins-coding-agents/issues/91)) ([c61e0b7](https://github.com/UI5/plugins-coding-agents/commit/c61e0b7fc7e38168f1df4f705f54c57e59d44c98))
+
 ## [0.1.6](https://github.com/UI5/plugins-coding-agents/compare/v0.1.5...v0.1.6) (2026-06-25)
 
 
