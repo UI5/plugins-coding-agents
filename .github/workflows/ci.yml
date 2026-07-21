@@ -43,6 +43,9 @@ jobs:
     - name: Perform dependency check
       run: npm run knip
 
+    - name: Perform vally check
+      run: npm run vally
+
     - name: Verify plugin.json copies are in sync
       run: |
         set -eu
