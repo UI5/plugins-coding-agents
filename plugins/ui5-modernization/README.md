@@ -13,17 +13,39 @@ This plugin provides:
 
 ## Installation
 
-### Via Claude CLI
+### Claude Code CLI
 
 ```bash
 claude plugin install ui5-modernization@claude-plugins-official
 ```
 
-### In Claude Code
+If you have already started an interactive Claude Code CLI session, you can use the `/plugin` command.
 
 ```bash
 /plugin install ui5-modernization@claude-plugins-official
 ```
+
+### GitHub Copilot CLI
+
+```bash
+copilot plugin install ui5-modernization@awesome-copilot
+```
+
+If you have already started an interactive GitHub Copilot CLI session, you can use the `/plugin` command.
+
+```bash
+/plugin install ui5-modernization@awesome-copilot
+```
+
+### Installing Skills Only
+
+If your coding agent doesn't support plugins, install the skills directly using the [skills](https://www.npmjs.com/package/skills) package:
+
+```bash
+npx skills add UI5/plugins-coding-agents
+```
+
+> **Note:** When installing the skills only, you will need to install the [UI5 MCP server](https://github.com/UI5/mcp-server) manually.
 
 ## How It Works
 

@@ -112,17 +112,31 @@ Authoritative development guidelines for all UI5 table controls (SAPUI5 1.136+ L
 
 ## Installation
 
-### Via Claude CLI
+### Claude Code CLI
+
 ```bash
 claude plugin install ui5@claude-plugins-official
 ```
 
-### In Claude Code
-```
+If you have already started an interactive Claude Code CLI session, you can use the `/plugin` command.
+
+```bash
 /plugin install ui5@claude-plugins-official
 ```
 
-## Installing Skills Only
+### GitHub Copilot CLI
+
+```bash
+copilot plugin install ui5@awesome-copilot
+```
+
+If you have already started an interactive GitHub Copilot CLI session, you can use the `/plugin` command.
+
+```bash
+/plugin install ui5@awesome-copilot
+```
+
+### Installing Skills Only
 
 If your coding agent doesn't support plugins, install the skills directly using the [skills](https://www.npmjs.com/package/skills) package:
 
