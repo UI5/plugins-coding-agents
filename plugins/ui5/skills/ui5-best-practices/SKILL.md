@@ -318,63 +318,25 @@ export default class MainController extends Controller {
 
 ### API Lookup
 
-**ALWAYS** use the `get_api_reference` tool to get information on UI5 controls and APIs. This provides direct access to the official UI5 API Reference for the UI5 version in use.
-
-```
-Usage: get_api_reference with project path
-Returns: Official API documentation for controls, classes, and namespaces
-```
+**ALWAYS** use the `get_api_reference` tool to get information on UI5 controls and APIs. Returns official API documentation for controls, classes, and namespaces for the UI5 version in use.
 
 ### Code Validation
 
-**ALWAYS** use the `run_ui5_linter` tool to identify issues. It detects deprecated APIs, accessibility issues, and other potential bugs.
-
-```
-Usage: run_ui5_linter with project path
-Returns: List of issues with severity levels
-```
+**ALWAYS** use the `run_ui5_linter` tool to identify issues (deprecated APIs, accessibility issues, bugs).
 
 ### Code Fixes
 
-To apply fixes suggested by the linter:
 1. **ALWAYS** confirm with the user first
 2. Use the `fix` parameter of the `run_ui5_linter` tool
-3. The tool automatically corrects some identified issues
-4. Manually fix remaining issues using the context information provided
+3. Manually fix remaining issues using the context information provided
 
 ### Local Server Behavior
 
-When interacting with the UI5 CLI's development server:
-
-**CRITICAL**: The server does **NOT** serve a default index file.
-
-```bash
-# ❌ WRONG - Will not work
-http://localhost:8080/
-
-# ✅ CORRECT - Must reference files by full path
-http://localhost:8080/index.html
-```
+**CRITICAL**: The UI5 CLI dev server does **NOT** serve a default index file. Use full paths: `http://localhost:8080/index.html`
 
 ### Code Quality Checks
 
-After making code changes, **ALWAYS** run the project's linter if available:
-
-```bash
-npm run lint           # Standard
-npm run eslint         # Alternative
-eslint .               # Direct ESLint call
-npm run ui5-lint       # UI5 Linter if configured
-ui5lint .              # UI5 Linter if available as CLI tool
-```
-
-**Why**: Linters catch common issues before committing:
-- Missing imports or type errors
-- Formatting inconsistencies
-- Deprecated API usage
-- Code style violations
-
-Fix all linting errors before committing.
+After making changes, run the project's linter (`npm run lint`, `eslint .`, or `ui5lint .`). Fix all errors before committing.
 
 ---
 
