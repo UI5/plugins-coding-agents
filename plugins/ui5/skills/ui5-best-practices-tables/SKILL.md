@@ -1,9 +1,9 @@
 ---
 name: ui5-best-practices-tables
 description: |
-  UI5 table best practices and authoritative development guidelines. Use when the user asks to "create a table", "add a table", "which table should I use", "implement sap.m.Table", "implement sap.ui.table", "GridTable", "ResponsiveTable", "TreeTable", "SmartTable", "MDC table", "sap.ui.mdc.Table", "sap.ui.comp.smarttable", "table not showing data", "table binding", "table selection", "drag and drop table", "table personalization", "copy paste table", "table export", "table sticky header", "table growing", "table pop-in", "table performance", "table accessibility", "table items binding", or is writing any UI5 freestyle application that includes a table control. Covers: control selection matrix, mandatory rules, common error patterns, and per-control API guidance for sap.m.Table, sap.ui.table.Table, sap.ui.table.TreeTable, sap.ui.comp.smarttable.SmartTable, and sap.ui.mdc.Table.
-
-  Keywords: sap.m.Table, sap.ui.table, GridTable, ResponsiveTable, TreeTable, SmartTable, sap.ui.mdc.Table, table binding, rows aggregation, items aggregation, rowMode, growing, sticky, personalization, drag and drop, DragDropInfo, p13n.Engine, OData V4, OData V2, cell templates, ariaLabelledBy
+  UI5 table best practices for freestyle applications. Use when creating/troubleshooting any table: sap.m.Table (ResponsiveTable), sap.ui.table.Table (GridTable), TreeTable, SmartTable, or sap.ui.mdc.Table. Covers control selection matrix, mandatory rules, common errors, and per-control API guidance.
+  Triggers: "create a table", "which table should I use", "GridTable", "ResponsiveTable", "TreeTable", "SmartTable", "MDC table", "sap.ui.mdc.Table", "table not showing data", "table binding", "table selection", "drag and drop table", "table personalization", "table growing", "table pop-in", "table performance", "table export", "table sticky header".
+  Keywords: sap.m.Table, sap.ui.table, GridTable, ResponsiveTable, TreeTable, SmartTable, sap.ui.mdc.Table, rows, items, rowMode, growing, sticky, personalization, p13n.Engine, DragDropInfo, OData V4, OData V2, ariaLabelledBy, cell templates
 ---
 
 # UI5 Table Best Practices
