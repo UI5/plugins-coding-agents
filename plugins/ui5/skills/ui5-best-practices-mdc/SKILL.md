@@ -1,9 +1,9 @@
 ---
 name: ui5-best-practices-mdc
 description: |
-    UI5 MDC (Model-Driven Controls) best practices and authoritative development guidelines for OData V4 delegate-based controls. Use when the user asks to "create an MDC FilterBar", "implement MDC Chart", "add MDC Field", "use MDC FilterField", "implement ValueHelp", "add MDC Link", "MDC MultiValueField", "sap.ui.mdc", "delegate pattern", "fetchProperties", "OData V4 freestyle controls", "MDC personalization", "p13nMode", "PropertyInfo", "MDC delegate", "FilterBarDelegate", "ChartDelegate", "ValueHelpDelegate", "LinkDelegate", "MDC field not rendering", "MDC chart not binding", "MDC conditions", "Condition.createCondition", "MDC Table delegate", or is writing any UI5 freestyle application using OData V4 with model-driven controls from sap.ui.mdc. Covers: delegate pattern, PropertyInfo structure, mandatory rules, common error patterns, and per-control API reference for FilterBar, Chart, Field, FilterField, ValueHelp, Link, and MultiValueField.
-
-    Keywords: sap.ui.mdc, MDC, FilterBar, Chart, Field, FilterField, ValueHelp, Link, MultiValueField, delegate, fetchProperties, updateBindingInfo, PropertyInfo, OData V4, JSON model, JSONModel, custom delegate, TypeMap, DefaultTypeMap, base delegate, non-OData, addItem, getFilters, p13nMode, autoBindOnInit, conditions, TypeMap, FieldBase, FilterBarBase, ChartDelegate, ValueHelpDelegate, LinkDelegate, FilterBarDelegate, MultiValueFieldDelegate, Condition.createCondition
+    UI5 MDC (sap.ui.mdc) best practices for OData V4 delegate-based controls. Use when creating/troubleshooting MDC FilterBar, Chart, Field, FilterField, ValueHelp, Link, MultiValueField, or Table. Covers delegate pattern, fetchProperties, PropertyInfo, p13nMode, updateBindingInfo, Condition.createCondition, and common errors (delegate not loaded, chart no data, fields not appearing). Also applies to JSON model (non-OData) MDC usage.
+    Triggers: "MDC", "sap.ui.mdc", "delegate pattern", "fetchProperties", "PropertyInfo", "MDC personalization", "p13nMode", "MDC field not rendering", "MDC chart not binding", "MDC conditions", OData V4 freestyle with model-driven controls.
+    Keywords: sap.ui.mdc, FilterBar, Chart, Field, FilterField, ValueHelp, Link, MultiValueField, delegate, fetchProperties, updateBindingInfo, PropertyInfo, OData V4, JSON model, TypeMap, p13nMode, conditions, FilterBarDelegate, ChartDelegate, ValueHelpDelegate, LinkDelegate, Condition.createCondition
 ---
 
 # UI5 MDC Controls Best Practices
