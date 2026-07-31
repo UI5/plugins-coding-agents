@@ -279,40 +279,14 @@ When multiple modules share the same class name, use descriptive aliases:
 </mvc:View>
 ```
 
-### Formatters with Multiple Parameters
+### Formatters with Multiple Parts / Expression Bindings
 
-When a binding expression uses a formatter with multiple parts, the `core:require` is the same — only the global namespace in the formatter reference changes.
-
-```xml
-<!-- Before -->
-<Text text="{
-    parts: [
-        {path: 'firstName'},
-        {path: 'lastName'}
-    ],
-    formatter: 'my.app.model.formatter.formatFullName'
-}" />
-
-<!-- After (with core:require for formatter on the view root) -->
-<Text text="{
-    parts: [
-        {path: 'firstName'},
-        {path: 'lastName'}
-    ],
-    formatter: 'formatter.formatFullName'
-}" />
-```
-
-### Globals Accessed Inside Expression Bindings
-
-Expression bindings that reference globals via the `${...}` syntax also need `core:require`.
+Multi-part bindings and expression bindings follow the same `core:require` pattern — just replace the dotted global with the local alias. Expression binding example:
 
 ```xml
-<!-- Before -->
-<Text visible="{= ${/count} > 0}" text="{= my.app.model.formatter.formatCount(${/count})}" />
-
-<!-- After -->
-<Text visible="{= ${/count} > 0}" text="{= formatter.formatCount(${/count})}" />
+<!-- Before: text="{= my.app.model.formatter.formatCount(${/count})}" -->
+<!-- After (with core:require for formatter): -->
+<Text text="{= formatter.formatCount(${/count})}" />
 ```
 
 ## App-Namespace Globals in XML
