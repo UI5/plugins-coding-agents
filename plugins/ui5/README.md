@@ -118,7 +118,7 @@ Authoritative development guidelines for all UI5 table controls (SAPUI5 1.136+ L
 claude plugin install ui5@claude-plugins-official
 ```
 
-If you have already started an interactive Claude Code CLI session, you can use the `/plugin` command.
+Use the `/plugin` command if you already started an interactive Claude Code CLI session.
 
 ```bash
 /plugin install ui5@claude-plugins-official
@@ -130,7 +130,7 @@ If you have already started an interactive Claude Code CLI session, you can use 
 copilot plugin install ui5@awesome-copilot
 ```
 
-If you have already started an interactive GitHub Copilot CLI session, you can use the `/plugin` command.
+Use the `/plugin` command if you already started an interactive GitHub Copilot CLI session.
 
 ```bash
 /plugin install ui5@awesome-copilot
@@ -144,4 +144,4 @@ If your coding agent doesn't support plugins, install the skills directly using 
 npx skills add UI5/plugins-coding-agents
 ```
 
-> **Note:** When installing the skills only, you will need to install the [UI5 MCP server](https://github.com/UI5/mcp-server) manually.
+> **Note:** You need to install the [UI5 MCP server](https://github.com/UI5/mcp-server) manually when installing the skills only.

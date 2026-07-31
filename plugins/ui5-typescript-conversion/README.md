@@ -12,7 +12,7 @@
 claude plugin install ui5-typescript-conversion@claude-plugins-official
 ```
 
-If you have already started an interactive Claude Code CLI session, you can use the `/plugin` command.
+Use the `/plugin` command if you already started an interactive Claude Code CLI session.
 
 ```bash
 /plugin install ui5-typescript-conversion@claude-plugins-official
@@ -24,7 +24,7 @@ If you have already started an interactive Claude Code CLI session, you can use 
 copilot plugin install ui5-typescript-conversion@awesome-copilot
 ```
 
-If you have already started an interactive GitHub Copilot CLI session, you can use the `/plugin` command.
+Use the `/plugin` command if you already started an interactive GitHub Copilot CLI session.
 
 ```bash
 /plugin install ui5-typescript-conversion@awesome-copilot
