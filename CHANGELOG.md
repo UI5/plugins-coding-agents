@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.1.8](https://github.com/UI5/plugins-coding-agents/compare/v0.1.7...v0.1.8) (2026-08-03)
+
+
+### Bug Fixes
+
+* **ui5-modernization:** Shorten skill 'fix-cyclic-deps' ([07521e5](https://github.com/UI5/plugins-coding-agents/commit/07521e5d46e39777f58257d08e7e22346acd18ef))
+* **ui5-modernization:** Shorten skill 'fix-js-globals' ([5732d82](https://github.com/UI5/plugins-coding-agents/commit/5732d825cd6c287811d6e9ffe15bad9bb5d5dfa2))
+* **ui5-modernization:** Shorten skill 'fix-xml-globals' ([8ad6f79](https://github.com/UI5/plugins-coding-agents/commit/8ad6f796b9dcbfd63fc4a5bc6b820b424d52044c))
+* **ui5-modernization:** Shorten skill 'modernize-flp-sandbox' ([11cf13a](https://github.com/UI5/plugins-coding-agents/commit/11cf13ab0a41baecd4b8fbbd9ec6e72f7b8d3243))
+* **ui5-modernization:** Shorten skill 'modernize-test-starter' ([f54e028](https://github.com/UI5/plugins-coding-agents/commit/f54e02876e2cb9a1005047eba3047b3d11a65493))
+* **ui5-modernization:** Shorten skill 'modernize-ui5-app' ([b02dcca](https://github.com/UI5/plugins-coding-agents/commit/b02dcca462d22bec770ce301201b00b212653c52))
+* **ui5-typescript-conversion:** Shorten skill 'ui5-typescript-conversion' ([1bded74](https://github.com/UI5/plugins-coding-agents/commit/1bded74a9fdbe5b1e48ee2c3ce0a7765c1b58cbb))
+* **ui5:** Remove duplicate mdc./smart.Table reference ([3b5d3d7](https://github.com/UI5/plugins-coding-agents/commit/3b5d3d7b5ecedfaa0a890bfbda43299fe93427e2))
+* **ui5:** Shorten skill 'ui5-best-practices' ([9f02ef4](https://github.com/UI5/plugins-coding-agents/commit/9f02ef4448ede6db42f0da4f1913dec0307c54f7))
+* **ui5:** Shorten skill description of 'ui5-best-practices-mdc' ([92482a5](https://github.com/UI5/plugins-coding-agents/commit/92482a57865d5fccd440eec5700fbe3773d79b25))
+* **ui5:** Shorten skill description of 'ui5-best-practices-smart-controls ' ([d277452](https://github.com/UI5/plugins-coding-agents/commit/d277452b3a7853262643c1c962e8176e3150c8cf))
+* **ui5:** Shorten skill description of 'ui5-best-practices-tables' ([ef28e24](https://github.com/UI5/plugins-coding-agents/commit/ef28e244483c853a0c0c68db669a912211340f08))
+
 ## [0.1.7](https://github.com/UI5/plugins-coding-agents/compare/v0.1.6...v0.1.7) (2026-07-21)
 
 
