@@ -24,7 +24,6 @@ Apply these guidelines whenever generating, reviewing, or troubleshooting MDC co
 | Working on or planning a `sap.ui.mdc.Link`            | [`references/mdc-link.md`](references/mdc-link.md)                                                                       |
 | Working on or planning a `sap.ui.mdc.MultiValueField` | [`references/mdc-multi-value-field.md`](references/mdc-multi-value-field.md)                                             |
 | Using MDC controls with JSON model (non-OData)        | [`references/mdc-json-delegates.md`](references/mdc-json-delegates.md)                                                   |
-| Working on or planning a `sap.ui.mdc.Table`           | See `ui5-best-practices-tables` skill, [`references/mdc-table.md`](../ui5-best-practices-tables/references/mdc-table.md) |
 
 Load before producing any output. Do not work from memory.
 

@@ -24,7 +24,6 @@ Apply these guidelines whenever generating, reviewing, or troubleshooting UI5 sm
 | Working on or planning a `sap.ui.comp.smartmultiinput.SmartMultiInput` | [`references/smart-multi-input.md`](references/smart-multi-input.md)                                                         |
 | Working on or planning a `sap.ui.comp.filterbar.FilterBar`             | [`references/filter-bar.md`](references/filter-bar.md)                                                                       |
 | Working on or planning a `sap.ui.comp.valuehelpdialog.ValueHelpDialog` | [`references/value-help-dialog.md`](references/value-help-dialog.md)                                                         |
-| Working on or planning a `sap.ui.comp.smarttable.SmartTable`           | See `ui5-best-practices-tables` skill, [`references/smart-table.md`](../ui5-best-practices-tables/references/smart-table.md) |
 
 Load before producing any output. Do not work from memory.
 
