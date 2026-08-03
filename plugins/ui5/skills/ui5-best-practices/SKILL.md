@@ -37,7 +37,7 @@ sap.ui.require(["sap/m/MessageBox"], function(MessageBox) {
 ```
 
 #### TypeScript
-```typescript
+```ts
 // ❌ WRONG - Global namespace
 const button: sap.m.Button;
 
@@ -274,7 +274,7 @@ For **UI5 1.115.0 and above**, import and use the specific event type from the c
 
 **Pattern**: `<ControlName>$<EventName>Event` (notice the "Event" suffix)
 
-```typescript
+```ts
 // ✅ CORRECT - Import specific event type
 import { Button$PressEvent } from "sap/m/Button";
 import { Table$RowSelectionChangeEvent } from "sap/ui/table/Table";
@@ -298,7 +298,7 @@ export default class MainController extends Controller {
 
 **UI5 < 1.115.0**: Control-specific event types are **NOT available**. Use the generic Event type:
 
-```typescript
+```ts
 import Event from "sap/ui/base/Event";
 import Controller from "sap/ui/core/mvc/Controller";
 

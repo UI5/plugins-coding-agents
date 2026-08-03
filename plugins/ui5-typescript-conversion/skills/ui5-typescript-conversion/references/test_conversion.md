@@ -10,7 +10,7 @@ Test conversion should only happen once the rest of the application has been con
 
 Unlike JavaScript where QUnit is often used as a global, TypeScript requires explicit import:
 
-```typescript
+```ts
 import QUnit from "sap/ui/thirdparty/qunit-2";
 ```
 
@@ -18,7 +18,7 @@ import QUnit from "sap/ui/thirdparty/qunit-2";
 
 The testsuite configuration uses plain `export default` (no sap.ui.define wrapper):
 
-```typescript
+```ts
 export default {
     name: "Testsuite for the com/myorg/myapp app",
     defaults: {
@@ -72,7 +72,7 @@ sap.ui.define(["sap/ui/test/opaQunit", "./pages/App"], (opaTest) => {
 
 TypeScript Pattern (NEW) - MUST BE USED:
 
-```typescript
+```ts
 import opaTest from "sap/ui/test/opaQunit";
 import AppPage from "./pages/AppPage";
 import QUnit from "sap/ui/thirdparty/qunit-2";
@@ -103,7 +103,7 @@ JavaScript uses createPageObjects() - DO NOT USE IN TYPESCRIPT
 
 TypeScript uses classes extending Opa5:
 
-```typescript
+```ts
 import Opa5 from "sap/ui/test/Opa5";
 import Press from "sap/ui/test/actions/Press";
 
@@ -160,7 +160,7 @@ sap.ui.define(["sap/ui/test/Opa5", "./arrangements/Startup", "./Journey1"], (Opa
 });
 ```
 TypeScript simplifies to:
-```typescript
+```ts
 // import all your OPA tests here
 import "integration/HelloJourney";
 ```

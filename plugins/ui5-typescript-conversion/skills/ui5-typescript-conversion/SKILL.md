@@ -46,23 +46,28 @@ export default class BaseController extends Controller {
 }
 ```
 
-### Be diligent, go step-by-step
+### Be diligent
 
-Carefully respect all guidelines in this document. Convert step by step: TypeScript project setup first, then central files other files depend on, so typed versions are available for consumers. `"allowJs": true` in `tsconfig.json` allows semi-converted projects.
+Carefully respect all guidelines in this document. Before each conversion step, consider all relevant details.
 
-### Write idiomatic, lint-clean code
+### Go step-by-step
 
-Produce code exactly as a developer would write it by hand: standard formatting, one statement per line, multi-line object and enum literals. Do NOT collapse code onto single lines to save space. The examples in this document use normal formatting on purpose — follow them.
+Convert step by step: TypeScript project setup first, then central files other files depend on, so typed versions are available for consumers. `"allowJs": true` in `tsconfig.json` allows semi-converted projects.
 
-### Avoid `any` and `unknown` casts
+### Avoid `any` type
 
-Find the proper type or create an interface instead of `any`. Import and use actual UI5 control types instead of casting through `unknown` — inspect the XMLView to find which control type you get from `this.byId(...)`, and use specific event types like `Route$PatternMatchedEvent`.
-
+Find the proper type or create an interface instead of `any`:
 ```ts
 // BAD: (this.getOwnerComponent() as any).getContentDensityClass();
 // GOOD:
 (this.getOwnerComponent() as AppComponent).getContentDensityClass()
+```
 
+### Avoid `unknown` casts
+
+Import and use actual UI5 control types. Inspect the XMLView to find which control type you get from `this.byId(...)`. Use specific event types like `Route$PatternMatchedEvent`.
+
+```ts
 // BAD: (this.byId("form") as unknown as {setVisible: (v: boolean) => void}).setVisible(false);
 // GOOD:
 import SimpleForm from "sap/ui/layout/form/SimpleForm";
@@ -85,9 +90,7 @@ Do not increase existing major versions. Do not remove existing dependencies.
 
 **IMPORTANT**: Also add `@sapui5/types` (or `@openui5/types`) matching the UI5 project version as dev dependency. Framework type and version from ui5.yaml or `get_project_info` MCP tool.
 
-If dependencies changed, ensure `npm install` / `yarn install` is run. The `typescript-eslint` dependency is only relevant when the project already has eslint.
-
-Also add `"ts-typecheck": "tsc --noEmit"` script to `package.json`.
+If dependencies changed, ensure `npm install` / `yarn install` is run. The `typescript-eslint` dependency is only relevant when the project already has eslint. Also add `"ts-typecheck": "tsc --noEmit"` script to `package.json`.
 
 ### 2. tsconfig.json
 
@@ -312,9 +315,7 @@ Converting custom UI5 controls requires specific patterns beyond the general con
 
 **This is the most important aspect to understand.**
 
-UI5 generates getter/setter (and more) methods for properties, aggregations, associations, and events at **runtime**. TypeScript cannot see them at development time. A control with a `text` property in its metadata will have `getText()`/`setText()` at runtime, but TypeScript errors on `control.getText()`. TypeScript also does not know the constructor's settings-object structure.
-
-This affects property getters/setters (`getText`, `setText`, `bindText`), aggregation methods (`addItem`, `removeItem`, `getItems`), association methods (`getLabel`, `setLabel`), event methods (`attachPress`, `detachPress`, `firePress`), and the constructor settings object.
+UI5 generates getter/setter (and more) methods for properties, aggregations, associations, and events at **runtime**. TypeScript cannot see them at development time. A control with a `text` property in its metadata will have `getText()`/`setText()` at runtime, but TypeScript errors on `control.getText()`. TypeScript also does not know the constructor's settings-object structure. This affects property getters/setters (`getText`, `setText`, `bindText`), aggregation methods (`addItem`, `removeItem`, `getItems`), association methods (`getLabel`, `setLabel`), event methods (`attachPress`, `detachPress`, `firePress`), and the constructor settings object.
 
 ### The Solution: @ui5/ts-interface-generator
 
@@ -344,7 +345,7 @@ It generates `*.gen.d.ts` files with interfaces for all runtime-generated method
 
 Copy the constructor signatures from the generator's terminal output into the beginning of the class body, before the metadata definition:
 
-```typescript
+```ts
 export default class MyControl extends Control {
     // The following three lines were generated and should remain as-is to make TypeScript aware of the constructor signatures
     constructor(id?: string | $MyControlSettings);
@@ -361,7 +362,7 @@ export default class MyControl extends Control {
 
 The control metadata must be typed as `MetadataOptions`:
 
-```typescript
+```ts
 import type { MetadataOptions } from "sap/ui/core/Element";
 
 export default class MyControl extends Control {
@@ -381,7 +382,7 @@ export default class MyControl extends Control {
 
 The `@namespace` JSDoc annotation is **required** for the transformer to generate correct UI5 class names:
 
-```typescript
+```ts
 /**
  * @namespace ui5.typescript.helloworld.control
  */
@@ -394,7 +395,7 @@ export default class MyControl extends Control {
 
 **Must use `export default` immediately** — a separate export breaks ts-interface-generator:
 
-```typescript
+```ts
 // CORRECT:
 export default class MyControl extends Control {
     // ...
@@ -411,7 +412,7 @@ export default MyControl;
 
 Both metadata and renderer are `static` class members. The renderer can be inline or in a separate file:
 
-```typescript
+```ts
 import Control from "sap/ui/core/Control";
 import type { MetadataOptions } from "sap/ui/core/Element";
 import RenderManager from "sap/ui/core/RenderManager";
@@ -455,7 +456,7 @@ When converting entire control libraries (not just single controls in apps), add
 
 In `library.ts`, enums must be attached to the global library object for UI5 runtime compatibility:
 
-```typescript
+```ts
 import ObjectPath from "sap/base/util/ObjectPath";
 
 export enum ExampleColor {
