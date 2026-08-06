@@ -24,9 +24,12 @@
 - Provides additional UI5-specific information for coding agents
 
 ## Plugin Overview
-- [UI5](./plugins/ui5/README.md)
-- [UI5 Modernization](./plugins/ui5-modernization/README.md)
-- [UI5 TypeScript Conversion](./plugins/ui5-typescript-conversion/README.md)
+
+| Plugin | Description | Installation |
+| ------ | ----------- | ------------ |
+| [UI5](./plugins/ui5/README.md) | Full-featured SAPUI5/OpenUI5 development plugin that supports project creation, API reference look-up, UI5 linter integration, and a broad set of best-practice skills. | [Installation Guide](./plugins/ui5/README.md#installation) |
+| [UI5 Modernization](./plugins/ui5-modernization/README.md) | Autonomous, multi-phase workflow and specialized skills for modernizing UI5 projects by replacing deprecated APIs and eliminating legacy patterns. | [Installation Guide](./plugins/ui5-modernization/README.md#installation) |
+| [UI5 TypeScript Conversion](./plugins/ui5-typescript-conversion/README.md) | Converts JavaScript-based UI5 projects to TypeScript with guided, step-by-step conversion skills. | [Installation Guide](./plugins/ui5-typescript-conversion/README.md#installation) |
 
 ## Further Information
 
