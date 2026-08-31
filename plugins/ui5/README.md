@@ -108,6 +108,17 @@ Authoritative development guidelines for all UI5 table controls (SAPUI5 1.136+ L
 - **Personalization** - `sap.m.p13n.Engine` integration
 - **Cell templates & alignment** - Type-based alignment and model type namespace rules
 
+#### ui5-fiori-guidelines
+
+Picks the correct SAP Fiori / UI5 control for a use case — and stops the wrong one — giving both the SAPUI5 class and the `ui5-*` web component tag:
+
+- **Wrong → Right mapping** - The exact wrong control mapped to the right one (e.g. `sap.m.Bar` used as an app header → `sap.f.ShellBar` / `ui5-shellbar`)
+- **Use-case → Component map** - "App-level navigation" → `ShellBar`; "list → detail split" → `FlexibleColumnLayout`
+- **Table selection by data, not looks** - Responsive vs Grid vs Analytical vs Tree, and when a responsive table degrades
+- **Decision-first reference files** - Per control: when to use, when NOT (with the alternative), machine-checkable rules, gotchas — across actions, inputs, containers, navigation, lists/tables, display, messages, AI, and upload
+- **Critical one-liners** - One emphasized button per page, icon-only buttons need a tooltip, links navigate / buttons act, Popover is non-modal / Dialog is modal
+- **Maintenance** - `REFRESH.md` documents an agent-driven re-sync against SAP sources with human review (no unattended writes)
+
 ---
 
 ## Installation
