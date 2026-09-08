@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.9](https://github.com/UI5/plugins-coding-agents/compare/v0.1.8...v0.1.9) (2026-09-08)
+
+
+### Bug Fixes
+
+* **ui5:** Enforce usage of latest UI5 MCP server ([a99b882](https://github.com/UI5/plugins-coding-agents/commit/a99b882ce364ef4b9f52fb4054f5f410c1636563))
+
 ## [0.1.8](https://github.com/UI5/plugins-coding-agents/compare/v0.1.7...v0.1.8) (2026-08-03)
 
 
