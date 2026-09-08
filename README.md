@@ -34,6 +34,7 @@
 ## Further Information
 
 - [Claude Code Docs](https://code.claude.com/docs/)
+- [OpenAI Codex Plugins Docs](https://developers.openai.com/plugins/build/plugins)
 
 ## Support, Feedback, Contributing
 
