@@ -34,7 +34,7 @@
     "test": "npm run prettier:check && npm run knip && npm run check-licenses"
   },
   "devDependencies": {
-    "@commitlint/cli": "^21.2.2",
+    "@commitlint/cli": "^21.2.3",
     "@commitlint/config-conventional": "^21.2.3",
     "husky": "^9.1.7",
     "knip": "^6.37.0",
