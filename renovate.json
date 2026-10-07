@@ -1,0 +1,53 @@
+{
+    "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+    "extends": [
+        "config:recommended"
+    ],
+    "rangeStrategy": "replace",
+    "lockFileMaintenance": {
+        "enabled": true,
+        "automerge": true,
+        "commitMessagePrefix": "build:",
+        "commitMessageAction": "In-range update of npm dependencies",
+        "schedule": [
+            "* 0-8 * * 1"
+        ]
+    },
+    "packageRules": [
+        {
+            "matchDatasources": [
+                "npm"
+            ],
+            "minimumReleaseAge": "3 days"
+        },
+        {
+            "matchDepNames": [
+                "*"
+            ],
+            "automerge": true,
+            "commitMessagePrefix": "build(deps-dev):",
+            "commitMessageAction": "Bump",
+            "schedule": [
+                "* 8-16 * * 1"
+            ]
+        },
+        {
+            "matchManagers": [
+                "github-actions"
+            ],
+            "automerge": true,
+            "commitMessagePrefix": "ci(github-actions):",
+            "commitMessageAction": "Bump",
+            "schedule": [
+                "* 8-16 * * 1"
+            ]
+        },
+        {
+            "matchPackageNames": [
+                "node",
+                "npm"
+            ],
+            "enabled": false
+        }
+    ]
+}
