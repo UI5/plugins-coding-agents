@@ -21,6 +21,13 @@
             "minimumReleaseAge": "3 days"
         },
         {
+            "matchPackageNames": [
+                "@ui5/mcp-server"
+            ],
+            "minimumReleaseAge": null,
+            "commitMessagePrefix": "deps:"
+        },
+        {
             "matchDepNames": [
                 "*"
             ],
@@ -48,6 +55,19 @@
                 "npm"
             ],
             "enabled": false
+        }
+    ],
+    "customManagers": [
+        {
+            "customType": "regex",
+            "fileMatch": [
+                "plugins/ui5/\\.mcp\\.json"
+            ],
+            "matchStrings": [
+                "@ui5/mcp-server@(?<currentValue>[^\"]+)"
+            ],
+            "depNameTemplate": "@ui5/mcp-server",
+            "datasourceTemplate": "npm"
         }
     ]
 }
