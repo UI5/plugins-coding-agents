@@ -1,0 +1,28 @@
+{
+  "name": "ui5-plugins-coding-agents",
+  "description": "UI5 coding-agent plugins: modernization toolkit, UI5 helpers, and TypeScript conversion",
+  "owner": {
+    "name": "SAP SE"
+  },
+  "metadata": {
+    "description": "Local development marketplace for the UI5 plugins-coding-agents repository",
+    "pluginRoot": "./plugins"
+  },
+  "plugins": [
+    {
+      "name": "ui5-modernization",
+      "source": "./plugins/ui5-modernization",
+      "description": "Complete UI5 modernization toolkit with workflow and specialized fix patterns for modernizing SAPUI5/OpenUI5 applications"
+    },
+    {
+      "name": "ui5",
+      "source": "./plugins/ui5",
+      "description": "UI5 helper plugin"
+    },
+    {
+      "name": "ui5-typescript-conversion",
+      "source": "./plugins/ui5-typescript-conversion",
+      "description": "Convert SAPUI5/OpenUI5 applications from JavaScript to TypeScript"
+    }
+  ]
+}
