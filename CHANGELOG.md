@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.9](https://github.com/UI5/plugins-coding-agents/compare/v0.1.8...v0.1.9) (2026-10-16)
+
+
+### Bug Fixes
+
+* **ui5:** Pin version of @ui5/mcp-server ([#148](https://github.com/UI5/plugins-coding-agents/issues/148)) ([769e130](https://github.com/UI5/plugins-coding-agents/commit/769e13048941350a41d837f4bf13a1a78a216824))
+
 ## [0.1.8](https://github.com/UI5/plugins-coding-agents/compare/v0.1.7...v0.1.8) (2026-08-03)
 
 
