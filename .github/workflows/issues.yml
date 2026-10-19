@@ -10,7 +10,7 @@ permissions:
 jobs:
   stale:
     name: Flag and close stale issues
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-26.04
     steps:
       - uses: actions/stale@v11.0.0
         with:
