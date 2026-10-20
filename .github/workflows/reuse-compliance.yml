@@ -14,7 +14,7 @@ permissions: {}
 jobs:
   compliance-check:
     name: Compliance Check
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-26.04
     steps:
     - uses: actions/checkout@v7
     - name: Execute REUSE Compliance Check
