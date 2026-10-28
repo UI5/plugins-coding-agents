@@ -41,13 +41,14 @@ For form fields use the value-state tokens (`--sapField_InvalidColor`, `--sapFie
 
 ## AI / Joule
 
-AI surfaces have a distinct purple→magenta identity. Use it only for AI-generated content.
+Embedded AI (AI buttons, icons, Local AI Notice) uses **SAP blue**, not purple. Purple is reserved for the Joule assistant. Don't introduce other colors for AI.
 
-| Token | Value |
-|---|---|
-| `--sapAssistant_Color1` | `#5d36ff` |
-| `--sapAssistant_Color2` | `#a100c2` |
-| `--sapAssistant_BackgroundGradient` | `linear-gradient(#5d36ff, #a100c2)` |
+| Use | Token | Value |
+|---|---|---|
+| Embedded AI buttons, icons, related UI | `--sapBrandColor` | `#0070f2` |
+| AI-populated fields / AI suggestions (attention) | `--sapInformationBackground` | `#e1f4ff` |
+| Joule header and Joule UI only | `--sapAccentColor5` / `--sapAssistant_Color1` | `#5d36ff` |
+| Joule gradient — brand/marketing moments only (welcome screens, banners) | `--sapAssistant_BackgroundGradient` | `linear-gradient(#5d36ff, #a100c2)` |
 
 ## Typography
 
@@ -62,14 +63,13 @@ The SAP font is **72**. Condensed density uses `72-Condensed`. Don't set a custo
 
 Set once at the app root; controls inherit it.
 
-| Tier | Element height token | Value | When |
-|---|---|---|---|
-| Cozy (default) | `--sapElement_Height` | `2.25rem` | Touch, mobile, low-density screens |
-| Compact | `--sapElement_Compact_Height` | `1.625rem` | Mouse/desktop, data-dense screens |
-| Condensed | `--sapElement_Condensed_Height` | `1.375rem` | Very dense tables (with Compact on the page) |
+| Tier | Element height token | Value |
+|---|---|---|
+| Cozy (default) | `--sapElement_Height` | `2.25rem` |
+| Compact | `--sapElement_Compact_Height` | `1.625rem` |
+| Condensed | `--sapElement_Condensed_Height` | `1.375rem` |
 
-- SAPUI5: add the CSS class `sapUiSizeCozy` / `sapUiSizeCompact` / `sapUiSizeCondensed` on a container.
-- Web Components: cozy is default; opt into compact via `import "@ui5/webcomponents-base/dist/features/ui5-content-density.js"` and the `ui5-content-density-compact` class.
+- OpenUI5 / SAPUI5: add the CSS class `sapUiSizeCozy` / `sapUiSizeCompact` / `sapUiSizeCondensed` on a container (cozy is the default).
 - Condensed is table-only and must sit inside a Compact container.
 
 ## Rules

@@ -1,0 +1,321 @@
+{
+  "version": "1.0",
+  "skill": "ui5-fiori-guidelines",
+  "skill_prompt_file": "../SKILL.md",
+  "modes": ["Select", "Review"],
+  "topics": [
+    "Shell and Navigation",
+    "Layout and Floorplan",
+    "Buttons and Actions",
+    "Forms and Inputs",
+    "Tables and Lists",
+    "Messaging",
+    "Accessibility"
+  ],
+  "assertion_types": {
+    "recommends": "The answer recommends a control whose name contains at least one string from `must_mention_any`. All matching is case-insensitive substring.",
+    "must_not_recommend": "None of the strings in `strings` is presented as the recommended control. Naming it as the wrong choice is allowed.",
+    "must_not_mention": "None of the strings in `strings` appear anywhere in the answer or report.",
+    "reads_reference": "The agent reads at least one of the files in `files` (checked in the tool-call transcript).",
+    "max_references_read": "The agent reads at most `max` files under `references/`. Catches over-reading that wastes tokens.",
+    "report_finding": "Review report contains a finding grouped under `topic` whose body mentions at least one string from `must_mention_any` AND at least one from `must_anchor_on`.",
+    "report_empty": "Review output is the negative response ('No Fiori guideline violations found') with zero findings.",
+    "finding_count_max": "Total findings under `topic` (or globally if `topic` is omitted) is <= `max`. Catches over-flagging."
+  },
+  "test_cases": [
+    {
+      "id": "sel-001",
+      "mode": "Select",
+      "prompt": "I'm using sap.m.Bar as the header of my app with the logo, notifications and user avatar. Is that right?",
+      "assertions": [
+        { "id": "a1", "type": "recommends", "must_mention_any": ["sap.f.ShellBar", "ShellBar"], "description": "App header is ShellBar" },
+        { "id": "a2", "type": "must_not_recommend", "strings": ["sap.m.Bar"], "description": "Bar is not the app header" },
+        { "id": "a3", "type": "max_references_read", "max": 0, "description": "Answered from the SKILL.md tables" }
+      ]
+    },
+    {
+      "id": "sel-002",
+      "mode": "Select",
+      "prompt": "Which namespace do I import SideNavigation from, and does it work in OpenUI5?",
+      "assertions": [
+        { "id": "a1", "type": "recommends", "must_mention_any": ["sap.tnt.SideNavigation", "sap/tnt/SideNavigation"], "description": "SideNavigation lives in sap.tnt" },
+        { "id": "a2", "type": "must_not_mention", "strings": ["sap.f.SideNavigation", "sap/f/SideNavigation"], "description": "The non-existent sap.f namespace is never suggested" },
+        { "id": "a3", "type": "must_not_mention", "strings": ["SAPUI5-only", "not available in OpenUI5", "not in OpenUI5"], "description": "sap.tnt ships with OpenUI5" }
+      ]
+    },
+    {
+      "id": "sel-003",
+      "mode": "Select",
+      "prompt": "I need a list of purchase orders, the order details next to it, and the line item details in a third column. How do I build the layout and handle navigation?",
+      "assertions": [
+        { "id": "a1", "type": "recommends", "must_mention_any": ["sap.f.FlexibleColumnLayout", "FlexibleColumnLayout"], "description": "List-detail-detail is FCL" },
+        { "id": "a2", "type": "recommends", "must_mention_any": ["FlexibleColumnLayoutSemanticHelper", "getNextUIState"], "description": "Uses the semantic helper for layouts" },
+        { "id": "a3", "type": "recommends", "must_mention_any": ["{layout}", "layout parameter", "sap.f.routing.Router"], "description": "Layout driven by the router" },
+        { "id": "a4", "type": "must_not_recommend", "strings": ["sap.m.SplitApp", "SplitContainer"], "description": "No legacy split containers" },
+        { "id": "a5", "type": "reads_reference", "files": ["references/ui-layouts.md"], "description": "Dispatches to the layouts reference" }
+      ]
+    },
+    {
+      "id": "sel-004",
+      "mode": "Select",
+      "prompt": "I want a page with a title that always stays visible, a header with filters that collapses when the user scrolls, and a footer with Save and Cancel.",
+      "assertions": [
+        { "id": "a1", "type": "recommends", "must_mention_any": ["sap.f.DynamicPage", "DynamicPage"], "description": "Dynamic Page" },
+        { "id": "a2", "type": "must_not_recommend", "strings": ["sap.m.Page"], "description": "Not a plain Page with a hand-built header" },
+        { "id": "a3", "type": "reads_reference", "files": ["references/ui-layouts.md"], "description": "Dispatches to the layouts reference" }
+      ]
+    },
+    {
+      "id": "sel-005",
+      "mode": "Select",
+      "prompt": "Users should be able to jump between the products of our suite from the app header. What control do I use?",
+      "assertions": [
+        { "id": "a1", "type": "recommends", "must_mention_any": ["sap.f.ProductSwitch", "ProductSwitch"], "description": "Product Switch" },
+        { "id": "a2", "type": "recommends", "must_mention_any": ["showProductSwitcher", "productSwitcherPressed"], "description": "Opened from the ShellBar" },
+        { "id": "a3", "type": "reads_reference", "files": ["references/ui-navigation.md"], "description": "Dispatches to the navigation reference" }
+      ]
+    },
+    {
+      "id": "sel-006",
+      "mode": "Select",
+      "prompt": "My object page saves a draft automatically while the user edits. How should I show that the draft is being saved?",
+      "assertions": [
+        { "id": "a1", "type": "recommends", "must_mention_any": ["sap.m.DraftIndicator", "DraftIndicator"], "description": "Draft Indicator" },
+        { "id": "a2", "type": "must_not_recommend", "strings": ["MessageToast"], "description": "Not a toast per autosave" },
+        { "id": "a3", "type": "reads_reference", "files": ["references/ui-display.md", "references/component-selection.md"], "description": "Dispatches to a display reference" }
+      ]
+    },
+    {
+      "id": "sel-007",
+      "mode": "Select",
+      "prompt": "On phones, users should refresh their task list by pulling it down. Which control?",
+      "assertions": [
+        { "id": "a1", "type": "recommends", "must_mention_any": ["sap.m.PullToRefresh", "PullToRefresh"], "description": "Pull to Refresh" },
+        { "id": "a2", "type": "recommends", "must_mention_any": ["hide()", "first control", "scrollable"], "description": "Mentions placement or hide() after loading" }
+      ]
+    },
+    {
+      "id": "sel-008",
+      "mode": "Select",
+      "prompt": "I show a product photo with <Image src=\"{PhotoUrl}\" alt=\"{ProductName}\" />. Is that accessible?",
+      "assertions": [
+        { "id": "a1", "type": "recommends", "must_mention_any": ["decorative=\"false\"", "decorative to false", "decorative: false"], "description": "alt is ignored while decorative defaults to true" }
+      ]
+    },
+    {
+      "id": "sel-009",
+      "mode": "Select",
+      "prompt": "I want to show a KPI like 'Budget used 82%' with a warning color in the title area of my object page.",
+      "assertions": [
+        { "id": "a1", "type": "recommends", "must_mention_any": ["sap.m.GenericTag", "GenericTag"], "description": "Generic Tag for header KPIs" },
+        { "id": "a2", "type": "recommends", "must_mention_any": ["ObjectNumber"], "description": "Value goes into the ObjectNumber aggregation" }
+      ]
+    },
+    {
+      "id": "sel-010",
+      "mode": "Select",
+      "prompt": "Which table should I use when I need sums and subtotals per group?",
+      "assertions": [
+        { "id": "a1", "type": "recommends", "must_mention_any": ["sap.ui.table.AnalyticalTable", "AnalyticalTable"], "description": "Analytical Table for aggregation" },
+        { "id": "a2", "type": "must_not_recommend", "strings": ["sap.m.Table"], "description": "Responsive table has no group subtotals (only footer totals)" }
+      ]
+    },
+    {
+      "id": "sel-011",
+      "mode": "Select",
+      "prompt": "My app has a ShellBar and a left navigation menu. What is the container for both?",
+      "assertions": [
+        { "id": "a1", "type": "recommends", "must_mention_any": ["sap.tnt.ToolPage", "ToolPage"], "description": "ToolPage hosts ShellBar and SideNavigation" },
+        { "id": "a2", "type": "must_not_recommend", "strings": ["sap.f.DynamicPage"], "description": "SideNavigation is not wrapped in a DynamicPage" }
+      ]
+    },
+    {
+      "id": "sel-012",
+      "mode": "Select",
+      "prompt": "My page footer has Save as the primary action, plus Save as Draft and Cancel. Which button type do I use for Save as Draft and for Cancel?",
+      "assertions": [
+        { "id": "a1", "type": "recommends", "must_mention_any": ["type=\"Ghost\"", "Ghost"], "description": "Secondary action in a footer toolbar is Ghost" },
+        { "id": "a2", "type": "recommends", "must_mention_any": ["Transparent"], "description": "Negative-path Cancel is Transparent" },
+        { "id": "a3", "type": "must_not_mention", "strings": ["Ghost is legacy", "Ghost is deprecated"], "description": "Ghost is a current, non-deprecated ButtonType" }
+      ]
+    },
+    {
+      "id": "sel-013",
+      "mode": "Select",
+      "prompt": "My responsive table of about 50 invoices needs a grand total of the Amount column. Do I have to switch to an AnalyticalTable?",
+      "assertions": [
+        { "id": "a1", "type": "recommends", "must_mention_any": ["footer"], "description": "Single-column total goes in the sap.m.Column footer" },
+        { "id": "a2", "type": "must_not_recommend", "strings": ["AnalyticalTable"], "description": "Analytical Table is for multilevel grouping with subtotals, not one total" }
+      ]
+    },
+    {
+      "id": "sel-014",
+      "mode": "Select",
+      "prompt": "How do I show a 'select all' CheckBox as partially checked when only some child rows are selected?",
+      "assertions": [
+        { "id": "a1", "type": "recommends", "must_mention_any": ["partiallySelected"], "description": "The property is partiallySelected" },
+        { "id": "a2", "type": "must_not_mention", "strings": ["indeterminate=\"true\"", "setIndeterminate"], "description": "sap.m.CheckBox has no indeterminate property" }
+      ]
+    },
+    {
+      "id": "sel-015",
+      "mode": "Select",
+      "prompt": "Users should click a message in my MessagePopover and jump to the field that has the error. How?",
+      "assertions": [
+        { "id": "a1", "type": "recommends", "must_mention_any": ["activeTitlePress", "activeTitle"], "description": "Deep linking uses activeTitle + activeTitlePress" },
+        { "id": "a2", "type": "must_not_mention", "strings": ["target=\"", "setTarget("], "description": "sap.m.MessageItem has no target property" }
+      ]
+    },
+    {
+      "id": "sel-016",
+      "mode": "Select",
+      "prompt": "Which color should my embedded AI 'Generate' button use so users recognize it as AI?",
+      "assertions": [
+        { "id": "a1", "type": "recommends", "must_mention_any": ["SAP blue", "sapBrandColor", "standard button"], "description": "Embedded AI uses SAP blue" },
+        { "id": "a2", "type": "must_not_recommend", "strings": ["sapAssistant", "purple", "gradient"], "description": "Purple / Joule gradient is reserved for Joule" }
+      ]
+    },
+    {
+      "id": "sel-017",
+      "mode": "Select",
+      "prompt": "Users pick one supplier from about 500 suppliers, identified by name and city. Which selection control?",
+      "assertions": [
+        { "id": "a1", "type": "recommends", "must_mention_any": ["SelectDialog", "sap.m.SelectDialog"], "description": "200-1,000 items → Input with suggestions + SelectDialog" },
+        { "id": "a2", "type": "must_not_recommend", "strings": ["ValueHelpDialog"], "description": "ValueHelpDialog is for >1,000 items or conditions" }
+      ]
+    },
+    {
+      "id": "sel-018",
+      "mode": "Select",
+      "prompt": "My table toolbar has Edit, Copy and Delete. The page footer already has an emphasized Save. Which button type does Edit get?",
+      "assertions": [
+        { "id": "a1", "type": "recommends", "must_mention_any": ["type=\"Ghost\"", "Ghost"], "description": "Most important content-toolbar button is Ghost when the page already has a primary action" },
+        { "id": "a2", "type": "must_not_recommend", "strings": ["type=\"Emphasized\"", "type=\"Default\""], "description": "Not a second Emphasized, and not Default" }
+      ]
+    },
+    {
+      "id": "sel-019",
+      "mode": "Select",
+      "prompt": "Users pick one of 15 plant locations in a form. Select or ComboBox?",
+      "assertions": [
+        { "id": "a1", "type": "recommends", "must_mention_any": ["sap.m.ComboBox", "ComboBox"], "description": "13-200 items → ComboBox" },
+        { "id": "a2", "type": "must_not_mention", "strings": ["20-200", "20–200"], "description": "Lower bound is 13, not 20" }
+      ]
+    },
+    {
+      "id": "sel-020",
+      "mode": "Select",
+      "prompt": "While my app loads its initial data I want to block everything with sap.m.BusyDialog. Is that right?",
+      "assertions": [
+        { "id": "a1", "type": "recommends", "must_mention_any": ["busy state", "setBusy", "busy=\"true\"", "busy property"], "description": "App or page loading sets busy at app level" },
+        { "id": "a2", "type": "must_not_recommend", "strings": ["sap.m.BusyDialog", "BusyDialog"], "description": "Busy Handling: no busy dialog for app or page loading" }
+      ]
+    },
+    {
+      "id": "rev-001",
+      "mode": "Review",
+      "prompt": "Review this view against the Fiori guidelines.",
+      "fixture": "fixtures/gap-shell.view.xml",
+      "assertions": [
+        { "id": "a0", "type": "reads_reference", "files": ["references/implementation-checklist.md"], "description": "Review mode reads the checklist" },
+        { "id": "a1", "type": "report_finding", "topic": "Shell and Navigation", "must_mention_any": ["ShellBar"], "must_anchor_on": ["Bar", "appHeader"], "description": "sap.m.Bar used as app header" },
+        { "id": "a2", "type": "report_finding", "topic": "Shell and Navigation", "must_mention_any": ["SideNavigation"], "must_anchor_on": ["List", "sideMenu"], "description": "sap.m.List used as side navigation" },
+        { "id": "a3", "type": "report_finding", "topic": "Shell and Navigation", "must_mention_any": ["ToolPage"], "must_anchor_on": ["HBox", "sideMenu", "Page"], "description": "Header + side nav belong in a ToolPage" }
+      ]
+    },
+    {
+      "id": "rev-002",
+      "mode": "Review",
+      "prompt": "Review this view against the Fiori guidelines.",
+      "fixture": "fixtures/gap-sidenav-namespace.view.xml",
+      "assertions": [
+        { "id": "a1", "type": "report_finding", "topic": "Shell and Navigation", "must_mention_any": ["sap.tnt.SideNavigation", "tnt:SideNavigation"], "must_anchor_on": ["f:SideNavigation", "sap.f"], "description": "sap.f.SideNavigation does not exist" },
+        { "id": "a2", "type": "finding_count_max", "max": 1, "description": "ToolPage + ShellBar are correct and must not be flagged" }
+      ]
+    },
+    {
+      "id": "rev-003",
+      "mode": "Review",
+      "prompt": "Check this view for Fiori guideline issues.",
+      "fixture": "fixtures/gap-tables.view.xml",
+      "assertions": [
+        { "id": "a1", "type": "report_finding", "topic": "Tables and Lists", "must_mention_any": ["MultiSelectionPlugin"], "must_anchor_on": ["MultiToggle", "supplierTable"], "description": "MultiToggle instead of MultiSelectionPlugin" },
+        { "id": "a2", "type": "report_finding", "topic": "Tables and Lists", "must_mention_any": ["sap.ui.table.Table", "Grid Table"], "must_anchor_on": ["AnalyticalTable", "orderTable"], "description": "AnalyticalTable without aggregation" },
+        { "id": "a3", "type": "finding_count_max", "topic": "Tables and Lists", "max": 3, "description": "No over-flagging" }
+      ]
+    },
+    {
+      "id": "rev-004",
+      "mode": "Review",
+      "prompt": "Review this controller against the Fiori guidelines.",
+      "fixture": "fixtures/gap-messages.controller.js",
+      "assertions": [
+        { "id": "a1", "type": "report_finding", "topic": "Messaging", "must_mention_any": ["MessageBox"], "must_anchor_on": ["Dialog", "onSaveError"], "description": "Hand-built Dialog for a plain error" },
+        { "id": "a2", "type": "report_finding", "topic": "Messaging", "must_mention_any": ["MessageToast"], "must_anchor_on": ["MessageStrip", "onSaveSuccess"], "description": "Persistent strip for a brief success" }
+      ]
+    },
+    {
+      "id": "rev-005",
+      "mode": "Review",
+      "prompt": "Review this view against the Fiori guidelines.",
+      "fixture": "fixtures/gap-inputs-actions.view.xml",
+      "assertions": [
+        { "id": "a1", "type": "report_finding", "topic": "Forms and Inputs", "must_mention_any": ["DatePicker"], "must_anchor_on": ["Input", "deliveryDate", "Delivery Date"], "description": "Plain Input for a date" },
+        { "id": "a2", "type": "report_finding", "topic": "Buttons and Actions", "must_mention_any": ["one emphasized", "one Emphasized", "single emphasized", "only one"], "must_anchor_on": ["Save and New", "Emphasized"], "description": "Two emphasized buttons" },
+        { "id": "a3", "type": "report_finding", "topic": "Buttons and Actions", "must_mention_any": ["Transparent"], "must_anchor_on": ["Ghost", "Cancel"], "description": "Negative-path Cancel in the footer must be Transparent, not Ghost" }
+      ]
+    },
+    {
+      "id": "rev-006",
+      "mode": "Review",
+      "prompt": "Review this view against the Fiori guidelines.",
+      "fixture": "fixtures/gap-dynamicpage.view.xml",
+      "assertions": [
+        { "id": "a1", "type": "report_finding", "topic": "Layout and Floorplan", "must_mention_any": ["fitContent"], "must_anchor_on": ["sap.m.Table", "supplierList", "Table"], "description": "fitContent with non-stretching sap.m.Table" },
+        { "id": "a2", "type": "report_finding", "topic": "Layout and Floorplan", "must_mention_any": ["finalizing", "Save", "Submit"], "must_anchor_on": ["Export", "Share", "footer"], "description": "Non-finalizing actions in the footer" },
+        { "id": "a3", "type": "report_finding", "topic": "Accessibility", "must_mention_any": ["decorative"], "must_anchor_on": ["Image", "alt"], "description": "alt ignored because decorative defaults to true" },
+        { "id": "a4", "type": "finding_count_max", "max": 5, "description": "No over-flagging" }
+      ]
+    },
+    {
+      "id": "rev-007",
+      "mode": "Review",
+      "prompt": "Review this controller against the Fiori guidelines.",
+      "fixture": "fixtures/gap-fcl.controller.js",
+      "assertions": [
+        { "id": "a1", "type": "report_finding", "topic": "Shell and Navigation", "must_mention_any": ["router", "navTo", "{layout}"], "must_anchor_on": ["setLayout", "addMidColumnPage"], "description": "FCL layout set manually instead of via the router" },
+        { "id": "a2", "type": "report_finding", "topic": "Shell and Navigation", "must_mention_any": ["FlexibleColumnLayoutSemanticHelper", "getNextUIState"], "must_anchor_on": ["TwoColumnsMidExpanded", "setLayout"], "description": "Hard-coded layout instead of the semantic helper" }
+      ]
+    },
+    {
+      "id": "rev-008",
+      "mode": "Review",
+      "prompt": "Review this view against the Fiori guidelines.",
+      "fixture": "fixtures/ok-toolpage.view.xml",
+      "assertions": [
+        { "id": "a1", "type": "report_empty", "description": "ToolPage + ShellBar + sap.tnt.SideNavigation is correct" },
+        { "id": "a2", "type": "must_not_mention", "strings": ["sap.f.SideNavigation", "use sap.f.ShellBar instead"], "description": "No wrong namespace suggestion, no false ShellBar finding" }
+      ]
+    },
+    {
+      "id": "rev-009",
+      "mode": "Review",
+      "prompt": "Review this view against the Fiori guidelines.",
+      "fixture": "fixtures/ok-dynamicpage.view.xml",
+      "assertions": [
+        { "id": "a1", "type": "report_empty", "description": "Correct DynamicPage: fitContent with auto-row grid table, finalizing footer, GenericTag, meaningful Image" },
+        { "id": "a2", "type": "must_not_mention", "strings": ["MultiToggle", "set fitContent to false", "decorative=\"false\" is missing"], "description": "No false positives on the correctly configured parts" }
+      ]
+    },
+    {
+      "id": "rev-010",
+      "mode": "Review",
+      "prompt": "Review this controller against the Fiori guidelines.",
+      "fixture": "fixtures/ok-fcl.controller.js",
+      "assertions": [
+        { "id": "a1", "type": "report_empty", "description": "Router + semantic helper navigation is correct" },
+        { "id": "a2", "type": "must_not_mention", "strings": ["setLayout"], "description": "No manual-layout finding" }
+      ]
+    }
+  ]
+}
