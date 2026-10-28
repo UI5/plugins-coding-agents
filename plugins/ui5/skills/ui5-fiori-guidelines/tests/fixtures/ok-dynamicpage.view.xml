@@ -1,0 +1,56 @@
+<mvc:View
+	controllerName="my.procurement.controller.SupplierEdit"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns="sap.m"
+	xmlns:f="sap.f"
+	xmlns:table="sap.ui.table"
+	xmlns:plugins="sap.ui.table.plugins">
+	<f:DynamicPage id="supplierPage" fitContent="true" showFooter="{ui>/editMode}">
+		<f:title>
+			<f:DynamicPageTitle>
+				<f:heading>
+					<Title text="{Name}" />
+				</f:heading>
+				<f:expandedContent>
+					<GenericTag text="Open Orders" status="Warning">
+						<value>
+							<ObjectNumber number="{OpenOrders}" emphasized="false" />
+						</value>
+					</GenericTag>
+				</f:expandedContent>
+				<f:actions>
+					<Button text="Edit" type="Emphasized" press=".onEdit" visible="{= !${ui>/editMode} }" />
+				</f:actions>
+			</f:DynamicPageTitle>
+		</f:title>
+		<f:header>
+			<f:DynamicPageHeader>
+				<Image src="{LogoUrl}" decorative="false" alt="{Name} logo" height="3rem" />
+			</f:DynamicPageHeader>
+		</f:header>
+		<f:content>
+			<table:Table id="orderTable" rows="{Orders}" rowMode="Auto">
+				<table:extension>
+					<OverflowToolbar>
+						<Title text="Orders" />
+					</OverflowToolbar>
+				</table:extension>
+				<table:dependents>
+					<plugins:MultiSelectionPlugin />
+				</table:dependents>
+				<table:columns>
+					<table:Column><Label text="Order" /><table:template><Text text="{OrderID}" /></table:template></table:Column>
+					<table:Column><Label text="Status" /><table:template><ObjectStatus text="{Status}" state="{StatusState}" /></table:template></table:Column>
+				</table:columns>
+			</table:Table>
+		</f:content>
+		<f:footer>
+			<OverflowToolbar>
+				<DraftIndicator id="draftIndicator" />
+				<ToolbarSpacer />
+				<Button text="Save" type="Emphasized" press=".onSave" />
+				<Button text="Cancel" press=".onCancel" />
+			</OverflowToolbar>
+		</f:footer>
+	</f:DynamicPage>
+</mvc:View>

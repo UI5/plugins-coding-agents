@@ -1,0 +1,23 @@
+<mvc:View
+	controllerName="my.procurement.controller.App"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns="sap.m"
+	xmlns:f="sap.f"
+	xmlns:tnt="sap.tnt">
+	<tnt:ToolPage id="toolPage">
+		<tnt:header>
+			<f:ShellBar title="Procurement" homeIcon="img/logo.png" showNotifications="true" />
+		</tnt:header>
+		<tnt:sideContent>
+			<f:SideNavigation id="sideNavigation" itemSelect=".onItemSelect">
+				<tnt:NavigationList>
+					<tnt:NavigationListItem text="Home" icon="sap-icon://home" key="home" />
+					<tnt:NavigationListItem text="Purchase Orders" icon="sap-icon://sales-order" key="orders" />
+				</tnt:NavigationList>
+			</f:SideNavigation>
+		</tnt:sideContent>
+		<tnt:mainContents>
+			<NavContainer id="mainContent" />
+		</tnt:mainContents>
+	</tnt:ToolPage>
+</mvc:View>

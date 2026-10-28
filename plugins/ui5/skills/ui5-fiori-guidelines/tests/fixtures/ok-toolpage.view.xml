@@ -1,0 +1,33 @@
+<mvc:View
+	controllerName="my.procurement.controller.App"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns="sap.m"
+	xmlns:f="sap.f"
+	xmlns:tnt="sap.tnt">
+	<tnt:ToolPage id="toolPage">
+		<tnt:header>
+			<f:ShellBar
+				title="Procurement"
+				homeIcon="img/logo.png"
+				showNotifications="true"
+				showProductSwitcher="true"
+				productSwitcherPressed=".onProductSwitcher">
+				<f:profile>
+					<Avatar initials="JD" />
+				</f:profile>
+			</f:ShellBar>
+		</tnt:header>
+		<tnt:sideContent>
+			<tnt:SideNavigation id="sideNavigation" itemSelect=".onItemSelect">
+				<tnt:NavigationList>
+					<tnt:NavigationListItem text="Home" icon="sap-icon://home" key="home" />
+					<tnt:NavigationListItem text="Purchase Orders" icon="sap-icon://sales-order" key="orders" />
+					<tnt:NavigationListItem text="Suppliers" icon="sap-icon://supplier" key="suppliers" />
+				</tnt:NavigationList>
+			</tnt:SideNavigation>
+		</tnt:sideContent>
+		<tnt:mainContents>
+			<NavContainer id="mainContent" />
+		</tnt:mainContents>
+	</tnt:ToolPage>
+</mvc:View>
