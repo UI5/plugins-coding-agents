@@ -1,0 +1,22 @@
+<mvc:View
+	controllerName="my.procurement.controller.OrderCreate"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns="sap.m"
+	xmlns:form="sap.ui.layout.form">
+	<Page id="createPage" title="Create Purchase Order">
+		<form:SimpleForm editable="true" layout="ColumnLayout">
+			<Label text="Supplier" />
+			<Input value="{/supplier}" />
+			<Label text="Delivery Date" />
+			<Input value="{/deliveryDate}" placeholder="YYYY-MM-DD" />
+		</form:SimpleForm>
+		<footer>
+			<OverflowToolbar>
+				<ToolbarSpacer />
+				<Button text="Save" type="Emphasized" press=".onSave" />
+				<Button text="Save and New" type="Emphasized" press=".onSaveAndNew" />
+				<Button text="Cancel" type="Ghost" press=".onCancel" />
+			</OverflowToolbar>
+		</footer>
+	</Page>
+</mvc:View>
