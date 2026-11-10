@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.1.10](https://github.com/UI5/plugins-coding-agents/compare/v0.1.9...v0.1.10) (2026-11-10)
+
+
+### Dependencies
+
+* Bump dependency @ui5/mcp-server to v0.3.3 ([#161](https://github.com/UI5/plugins-coding-agents/issues/161)) ([0c6599a](https://github.com/UI5/plugins-coding-agents/commit/0c6599ab8b0b7335a39d3504831bfff41b3c7400))
+
 ## [0.1.9](https://github.com/UI5/plugins-coding-agents/compare/v0.1.8...v0.1.9) (2026-10-16)
 
 
