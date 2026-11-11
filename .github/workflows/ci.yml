@@ -48,6 +48,7 @@ jobs:
         set -eu
         COPIES=(
           ".github/plugin/plugin.json"
+          ".codex-plugin/plugin.json"
         )
         failed=0
         for root in plugins/*/plugin.json; do

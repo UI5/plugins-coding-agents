@@ -37,6 +37,18 @@ Use the `/plugin` command if you already started an interactive GitHub Copilot C
 /plugin install ui5-modernization@awesome-copilot
 ```
 
+### OpenAI Codex CLI
+
+```bash
+codex plugin install ui5-modernization@<registry-name>
+```
+
+Use the `/plugin` command if you already started an interactive OpenAI Codex CLI session.
+
+```bash
+/plugin install ui5-modernization@<registry-name>
+```
+
 ### Installing Skills Only
 
 If your coding agent doesn't support plugins, install the skills directly using the [skills](https://www.npmjs.com/package/skills) package:
