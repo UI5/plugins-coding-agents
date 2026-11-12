@@ -1,0 +1,43 @@
+<mvc:View
+	controllerName="my.procurement.controller.Suppliers"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns="sap.m"
+	xmlns:f="sap.f">
+	<f:DynamicPage id="supplierPage" fitContent="true" showFooter="true">
+		<f:title>
+			<f:DynamicPageTitle>
+				<f:heading>
+					<Title text="Suppliers" />
+				</f:heading>
+			</f:DynamicPageTitle>
+		</f:title>
+		<f:header>
+			<f:DynamicPageHeader>
+				<HBox>
+					<Image src="img/supplier-map.png" alt="Map of supplier locations" width="20rem" />
+				</HBox>
+			</f:DynamicPageHeader>
+		</f:header>
+		<f:content>
+			<Table id="supplierList" items="{/Suppliers}">
+				<columns>
+					<Column><Text text="Supplier" /></Column>
+					<Column><Text text="Country" /></Column>
+				</columns>
+				<items>
+					<ColumnListItem>
+						<Text text="{Name}" />
+						<Text text="{Country}" />
+					</ColumnListItem>
+				</items>
+			</Table>
+		</f:content>
+		<f:footer>
+			<OverflowToolbar>
+				<ToolbarSpacer />
+				<Button text="Export" press=".onExport" />
+				<Button text="Share" press=".onShare" />
+			</OverflowToolbar>
+		</f:footer>
+	</f:DynamicPage>
+</mvc:View>
