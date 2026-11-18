@@ -20,8 +20,5 @@
         "api-documentation",
         "development-guidelines",
         "best-practices"
-    ],
-    "skills": [
-        "./skills/"
     ]
 }

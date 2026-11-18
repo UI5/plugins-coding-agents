@@ -22,12 +22,14 @@ Here's how a release comes together:
 2. On every push to `main`, release-please quietly keeps a release pull request up to date (you'll recognize it by its `release: vX.Y.Z` title). It collects the pending changes into [CHANGELOG.md](../CHANGELOG.md) and bumps the version in every `plugin.json`.
 3. When you're ready to ship, **rebase and merge that pull request.** release-please takes it from there: it tags the commit `vX.Y.Z` and cuts the matching GitHub Release.
 
-One thing worth knowing: thanks to the `extra-files` setting in [release-please-config.json](../release-please-config.json), the version gets bumped in *two* copies of each plugin's manifest:
+Each plugin contains four files that the version bump must keep in sync. Thanks to the `extra-files` setting in [release-please-config.json](../release-please-config.json), release-please bumps the version in the two `plugin.json` copies automatically:
 
-- `plugins/<name>/plugin.json` — the one Claude Code actually reads.
-- `plugins/<name>/.github/plugin/plugin.json` — a duplicate that the GitHub Copilot `awesome-copilot` smoke test insists on.
+- `plugins/<name>/plugin.json` — the agent-plugin spec manifest (used by both marketplaces); carries a `$schema` field.
+- `plugins/<name>/mcp.json` — the agent-plugin spec MCP server config; carries a `$schema` field.
+- `plugins/<name>/.claude-plugin/plugin.json` — the Claude Code-specific copy of the manifest (no `$schema`).
+- `plugins/<name>/.mcp.json` — the Claude Code-specific MCP server config (no `$schema`).
 
-To make sure those two never quietly drift apart, [CI](../.github/workflows/ci.yml) checks that the `.github/plugin/plugin.json` copy is identical to the root one down to the byte.
+The root `plugin.json` and its `.claude-plugin/plugin.json` counterpart must stay identical except for the `$schema` field. [CI](../.github/workflows/ci.yml) enforces this by stripping `$schema` from both files before comparing them.
 
 Once the release is out, jot down the version it produced — specifically the Git tag `vX.Y.Z`. You'll need it for the GitHub Copilot marketplace below.
 

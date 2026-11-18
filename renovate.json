@@ -63,7 +63,8 @@
         {
             "customType": "regex",
             "managerFilePatterns": [
-                "/plugins/ui5/\\.mcp\\.json/"
+                "/plugins/ui5/\\.mcp\\.json/",
+                "/plugins/ui5/mcp\\.json/"
             ],
             "matchStrings": [
                 "@ui5/mcp-server@(?<currentValue>[^\"]+)"
