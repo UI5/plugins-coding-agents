@@ -1,6 +1,6 @@
 # SAP Fiori Component Selection Skill
 
-Picks the correct SAP Fiori / UI5 control for a use case — and stops the wrong one (a `sap.m.Bar` used as an
+Picks the correct SAPUI5 / OpenUI5 control for a use case — and stops the wrong one (a `sap.m.Bar` used as an
 app header, a responsive table used for large and complex data). This skill catches those before the code ships.
 
 Built for AI coding assistants working alongside application developers.

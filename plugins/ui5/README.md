@@ -110,7 +110,7 @@ Authoritative development guidelines for all UI5 table controls (SAPUI5 1.136+ L
 
 #### ui5-design-advisor
 
-Picks the correct SAP Fiori / UI5 control for a use case — and stops the wrong one — giving both the SAPUI5 class and the `ui5-*` web component tag:
+Picks the correct SAPUI5 / OpenUI5 control for a use case — and stops the wrong one — giving both the SAPUI5 class and the `ui5-*` web component tag:
 
 - **Wrong → Right mapping** - The exact wrong control mapped to the right one (e.g. `sap.m.Bar` used as an app header → `sap.f.ShellBar` / `ui5-shellbar`)
 - **Use-case → Component map** - "App-level navigation" → `ShellBar`; "list → detail split" → `FlexibleColumnLayout`
