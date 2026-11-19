@@ -1,6 +1,6 @@
 {
   "version": "1.0",
-  "skill": "ui5-fiori-guidelines",
+  "skill": "ui5-design-advisor",
   "skill_prompt_file": "../SKILL.md",
   "modes": ["Select", "Review"],
   "topics": [

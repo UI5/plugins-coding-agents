@@ -1,5 +1,5 @@
 ---
-name: ui5-fiori-guidelines
+name: ui5-design-advisor
 description: Picks the correct SAP Fiori / UI5 control for a use case and prevents the usage of the wrong one; also reviews built OpenUI5/SAPUI5 apps against the Fiori guidelines. Use when (1) choosing between UI5 controls or planning page and app layout (DynamicPage, FlexibleColumnLayout, ObjectPageLayout, ShellBar, ToolPage, App), or (2) the user asks to review, audit, or check an existing Fiori app, view, or fragment against the Fiori guidelines. Covers sap.m.*, sap.f.*, sap.tnt.*, sap.uxap.*, sap.ui.table.* in XML views, fragments, controllers, and manifest.json. Catches classic wrong-component mistakes, for example sap.m.Bar as app header (use sap.f.ShellBar), List as side navigation (use sap.tnt.SideNavigation), responsive sap.m.Table for large data (use sap.ui.table.Table) or group subtotals (use AnalyticalTable), Dialog for a plain error (use MessageBox or MessageStrip), Page for object details (use sap.uxap.ObjectPageLayout).
 ---
 

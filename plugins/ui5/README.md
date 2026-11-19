@@ -108,7 +108,7 @@ Authoritative development guidelines for all UI5 table controls (SAPUI5 1.136+ L
 - **Personalization** - `sap.m.p13n.Engine` integration
 - **Cell templates & alignment** - Type-based alignment and model type namespace rules
 
-#### ui5-fiori-guidelines
+#### ui5-design-advisor
 
 Picks the correct SAP Fiori / UI5 control for a use case — and stops the wrong one — giving both the SAPUI5 class and the `ui5-*` web component tag:
 
