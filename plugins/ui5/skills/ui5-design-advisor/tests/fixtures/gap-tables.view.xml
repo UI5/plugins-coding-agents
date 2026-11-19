@@ -1,0 +1,30 @@
+<mvc:View
+	controllerName="my.procurement.controller.Analysis"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns="sap.m"
+	xmlns:table="sap.ui.table">
+	<VBox>
+		<table:Table
+			id="supplierTable"
+			rows="{/Suppliers}"
+			selectionMode="MultiToggle">
+			<table:extension>
+				<OverflowToolbar>
+					<Title text="Suppliers" />
+				</OverflowToolbar>
+			</table:extension>
+			<table:columns>
+				<table:Column><Label text="Supplier" /><table:template><Text text="{Name}" /></table:template></table:Column>
+				<table:Column><Label text="Country" /><table:template><Text text="{Country}" /></table:template></table:Column>
+			</table:columns>
+		</table:Table>
+
+		<table:AnalyticalTable id="orderTable" rows="{/PurchaseOrders}">
+			<table:columns>
+				<table:AnalyticalColumn leadingProperty="OrderID"><Label text="Order" /><table:template><Text text="{OrderID}" /></table:template></table:AnalyticalColumn>
+				<table:AnalyticalColumn leadingProperty="Supplier"><Label text="Supplier" /><table:template><Text text="{Supplier}" /></table:template></table:AnalyticalColumn>
+				<table:AnalyticalColumn leadingProperty="Status"><Label text="Status" /><table:template><Text text="{Status}" /></table:template></table:AnalyticalColumn>
+			</table:columns>
+		</table:AnalyticalTable>
+	</VBox>
+</mvc:View>

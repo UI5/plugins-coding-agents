@@ -1,0 +1,30 @@
+<mvc:View
+	controllerName="my.procurement.controller.App"
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns="sap.m">
+	<App id="app">
+		<Page id="mainPage">
+			<customHeader>
+				<Bar id="appHeader">
+					<contentLeft>
+						<Image src="img/logo.png" height="2rem" />
+						<Title text="Procurement" />
+					</contentLeft>
+					<contentRight>
+						<Button icon="sap-icon://bell" tooltip="Notifications" press=".onNotifications" />
+						<Avatar initials="JD" displaySize="XS" press=".onProfile" />
+					</contentRight>
+				</Bar>
+			</customHeader>
+			<HBox>
+				<List id="sideMenu" width="15rem" mode="SingleSelectMaster" selectionChange=".onMenuSelect">
+					<StandardListItem title="Home" icon="sap-icon://home" />
+					<StandardListItem title="Purchase Orders" icon="sap-icon://sales-order" />
+					<StandardListItem title="Suppliers" icon="sap-icon://supplier" />
+					<StandardListItem title="Reports" icon="sap-icon://business-objects-experience" />
+				</List>
+				<NavContainer id="mainContent" width="100%" />
+			</HBox>
+		</Page>
+	</App>
+</mvc:View>
