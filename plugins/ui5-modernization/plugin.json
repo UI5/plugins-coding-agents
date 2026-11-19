@@ -1,4 +1,5 @@
 {
+    "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
     "name": "ui5-modernization",
     "version": "0.1.9",
     "description": "Complete UI5 modernization toolkit with workflow and specialized fix patterns for modernizing SAPUI5/OpenUI5 applications",
@@ -15,8 +16,5 @@
         "linter",
         "upgrade"
     ],
-    "license": "Apache-2.0",
-    "skills": [
-        "./skills/"
-    ]
+    "license": "Apache-2.0"
 }
