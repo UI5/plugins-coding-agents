@@ -2,7 +2,7 @@
 
 ## Linting Guidelines
 
-Please ensure prettifing the `.mcp.json` and `.claude-plugin/plugin.json` using [Prettier](https://prettier.io/) by execute `npm run prettier` before you commit your change.  
+Please ensure prettifying the `.mcp.json` and `plugin.json` files using [Prettier](https://prettier.io/) by executing `npm run prettier` before you commit your change.
 
 ## Git Guidelines
 
